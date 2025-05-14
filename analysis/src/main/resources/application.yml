@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: analysis
+#  datasource:
+#    url: jdbc:mysql://103.184.112.170:6033/witech
+#    username: witech
+#    password: w!tech@25
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      format_sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  data:
+    redis:
+      host: redis-18661.c259.us-central1-2.gce.redns.redis-cloud.com
+      port: 18661
+      username: default
+      password: 3oz76doZwwSOb1bfEUkXZRtGql6PXR8S
+      timeout: 5000
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: nguyenhuutrong11133@gmail.com
+    password: xamr qwhg zdwq cwfn
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            protocols: TLSv1.2
+            trust: smtp.gmail.com
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+  security:
+    jwt:
+      secret: 901cc62b045e19fa6edefc82bf73e2b99578e8e578314ec8f146cfa37c9c2e8338763e53ba03d0b0b22441fbbebb3ec3f357bc28a1bdba8e4b52b32032425fff8b3787626e697976e1dc737f8792b1fd774fc684650c560b5649ee36eb3577f8ca6913d2029e95366f64463b0b800befcfa7dc61717169cccef317af3e21c323f1fefb0d86addbd6072726e4d4a15d0bed659cbd7bf223bf5c553c0d2f82e15320a4f40041391ff56e3b967832794586e63450265dcf225978abc81ad8fb7f8eef76a3837c862b05cf0a67a4007ac85b80d2039ea98539381cb695bbdc55cf3f3b3e3615800857a5ea20358601d0facb5d744490c7d15c779b8f2cbbd8fdd4f552ddf288e6ffa84ae68a6b89fae80f1584018522691d6e3f0dea124e66ee27dbc4aaa6b2e9df0bb775fb1c1e0e2b8d9de739699e91225719a0bfb5d4e1ff5446f022cf68e720e07a7d3f1d2173949da04d5ef71913ebd53018346257ac363800625dc7b4690600857f530a985611813800942227e308cada5ad8cf86bf8bd927c503bcd833faa37902808bd6fe79e3529a60bd6ff8faa4e121765f547a1c226ae2edde9ea3d1b5b1b476f831dd3920f251722c61b798ee26fa702ae5b4609fe4bc9103b9bda1b1f706934270f5017999bd2ac426db3ff0fa6e3a2536b761b5808941f5632da98307296e26914a85cb7c37fcb13019f8076e9a10e15b2e6b1967
+      expirationInMils: 3600000
+  shell:
+    interactive:
+      enabled: true
+    command:
+      script:
+        enabled: true
+
+server:
+  port: 9192
