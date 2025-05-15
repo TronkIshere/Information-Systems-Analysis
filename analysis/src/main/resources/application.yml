@@ -1,11 +1,11 @@
 spring:
   application:
     name: analysis
-#  datasource:
-#    url: jdbc:mysql://103.184.112.170:6033/witech
-#    username: witech
-#    password: w!tech@25
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=analysis;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: 1234
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     show-sql: true
     hibernate:
@@ -13,7 +13,8 @@ spring:
       format_sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.SQLServer2016Dialect
+        connection.provider_disables_autocommit: true
   servlet:
     multipart:
       enabled: true
@@ -46,7 +47,7 @@ spring:
           writetimeout: 5000
   security:
     jwt:
-      secret: 901cc62b045e19fa6edefc82bf73e2b99578e8e578314ec8f146cfa37c9c2e8338763e53ba03d0b0b22441fbbebb3ec3f357bc28a1bdba8e4b52b32032425fff8b3787626e697976e1dc737f8792b1fd774fc684650c560b5649ee36eb3577f8ca6913d2029e95366f64463b0b800befcfa7dc61717169cccef317af3e21c323f1fefb0d86addbd6072726e4d4a15d0bed659cbd7bf223bf5c553c0d2f82e15320a4f40041391ff56e3b967832794586e63450265dcf225978abc81ad8fb7f8eef76a3837c862b05cf0a67a4007ac85b80d2039ea98539381cb695bbdc55cf3f3b3e3615800857a5ea20358601d0facb5d744490c7d15c779b8f2cbbd8fdd4f552ddf288e6ffa84ae68a6b89fae80f1584018522691d6e3f0dea124e66ee27dbc4aaa6b2e9df0bb775fb1c1e0e2b8d9de739699e91225719a0bfb5d4e1ff5446f022cf68e720e07a7d3f1d2173949da04d5ef71913ebd53018346257ac363800625dc7b4690600857f530a985611813800942227e308cada5ad8cf86bf8bd927c503bcd833faa37902808bd6fe79e3529a60bd6ff8faa4e121765f547a1c226ae2edde9ea3d1b5b1b476f831dd3920f251722c61b798ee26fa702ae5b4609fe4bc9103b9bda1b1f706934270f5017999bd2ac426db3ff0fa6e3a2536b761b5808941f5632da98307296e26914a85cb7c37fcb13019f8076e9a10e15b2e6b1967
+      secret: 22d8fe37d4ca47d46280c4d3c055247ccde217f07171b70b5bf719202f8ad7081fe9eceb313614cdd68c5fa5d78f3b5bff5b081e3e06172a1e955a94f1c499baf32a625484b648a4eea2265c1f316db5e4db633dcb9d4b59b3ab9d1db94796a21c937417477da92564ed9b8d4dd3a7ff4209d1b57d1f29f09cb9628bceb151e7b1d18007e5f1a3af7d742e84afee578d1d491f8b4a512b05cca3c78b8dad0f0e879ca313ecdcd343680200f31b1eab3dcb49dc68c02c48c75d9990da146ba5d7c27e02325c1bd4a1d8eace6b005ef8b04c310d31edf192072056f2816e3ab204cbe9eed353ee3f4952744b53bd0693347553d1c47d203b43fbf3c25a9e836b5ce10bdda1c3de61f1da4af407def41f28ed6fc9fad3366fc500bd1ab940b141edcde0ff52a2420329a5ca00d21649545d385fa27454369697da1a31339b8e3cb1f9ce64ca28e667cb8ab0993b6dace0f7ef5d191575b4a40ef82b0482adbc15a318f03d018ba0418efe30db8d027e4adbba29e71f8a7dd103a911a11dc40f0c0d3949ee4836fa14ec85e8bad8a41f4340b3415b97b6634c0f488d042e73ef493d2b6e4361dbefbd40a5b9d3456b1d1a05223fc438c8afc0746d30fcdd27a0e729c189efe8514433b08ddae933c46dd098436e6cad616dd47165a481488c85b65dca95c3275bd1a82e47a6c2fde4c6739e80f52fb5b5ec8f6511c64592a2a2ada9
       expirationInMils: 3600000
   shell:
     interactive:

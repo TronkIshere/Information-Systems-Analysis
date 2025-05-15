@@ -3,6 +3,7 @@ package com.tronk.analysis.entity;
 import com.tronk.analysis.entity.common.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 @Entity
+@Table(name = "app_role")
 @Getter
 @Setter
 @NoArgsConstructor

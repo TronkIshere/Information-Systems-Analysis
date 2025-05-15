@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 @Entity
+@Table(name = "app_user")
 @Getter
 @Setter
 @NoArgsConstructor
