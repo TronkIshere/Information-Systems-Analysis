@@ -11,12 +11,12 @@ import java.util.List;
 
 @Slf4j
 public class ControllerCodeGenerator {
-    public static void createFile(Path controllerDirectoryPath, String selectedEntity, List<String> entityProperties) throws IOException {
+    public static void createFile(Path controllerDirectoryPath, String selectedEntity) throws IOException {
         String controllerName = selectedEntity + "Controller";
         Path filePath = controllerDirectoryPath.resolve(controllerName + ".java");
 
         StringBuilder code = new StringBuilder();
-        code.append(ControllerFileWriter.writeFile(selectedEntity, entityProperties));
+        code.append(ControllerFileWriter.writeFile(selectedEntity));
 
         Files.write(filePath, code.toString().getBytes(StandardCharsets.UTF_8));
         log.info("Interface created at " + filePath);

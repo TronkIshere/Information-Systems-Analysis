@@ -11,6 +11,8 @@ public class EntityFileWriter {
         code.append("import jakarta.persistence.*;\n");
         code.append("import lombok.*;\n");
         code.append("import lombok.experimental.FieldDefaults;\n\n");
+
+        code.append("import java.util.UUID;\n");
         code.append(RequiredImports.getRequiredImports(fields));
 
         //add annotation
@@ -22,7 +24,7 @@ public class EntityFileWriter {
         code.append("@FieldDefaults(level = AccessLevel.PRIVATE)\n");
 
         //add class
-        code.append("public class ").append(className).append(" extends AbstractEntity<Long> {\n");
+        code.append("public class ").append(className).append(" extends AbstractEntity<UUID> {\n");
 
         //add properties
         for (String field : fields.split(",")) {

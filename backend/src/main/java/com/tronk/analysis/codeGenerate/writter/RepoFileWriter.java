@@ -7,6 +7,7 @@ public class RepoFileWriter {
         StringBuilder code = new StringBuilder();
         //add imports
         code.append("package ").append(ProjectPathUtils.findPackage("repository")).append(";\n\n");
+        code.append("import java.util.UUID;\n");
         code.append("import ").append(ProjectPathUtils.findPackage("entity")).append(".").append(selectedEntity + ";\n");
         code.append("import org.springframework.data.jpa.repository.JpaRepository;\n");
         code.append("\n");
@@ -17,7 +18,7 @@ public class RepoFileWriter {
                 .append("Repository extends")
                 .append(" JpaRepository<")
                 .append(selectedEntity)
-                .append(", Long> {\n}");
+                .append(", UUID> {\n}");
         return code;
     }
 }

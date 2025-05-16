@@ -9,17 +9,20 @@ import java.util.stream.Stream;
 
 public class ProjectPathUtils {
     private static final Path SRC_MAIN_JAVA = Paths.get("src", "main", "java");
+    private static final Path BASE_PATH = Paths.get("src", "main", "java", "com", "tronk", "analysis");
+    public static Path getOrCreateDirectory(String folderPath) throws IOException {
+        String[] folders = folderPath.split("/");
+        Path currentPath = BASE_PATH;
 
-    public static Path getOrCreateDirectory(String folderName) throws IOException {
-        Path basePath = Paths.get("src", "main", "java", "com", "example");
-        Path entityDir = findEntityFolder(basePath, folderName);
-
-        if (entityDir == null) {
-            entityDir = basePath.resolve(folderName);
-            Files.createDirectories(entityDir);
+        for (String folder : folders) {
+            currentPath = currentPath.resolve(folder);
+            if (!Files.exists(currentPath)) {
+                Files.createDirectories(currentPath);
+            }
         }
-        System.out.println(folderName + " directory path: " + entityDir.toAbsolutePath());
-        return entityDir;
+
+        System.out.println(folderPath + " directory path: " + currentPath.toAbsolutePath());
+        return currentPath;
     }
 
     public static Path findEntityFolder(Path dir, String folderName) {

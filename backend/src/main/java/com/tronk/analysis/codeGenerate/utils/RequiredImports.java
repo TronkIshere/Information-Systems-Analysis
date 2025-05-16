@@ -9,12 +9,41 @@ public class RequiredImports {
             imports.append("import java.time.LocalDateTime;\n");
         } else if (fields.contains("LocalDate")) {
             imports.append("import java.time.LocalDate;\n");
+        } else if (fields.contains("LocalTime")) {
+            imports.append("import java.time.LocalTime;\n");
         }
         if (fields.contains("Instant")) {
             imports.append("import java.time.Instant;\n");
         }
         if (fields.contains("Timestamp")) {
             imports.append("import java.sql.Timestamp;\n");
+        }
+        if (fields.contains("Date")) {
+            imports.append("import java.util.Date;\n");
+        }
+        if (fields.contains("Calendar")) {
+            imports.append("import java.util.Calendar;\n");
+        }
+        if (fields.contains("GregorianCalendar")) {
+            imports.append("import java.util.GregorianCalendar;\n");
+        }
+        if (fields.contains("ZonedDateTime")) {
+            imports.append("import java.time.ZonedDateTime;\n");
+        }
+        if (fields.contains("OffsetDateTime")) {
+            imports.append("import java.time.OffsetDateTime;\n");
+        }
+        if (fields.contains("OffsetTime")) {
+            imports.append("import java.time.OffsetTime;\n");
+        }
+        if (fields.contains("Year")) {
+            imports.append("import java.time.Year;\n");
+        }
+        if (fields.contains("YearMonth")) {
+            imports.append("import java.time.YearMonth;\n");
+        }
+        if (fields.contains("MonthDay")) {
+            imports.append("import java.time.MonthDay;\n");
         }
 
         // Number
