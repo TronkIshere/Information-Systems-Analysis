@@ -1,96 +1,119 @@
 package com.tronk.analysis.codeGenerate.writter;
 
 import com.tronk.analysis.codeGenerate.utils.ProjectPathUtils;
-import com.tronk.analysis.codeGenerate.utils.RequiredImports;
 import com.tronk.analysis.codeGenerate.utils.StringUtils;
 
 import java.util.List;
 
 public class ServiceFileWriter {
-    public static StringBuilder writeFile(String selectedEntity, List<String> entityProperties) {
-        String propertiesString = String.join(", ", entityProperties);
+    public static StringBuilder writeFile(String selectedEntity, List<String> entityPropertiesList) {
+        String entityVarName = StringUtils.lowerFirst(selectedEntity);
+        String responseClassName = selectedEntity + "Response";
 
         StringBuilder code = new StringBuilder();
-        //add import
+        // Add imports
         code.append("package ").append(ProjectPathUtils.findPackage("service")).append(".impl;\n\n");
+        code.append("import ").append(ProjectPathUtils.findPackage("request")).append(".").append(StringUtils.lowerFirst(selectedEntity)).append(".Upload").append(selectedEntity).append("Request").append(";\n");
+        code.append("import ").append(ProjectPathUtils.findPackage("request")).append(".").append(StringUtils.lowerFirst(selectedEntity)).append(".Update").append(selectedEntity).append("Request").append(";\n");
+        code.append("import ").append(ProjectPathUtils.findPackage("response")).append(".").append(StringUtils.lowerFirst(selectedEntity)).append(".").append(selectedEntity).append("Response").append(";\n");
         code.append("import ").append(ProjectPathUtils.findPackage("entity")).append(".").append(selectedEntity).append(";\n");
         code.append("import ").append(ProjectPathUtils.findPackage("repository")).append(".").append(selectedEntity).append("Repository;\n");
         code.append("import ").append(ProjectPathUtils.findPackage("service")).append(".").append(selectedEntity).append("Service;\n");
-        code.append("import lombok.AccessLevel;").append("\n");
-        code.append("import lombok.RequiredArgsConstructor;").append("\n");
-        code.append("import lombok.experimental.FieldDefaults;").append("\n");
-        code.append("import org.springframework.http.ResponseEntity;\n");
-        code.append("import org.springframework.stereotype.Service;").append("\n");
-        code.append(RequiredImports.getRequiredImports(propertiesString));
+        code.append("import ").append(ProjectPathUtils.findPackage("mapper")).append(".").append(selectedEntity).append("Mapper;\n");
+        code.append("import jakarta.persistence.EntityNotFoundException;\n");
+        code.append("import lombok.AccessLevel;\n");
+        code.append("import lombok.RequiredArgsConstructor;\n");
+        code.append("import lombok.experimental.FieldDefaults;\n");
+        code.append("import org.springframework.data.domain.Page;\n");
+        code.append("import org.springframework.data.domain.Pageable;\n");
+        code.append("import org.springframework.stereotype.Service;\n");
+        code.append("import java.time.LocalDateTime;\n");
+        code.append("import java.util.UUID;\n");
+        code.append("import java.util.List;\n\n");
 
-        //add class
-        code.append("@Service\n")
-                .append("@RequiredArgsConstructor\n")
-                .append("@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)\n")
-                .append("public class ").append(selectedEntity).append("ServiceImpl implements ").append(selectedEntity).append("Service {\n\n");
+        // Class definition
+        code.append("@Service\n");
+        code.append("@RequiredArgsConstructor\n");
+        code.append("@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)\n");
+        code.append("public class ").append(selectedEntity).append("ServiceImpl implements ").append(selectedEntity).append("Service {\n");
+        code.append("\t").append(selectedEntity).append("Repository ").append(entityVarName).append("Repository;\n");
 
-        code.append("\t").append(selectedEntity).append("Repository ").append(StringUtils.lowerFirst(selectedEntity)).append("Repository;\n\n");
+        // Create method
+        code.append("\t@Override\n");
+        code.append("\tpublic ").append(responseClassName).append(" create").append(selectedEntity)
+                .append("(Upload").append(selectedEntity).append("Request request) {\n");
+        code.append("\t\t").append(selectedEntity).append(" ").append(entityVarName).append(" = new ").append(selectedEntity).append("();\n");
 
-        code.append("\t@Override\n")
-                .append("\tpublic ResponseEntity<").append(selectedEntity).append("> save").append(selectedEntity).append("(");
-        if (!entityProperties.isEmpty()) {
-            String params = String.join(", ", entityProperties);
-            code.append(params);
-        }
-        code.append(") {\n")
-                .append("\t\t").append(selectedEntity).append(" entity = new ").append(selectedEntity).append("();\n");
-
-        for (String property : entityProperties) {
-            String fieldName = property.split(" ")[1];
-            code.append("\t\tentity.set").append(StringUtils.upperFirst(fieldName)).append("(").append(fieldName).append(");\n");
-        }
-
-        code.append("\t\t").append(selectedEntity).append(" savedEntity = ").append(StringUtils.lowerFirst(selectedEntity))
-                .append("Repository.save(entity);\n")
-                .append("\t\treturn ResponseEntity.ok(savedEntity);\n")
-                .append("\t}\n\n");
-
-        code.append("\t@Override\n")
-                .append("\tpublic ResponseEntity<").append(selectedEntity).append("> get").append(selectedEntity)
-                .append("ById(Long id) {\n")
-                .append("\t\treturn ").append(StringUtils.lowerFirst(selectedEntity))
-                .append("Repository.findById(id)\n")
-                .append("\t\t\t.map(ResponseEntity::ok)\n")
-                .append("\t\t\t.orElse(ResponseEntity.notFound().build());\n")
-                .append("\t}\n\n");
-
-        code.append("\t@Override\n")
-                .append("\tpublic ResponseEntity<").append(selectedEntity).append("> update").append(selectedEntity)
-                .append("(Long id, ");
-        if (!entityProperties.isEmpty()) {
-            String params = String.join(", ", entityProperties);
-            code.append(params);
-        }
-        code.append(") {\n")
-                .append("\t\treturn ").append(StringUtils.lowerFirst(selectedEntity)).append("Repository.findById(id)\n")
-                .append("\t\t\t.map(existingEntity -> {\n");
-
-        for (String property : entityProperties) {
-            String fieldName = property.split(" ")[1];
-            code.append("\t\t\t\texistingEntity.set").append(StringUtils.upperFirst(fieldName)).append("(").append(fieldName).append(");\n");
+        for (String property : entityPropertiesList) {
+            String[] parts = property.split(" ");
+            if (parts.length >= 2) {
+                String propType = parts[0];
+                String propName = parts[1].trim();
+                String capitalizedPropName = StringUtils.capitalize(propName);
+                code.append("\t\t").append(entityVarName).append(".set").append(capitalizedPropName)
+                        .append("(request.get").append(capitalizedPropName).append("());\n");
+            }
         }
 
-        code.append("\t\t\t\t").append(selectedEntity).append(" updatedEntity = ")
-                .append(StringUtils.lowerFirst(selectedEntity)).append("Repository.save(existingEntity);\n")
-                .append("\t\t\t\treturn ResponseEntity.ok(updatedEntity);\n")
-                .append("\t\t\t})\n")
-                .append("\t\t\t.orElse(ResponseEntity.notFound().build());\n")
-                .append("\t}\n\n");
+        code.append("\t\t").append(selectedEntity).append(" savedEntity = ")
+                .append(entityVarName).append("Repository.save(").append(entityVarName).append(");\n");
+        code.append("\t\treturn ").append(StringUtils.upperFirst(entityVarName)).append("Mapper.toResponse(savedEntity);\n");
+        code.append("\t}\n\n");
 
-        code.append("\t@Override\n")
-                .append("\tpublic ResponseEntity<Void> delete").append(selectedEntity).append("ById(Long id) {\n")
-                .append("\t\tif (").append(StringUtils.lowerFirst(selectedEntity)).append("Repository.existsById(id)) {\n")
-                .append("\t\t\t").append(StringUtils.lowerFirst(selectedEntity)).append("Repository.deleteById(id);\n")
-                .append("\t\t\treturn ResponseEntity.noContent().build();\n")
-                .append("\t\t} else {\n")
-                .append("\t\t\treturn ResponseEntity.notFound().build();\n")
-                .append("\t\t}\n")
-                .append("\t}\n");
+        // Get all method
+        code.append("\t@Override\n");
+        code.append("\tpublic List<").append(responseClassName).append("> getAll").append(selectedEntity).append("s() {\n");
+        code.append("\t\treturn ").append(StringUtils.upperFirst(entityVarName)).append("Mapper.toResponseList(")
+                .append(entityVarName).append("Repository.findAll());\n");
+        code.append("\t}\n\n");
+
+        // Get by ID method
+        code.append("\t@Override\n");
+        code.append("\tpublic ").append(responseClassName).append(" get").append(selectedEntity).append("ById(UUID id) {\n");
+        code.append("\t\treturn ").append(StringUtils.upperFirst(entityVarName)).append("Mapper.toResponse(\n");
+        code.append("\t\t\t").append(entityVarName).append("Repository.findById(id)\n");
+        code.append("\t\t\t\t.orElseThrow(() -> new EntityNotFoundException(\"").append(selectedEntity).append(" not found\")));\n");
+        code.append("\t}\n\n");
+
+        // Update method
+        code.append("\t@Override\n");
+        code.append("\tpublic ").append(responseClassName).append(" update").append(selectedEntity).append("(Update").append(selectedEntity).append("Request request) {\n");
+        code.append("\t\t").append(selectedEntity).append(" entity = ").append(entityVarName).append("Repository.findById(request.getId())\n");
+        code.append("\t\t\t.orElseThrow(() -> new EntityNotFoundException(\"").append(selectedEntity).append(" not found\"));\n");
+        code.append("\t\t").append(selectedEntity).append(" ").append(entityVarName).append(" = new ").append(selectedEntity).append("();\n");
+
+        for (String property : entityPropertiesList) {
+            String[] parts = property.split(" ");
+            if (parts.length >= 2) {
+                String propName = parts[1].trim();
+                String capitalizedPropName = StringUtils.capitalize(propName);
+                code.append("\t\t").append(entityVarName).append(".set").append(capitalizedPropName)
+                        .append("(request.get").append(capitalizedPropName).append("());\n");
+            }
+        }
+
+        code.append("\t\treturn ").append(StringUtils.upperFirst(entityVarName)).append("Mapper.toResponse(")
+                .append(entityVarName).append("Repository.save(entity));\n");
+        code.append("\t}\n\n");
+
+        // Delete method
+        code.append("\t@Override\n");
+        code.append("\tpublic void delete").append(selectedEntity).append("ById(UUID id) {\n");
+        code.append("\t\t").append(selectedEntity).append(" entity = ").append(entityVarName).append("Repository.findById(id)\n");
+        code.append("\t\t\t.orElseThrow(() -> new EntityNotFoundException(\"").append(selectedEntity).append(" not found\"));\n");
+        code.append("\t\t").append(entityVarName).append("Repository.delete(entity);\n");
+        code.append("\t}\n\n");
+
+        // Soft delete method
+        code.append("\t@Override\n");
+        code.append("\tpublic String softDelete").append(selectedEntity).append("(UUID id) {\n");
+        code.append("\t\t").append(selectedEntity).append(" entity = ").append(entityVarName).append("Repository.findById(id)\n");
+        code.append("\t\t\t.orElseThrow(() -> new EntityNotFoundException(\"").append(selectedEntity).append(" not found\"));\n");
+        code.append("\t\tentity.setDeletedAt(LocalDateTime.now());\n");
+        code.append("\t\t").append(entityVarName).append("Repository.save(entity);\n");
+        code.append("\t\treturn \"")
+                .append(selectedEntity).append(" with ID \" + id + \" has been soft deleted\";\n");
+        code.append("\t}\n");
 
         code.append("}\n");
         return code;
