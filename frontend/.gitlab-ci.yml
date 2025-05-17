@@ -1,0 +1,44 @@
+image: docker:latest
+services:
+  - docker:dind
+
+stages:
+  - build
+  # - test
+  # - release
+  - deploy
+
+# cache:
+#   key: node_deps
+#   paths:
+#     - node_modules/
+
+variables:
+  NAME: frontend
+  SERVICE_NAME: $NAME-srv
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE/$SERVICE_NAME:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE/$SERVICE_NAME:latest
+  WEBHOOK_URL: "http://103.184.112.170:9000/api/stacks/webhooks/97f6a32d-623d-4ec9-856c-ff791e1f8028"
+
+  FF_USE_FASTZIP: "true"
+  # These can be specified per job or per pipeline
+  ARTIFACT_COMPRESSION_LEVEL: "fast"
+  CACHE_COMPRESSION_LEVEL: "fast"
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build:
+  stage: build
+  script:
+    - cd $NAME $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # - docker pull $CONTAINER_RELEASE_IMAGE || true
+    - docker build --cache-from $CONTAINER_RELEASE_IMAGE --tag $CONTAINER_RELEASE_IMAGE .
+    # - docker push $CONTAINER_TEST_IMAGE
+    - docker push $CONTAINER_RELEASE_IMAGE
+deploy:
+  stage: deploy
+  before_script:
+    - apk update && apk add curl
+  script:
+    - curl --request POST --url $WEBHOOK_URL
