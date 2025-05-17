@@ -31,7 +31,7 @@ public class CodeGeneratorCLI {
 
     @ShellMethod(key = "addService", value = "Generate a new service class")
     public String generateService() throws IOException, ClassNotFoundException {
-        Path entitiesDirectoryPath = ProjectPathUtils.getOrCreateDirectory("entity");
+        Path entitiesDirectoryPath = getEntitiesDirectoryPath();
 
         List<String> entityClasses = EntityUtils.getEntityClasses(entitiesDirectoryPath);
         if (entityClasses.isEmpty()) return "Not Entity has found!";
@@ -41,6 +41,15 @@ public class CodeGeneratorCLI {
 
         List<String> entityPropertiesList = EntityUtils.getEntityProperties(selectedEntity);
 
+        createAllCrudFiles(selectedEntity, entityPropertiesList);
+        return "Created controller, service, repository is completed";
+    }
+
+    private Path getEntitiesDirectoryPath() throws IOException {
+        return ProjectPathUtils.getOrCreateDirectory("entity");
+    }
+
+    private void createAllCrudFiles(String selectedEntity, List<String> entityPropertiesList) throws IOException {
         Path responseDirectoryPath = ProjectPathUtils.getOrCreateDirectory("dto/response/" + selectedEntity.toLowerCase());
         Path requestDirectoryPath = ProjectPathUtils.getOrCreateDirectory("dto/request/" + selectedEntity.toLowerCase());
         Path repoDirectoryPath = ProjectPathUtils.getOrCreateDirectory("repository");
@@ -57,9 +66,6 @@ public class CodeGeneratorCLI {
         RequestCodeGenerator.createFile(requestDirectoryPath, "Upload" + selectedEntity + "Request", selectedEntity, entityPropertiesList);
         RequestCodeGenerator.createFile(requestDirectoryPath, "Update" + selectedEntity + "Request", selectedEntity, entityPropertiesList);
         ResponseCodeGenerator.createFile(responseDirectoryPath, selectedEntity + "Response", selectedEntity, entityPropertiesList);
-
-        return "Created controller, service, repository is completed";
     }
-
 }
 
