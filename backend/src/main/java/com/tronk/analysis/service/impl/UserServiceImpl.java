@@ -42,9 +42,12 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
         user.setName(request.getName());
-        user.setPhoneNumber(request.getPhoneNumber());
         user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setLoginName(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setBirthDay(request.getBirthDay());
+        user.setGender(request.isGender());
 
         Role role = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Role not found"));
@@ -92,7 +95,6 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-
     @Override
     public PageResponse<UserResponse> searchUserByKeyWord(SearchUsersRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNo(), request.getPageSize());
@@ -121,6 +123,9 @@ public class UserServiceImpl implements UserService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
+        user.setLoginName(request.getEmail());
+        user.setBirthDay(request.getBirthDay());
+        user.setGender(request.isGender());
         userRepository.save(user);
         return UserMapper.toUserResponse(user);
     }

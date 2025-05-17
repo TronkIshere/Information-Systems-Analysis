@@ -32,11 +32,6 @@ public class CodeGeneratorCLI {
     @ShellMethod(key = "addService", value = "Generate a new service class")
     public String generateService() throws IOException, ClassNotFoundException {
         Path entitiesDirectoryPath = ProjectPathUtils.getOrCreateDirectory("entity");
-        Path repoDirectoryPath = ProjectPathUtils.getOrCreateDirectory("repository");
-        Path interfaceDirectoryPath = ProjectPathUtils.getOrCreateDirectory("service");
-        Path serviceDirectoryPath = ProjectPathUtils.getOrCreateDirectory("service/impl");
-        Path controllerDirectoryPath = ProjectPathUtils.getOrCreateDirectory("controller");
-        Path mapperDirectoryPath = ProjectPathUtils.getOrCreateDirectory("mapper");
 
         List<String> entityClasses = EntityUtils.getEntityClasses(entitiesDirectoryPath);
         if (entityClasses.isEmpty()) return "Not Entity has found!";
@@ -48,6 +43,11 @@ public class CodeGeneratorCLI {
 
         Path responseDirectoryPath = ProjectPathUtils.getOrCreateDirectory("dto/response/" + selectedEntity.toLowerCase());
         Path requestDirectoryPath = ProjectPathUtils.getOrCreateDirectory("dto/request/" + selectedEntity.toLowerCase());
+        Path repoDirectoryPath = ProjectPathUtils.getOrCreateDirectory("repository");
+        Path interfaceDirectoryPath = ProjectPathUtils.getOrCreateDirectory("service");
+        Path serviceDirectoryPath = ProjectPathUtils.getOrCreateDirectory("service/impl");
+        Path controllerDirectoryPath = ProjectPathUtils.getOrCreateDirectory("controller");
+        Path mapperDirectoryPath = ProjectPathUtils.getOrCreateDirectory("mapper");
 
         RepositoryCodeGenerator.createFile(repoDirectoryPath, selectedEntity);
         InterfaceCodeGenerator.createFile(interfaceDirectoryPath, selectedEntity);
@@ -57,7 +57,6 @@ public class CodeGeneratorCLI {
         RequestCodeGenerator.createFile(requestDirectoryPath, "Upload" + selectedEntity + "Request", selectedEntity, entityPropertiesList);
         RequestCodeGenerator.createFile(requestDirectoryPath, "Update" + selectedEntity + "Request", selectedEntity, entityPropertiesList);
         ResponseCodeGenerator.createFile(responseDirectoryPath, selectedEntity + "Response", selectedEntity, entityPropertiesList);
-
 
         return "Created controller, service, repository is completed";
     }

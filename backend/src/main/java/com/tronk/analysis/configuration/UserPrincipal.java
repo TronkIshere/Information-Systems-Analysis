@@ -38,7 +38,7 @@ public class UserPrincipal implements UserDetails {
     public static UserPrincipal create(User user) {
         return new UserPrincipal(
                 user.getId(),
-                user.getEmail(),
+                user.getLoginName(),
                 user.getName(),
                 user.getPassword(),
                 user.getRoles(),
@@ -58,8 +58,8 @@ public class UserPrincipal implements UserDetails {
     }
 
     private static String determinePrincipalName(User user) {
-        if (StringUtils.hasText(user.getEmail())) {
-            return user.getEmail();
+        if (StringUtils.hasText(user.getLoginName())) {
+            return user.getLoginName();
         }
         throw new IllegalArgumentException("Cannot determine principal name - user has neither email nor any auth provider");
     }

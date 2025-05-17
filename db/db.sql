@@ -17,6 +17,7 @@ USE analysis;
 SELECT * FROM app_user;
 SELECT * FROM app_role;
 SELECT * FROM user_roles;
+SELECT * FROM student;
 
 SELECT 
     COLUMN_NAME, 
@@ -25,4 +26,13 @@ FROM
     INFORMATION_SCHEMA.COLUMNS 
 WHERE 
     TABLE_NAME = 'app_user' 
+    AND COLUMN_NAME = 'password';
+
+SELECT 
+    COLUMN_NAME, 
+    DATA_TYPE 
+FROM 
+    INFORMATION_SCHEMA.COLUMNS 
+WHERE 
+    TABLE_NAME = 'app_role' 
     AND COLUMN_NAME = 'id';

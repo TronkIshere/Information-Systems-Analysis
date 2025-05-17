@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -20,7 +21,11 @@ public class User extends AbstractEntity<UUID> {
     String name;
     String email;
     String phoneNumber;
+    String status;
+    String loginName;
     String password;
+    Date birthDay;
+    boolean gender;
 
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.MERGE, CascadeType.DETACH})

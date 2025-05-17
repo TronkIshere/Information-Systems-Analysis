@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -13,5 +15,7 @@ public class UpdateUserRequest {
     String name;
     String email;
     String phoneNumber;
+    Date birthDay;
+    boolean gender;
 }
 

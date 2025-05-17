@@ -1,0 +1,9 @@
+1747319476292:addEntity --name Student --fields "String:studentCode,String:fullName,Date:birthDate,String:gender,String:address,String:phone,String:email,UUID:classId,String:status"
+1747320390772:addService
+1747493086576:addEntity --name Student --fields "UUID:student_code,String:major,BigDecimal:gpa"
+1747493168853:addEntity --name Department --fields "String:name"
+1747493442602:addEntity --name Lecturer --fields "String:lecturerCode,String:academicRank,BigDecimal:salary,Date:hireDate,String:researchField"
+1747493765441:addEntity --name Course --fields "String:name,int:credit,BigDecimal:baseFeeCredit"
+1747493909411:addEntity --name Receipt --fields "BigDecimal:totalAmount,boolean:status,String:description"
+1747493985292:addEntity --name Senester --fields "String:name,Date:startDate,Date:endDate"
+1747494154498:addService

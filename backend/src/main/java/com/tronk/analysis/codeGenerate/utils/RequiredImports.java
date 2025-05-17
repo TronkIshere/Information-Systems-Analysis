@@ -56,6 +56,9 @@ public class RequiredImports {
         if (fields.contains("Float")) {
             imports.append("import java.lang.Float;\n");
         }
+        if (fields.contains("Integer") || fields.contains("int")) {
+            imports.append("import java.lang.Integer;\n");
+        }
 
         // collections
         if (fields.contains("List")) {

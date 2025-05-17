@@ -13,7 +13,7 @@ public class UserMapper {
         return UserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
-                .email(user.getEmail())
+                .email(user.getLoginName())
                 .phoneNumber(user.getPhoneNumber())
                 .build();
     }
