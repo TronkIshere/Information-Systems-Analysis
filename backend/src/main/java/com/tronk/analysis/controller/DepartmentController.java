@@ -1,21 +1,32 @@
 package com.tronk.analysis.controller;
 
-import com.tronk.analysis.dto.response.common.ResponseAPI;
-import com.tronk.analysis.dto.request.department.UploadDepartmentRequest;
 import com.tronk.analysis.dto.request.department.UpdateDepartmentRequest;
+import com.tronk.analysis.dto.request.department.UploadDepartmentRequest;
+import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.department.DepartmentResponse;
 import com.tronk.analysis.service.DepartmentService;
-import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/departments")
 public class DepartmentController {
-
 	private final DepartmentService departmentService;
+
+	@GetMapping("/list")
+	ResponseAPI<List<DepartmentResponse>> getAllUsers() {
+		var result = departmentService.getAllDepartments();
+		return ResponseAPI.<List<DepartmentResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
 
 	@PostMapping
 	public ResponseAPI<DepartmentResponse> createDepartment(

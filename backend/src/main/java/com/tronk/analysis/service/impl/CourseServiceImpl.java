@@ -23,6 +23,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CourseServiceImpl implements CourseService {
 	CourseRepository courseRepository;
+
 	@Override
 	public CourseResponse createCourse(UploadCourseRequest request) {
 		Course course = new Course();

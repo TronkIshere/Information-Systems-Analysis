@@ -3,19 +3,31 @@ package com.tronk.analysis.controller;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.request.student.UploadStudentRequest;
 import com.tronk.analysis.dto.request.student.UpdateStudentRequest;
+import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.dto.response.student.StudentResponse;
 import com.tronk.analysis.service.StudentService;
 import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/students")
 public class StudentController {
-
 	private final StudentService studentService;
+
+	@GetMapping("/list")
+	ResponseAPI<List<StudentResponse>> getAllUsers() {
+		var result = studentService.getAllStudents();
+		return ResponseAPI.<List<StudentResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
 
 	@PostMapping
 	public ResponseAPI<StudentResponse> createStudent(

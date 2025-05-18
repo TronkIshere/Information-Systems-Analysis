@@ -1,21 +1,32 @@
 package com.tronk.analysis.controller;
 
-import com.tronk.analysis.dto.response.common.ResponseAPI;
-import com.tronk.analysis.dto.request.lecturer.UploadLecturerRequest;
 import com.tronk.analysis.dto.request.lecturer.UpdateLecturerRequest;
+import com.tronk.analysis.dto.request.lecturer.UploadLecturerRequest;
+import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.lecturer.LecturerResponse;
 import com.tronk.analysis.service.LecturerService;
-import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/lecturers")
 public class LecturerController {
-
 	private final LecturerService lecturerService;
+
+	@GetMapping("/list")
+	ResponseAPI<List<LecturerResponse>> getAllUsers() {
+		var result = lecturerService.getAllLecturers();
+		return ResponseAPI.<List<LecturerResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
 
 	@PostMapping
 	public ResponseAPI<LecturerResponse> createLecturer(

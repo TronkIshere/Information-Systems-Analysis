@@ -1,21 +1,32 @@
 package com.tronk.analysis.controller;
 
-import com.tronk.analysis.dto.response.common.ResponseAPI;
-import com.tronk.analysis.dto.request.course.UploadCourseRequest;
 import com.tronk.analysis.dto.request.course.UpdateCourseRequest;
+import com.tronk.analysis.dto.request.course.UploadCourseRequest;
+import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.course.CourseResponse;
 import com.tronk.analysis.service.CourseService;
-import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/courses")
 public class CourseController {
-
 	private final CourseService courseService;
+
+	@GetMapping("/list")
+	ResponseAPI<List<CourseResponse>> getAllUsers() {
+		var result = courseService.getAllCourses();
+		return ResponseAPI.<List<CourseResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
 
 	@PostMapping
 	public ResponseAPI<CourseResponse> createCourse(
