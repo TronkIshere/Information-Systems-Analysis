@@ -1,4 +1,4 @@
-package com.tronk.analysis.mapper;
+package com.tronk.analysis.mapper.Lecturer;
 
 import com.tronk.analysis.entity.Lecturer;
 import com.tronk.analysis.dto.response.lecturer.LecturerResponse;

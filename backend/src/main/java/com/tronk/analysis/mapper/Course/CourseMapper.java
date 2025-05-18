@@ -1,4 +1,4 @@
-package com.tronk.analysis.mapper;
+package com.tronk.analysis.mapper.Course;
 
 import com.tronk.analysis.entity.Course;
 import com.tronk.analysis.dto.response.course.CourseResponse;

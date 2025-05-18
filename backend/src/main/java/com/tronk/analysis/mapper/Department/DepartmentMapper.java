@@ -1,4 +1,4 @@
-package com.tronk.analysis.mapper;
+package com.tronk.analysis.mapper.Department;
 
 import com.tronk.analysis.entity.Department;
 import com.tronk.analysis.dto.response.department.DepartmentResponse;

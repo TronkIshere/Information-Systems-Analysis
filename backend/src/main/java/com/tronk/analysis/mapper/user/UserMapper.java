@@ -1,4 +1,4 @@
-package com.tronk.analysis.mapper;
+package com.tronk.analysis.mapper.user;
 
 import com.tronk.analysis.dto.response.user.UserResponse;
 import com.tronk.analysis.entity.User;

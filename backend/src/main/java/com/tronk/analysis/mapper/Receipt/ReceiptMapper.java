@@ -1,4 +1,4 @@
-package com.tronk.analysis.mapper;
+package com.tronk.analysis.mapper.Receipt;
 
 import com.tronk.analysis.entity.Receipt;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;

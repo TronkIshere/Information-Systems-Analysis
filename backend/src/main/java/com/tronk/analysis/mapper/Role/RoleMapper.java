@@ -1,4 +1,4 @@
-package com.tronk.analysis.mapper;
+package com.tronk.analysis.mapper.Role;
 
 import com.tronk.analysis.dto.response.role.RoleResponse;
 import com.tronk.analysis.entity.Role;
