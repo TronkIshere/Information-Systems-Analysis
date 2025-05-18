@@ -1,4 +1,4 @@
-package com.tronk.analysis.dto.request.student;
+package com.tronk.analysis.dto.response.lecturer;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,8 +14,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UploadStudentWithUserRequest implements Serializable {
+public class LecturerWithUserResponse implements Serializable {
     // user
+    UUID userId;
     String name;
     String email;
     String phoneNumber;
@@ -23,10 +24,11 @@ public class UploadStudentWithUserRequest implements Serializable {
     String password;
     Date birthDay;
     boolean gender;
-    //student
-    UUID student_code;
-    String major;
-    BigDecimal gpa;
-    UUID id;
-    UUID userId;
+    //lecturer
+    UUID lecturerId;
+    String lecturerCode;
+    String academicRank;
+    BigDecimal salary;
+    Date hireDate;
+    String researchField;
 }

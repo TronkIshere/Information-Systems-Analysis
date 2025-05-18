@@ -12,4 +12,13 @@ public class ApplicationException extends RuntimeException{
         this.errorCode = errorCode;
     }
 
+    public ApplicationException(ErrorCode errorCode, String customMessage) {
+        super(customMessage);
+        this.errorCode = errorCode;
+    }
+
+    public ApplicationException(ErrorCode errorCode, Object... formatArgs) {
+        super(errorCode.formatMessage(formatArgs));
+        this.errorCode = errorCode;
+    }
 }

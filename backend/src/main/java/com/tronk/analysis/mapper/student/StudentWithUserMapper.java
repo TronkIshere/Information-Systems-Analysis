@@ -6,7 +6,6 @@ import com.tronk.analysis.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StudentWithUserMapper {
     public StudentWithUserMapper (){}

@@ -11,7 +11,9 @@ public class DepartmentMapper {
 
 	public static DepartmentResponse toResponse(Department department) {
 		return DepartmentResponse.builder()
-			.build();
+				.id(department.getId())
+				.name(department.getName())
+				.build();
 	}
 
 	public static List<DepartmentResponse> toResponseList(List<Department> departments) {

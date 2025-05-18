@@ -14,19 +14,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UploadStudentWithUserRequest implements Serializable {
+public class UpdateStudentWithUserRequest implements Serializable {
     // user
+    String userId;
     String name;
     String email;
     String phoneNumber;
-    String status;
-    String password;
+    String password; // optional
     Date birthDay;
     boolean gender;
-    //student
-    UUID student_code;
+    // student
+    UUID studentId;
+    UUID studentCode;
     String major;
     BigDecimal gpa;
-    UUID id;
-    UUID userId;
 }

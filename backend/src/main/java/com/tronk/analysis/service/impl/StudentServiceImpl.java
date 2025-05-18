@@ -1,5 +1,6 @@
 package com.tronk.analysis.service.impl;
 
+import com.tronk.analysis.dto.request.student.UpdateStudentWithUserRequest;
 import com.tronk.analysis.dto.request.student.UploadStudentRequest;
 import com.tronk.analysis.dto.request.student.UpdateStudentRequest;
 import com.tronk.analysis.dto.request.student.UploadStudentWithUserRequest;
@@ -125,6 +126,32 @@ public class StudentServiceImpl implements StudentService {
 		student.setMajor(request.getMajor());
 		student.setGpa(request.getGpa());
 		return StudentMapper.toResponse(studentRepository.save(entity));
+	}
+
+	@Override
+	public StudentWithUserResponse updateStudentWithUserInfo(UpdateStudentWithUserRequest request) {
+		Student student = studentRepository.findById(request.getStudentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+
+		User user = student.getApp_user();
+		user.setName(request.getName());
+		user.setEmail(request.getEmail());
+		user.setPhoneNumber(request.getPhoneNumber());
+		user.setBirthDay(request.getBirthDay());
+		user.setGender(request.isGender());
+
+		if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+			user.setPassword(passwordEncoder.encode(request.getPassword()));
+		}
+
+		student.setStudentCode(request.getStudentCode());
+		student.setMajor(request.getMajor());
+		student.setGpa(request.getGpa());
+
+		User updatedUser = userRepository.save(user);
+		Student updatedStudent = studentRepository.save(student);
+
+		return StudentWithUserMapper.toResponse(updatedStudent, updatedUser);
 	}
 
 	@Override

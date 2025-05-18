@@ -1,5 +1,6 @@
 package com.tronk.analysis.service;
 
+import com.tronk.analysis.dto.request.student.UpdateStudentWithUserRequest;
 import com.tronk.analysis.dto.request.student.UploadStudentRequest;
 import com.tronk.analysis.dto.request.student.UpdateStudentRequest;
 import com.tronk.analysis.dto.request.student.UploadStudentWithUserRequest;
@@ -22,6 +23,8 @@ public interface StudentService {
 	List<StudentResponse> getAllStudents();
 
 	StudentResponse updateStudent(UpdateStudentRequest request);
+
+	StudentWithUserResponse updateStudentWithUserInfo(UpdateStudentWithUserRequest request);
 
 	void deleteStudentById(UUID id);
 

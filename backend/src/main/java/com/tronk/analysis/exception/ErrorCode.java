@@ -59,6 +59,7 @@ public enum ErrorCode {
     LECTURER_CODE_INVALID(4303, "Invalid lecturer code", HttpStatus.BAD_REQUEST),
     LECTURER_SALARY_INVALID(4304, "Invalid salary value", HttpStatus.BAD_REQUEST),
     LECTURER_HAS_COURSES(4305, "Cannot delete lecturer with assigned courses", HttpStatus.CONFLICT),
+    LECTURER_ALREADY_IN_DEPARTMENT(4306, "Lecturer already belongs to this department", HttpStatus.CONFLICT),
 
     // Receipt related errors (44xx)
     RECEIPT_NOT_FOUND(4401, "Receipt not found", HttpStatus.NOT_FOUND),
@@ -74,6 +75,10 @@ public enum ErrorCode {
     STUDENT_GPA_INVALID(4504, "Invalid GPA value", HttpStatus.BAD_REQUEST),
     STUDENT_HAS_RECEIPTS(4505, "Cannot delete student with existing receipts", HttpStatus.CONFLICT),
     STUDENT_MAJOR_INVALID(4506, "Invalid major specification", HttpStatus.BAD_REQUEST);
+
+    public String formatMessage(Object... args) {
+        return String.format(message, args);
+    }
 
     int code;
     String message;

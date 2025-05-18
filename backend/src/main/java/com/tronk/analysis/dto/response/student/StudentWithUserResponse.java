@@ -3,6 +3,7 @@ package com.tronk.analysis.dto.response.student;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
@@ -13,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class StudentWithUserResponse {
+public class StudentWithUserResponse implements Serializable {
     // user
     UUID userId;
     String name;

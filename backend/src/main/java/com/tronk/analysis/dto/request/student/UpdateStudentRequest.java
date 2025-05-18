@@ -16,5 +16,5 @@ public class UpdateStudentRequest implements Serializable {
 	UUID student_code;
 	String major;
 	BigDecimal gpa;
-UUID id;
+	UUID id;
 }

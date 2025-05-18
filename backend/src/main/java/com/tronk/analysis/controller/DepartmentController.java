@@ -1,5 +1,6 @@
 package com.tronk.analysis.controller;
 
+import com.tronk.analysis.dto.request.department.AddLecturerListRequest;
 import com.tronk.analysis.dto.request.department.UpdateDepartmentRequest;
 import com.tronk.analysis.dto.request.department.UploadDepartmentRequest;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
@@ -58,6 +59,17 @@ public class DepartmentController {
 			.message("success")
 			.data(result)
 			.build();
+	}
+
+	@PutMapping("/addLecturerListRequest")
+	public ResponseAPI<String> addLecturerList(
+			@RequestBody AddLecturerListRequest request) {
+		departmentService.addLecturerList(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data("success")
+				.build();
 	}
 
 	@DeleteMapping("/{id}")

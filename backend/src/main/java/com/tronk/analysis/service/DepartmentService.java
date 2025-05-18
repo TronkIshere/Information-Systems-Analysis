@@ -1,5 +1,6 @@
 package com.tronk.analysis.service;
 
+import com.tronk.analysis.dto.request.department.AddLecturerListRequest;
 import com.tronk.analysis.dto.request.department.UploadDepartmentRequest;
 import com.tronk.analysis.dto.request.department.UpdateDepartmentRequest;
 import com.tronk.analysis.dto.response.department.DepartmentResponse;
@@ -20,4 +21,5 @@ public interface DepartmentService {
 
 	String softDeleteDepartment(UUID id);
 
+	void addLecturerList(AddLecturerListRequest request);
 }

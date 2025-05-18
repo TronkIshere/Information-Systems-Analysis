@@ -1,10 +1,15 @@
 package com.tronk.analysis.service.impl;
 
+import com.tronk.analysis.dto.request.department.AddLecturerListRequest;
 import com.tronk.analysis.dto.request.department.UploadDepartmentRequest;
 import com.tronk.analysis.dto.request.department.UpdateDepartmentRequest;
 import com.tronk.analysis.dto.response.department.DepartmentResponse;
 import com.tronk.analysis.entity.Department;
+import com.tronk.analysis.entity.Lecturer;
+import com.tronk.analysis.exception.ApplicationException;
+import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.repository.DepartmentRepository;
+import com.tronk.analysis.repository.LecturerRepository;
 import com.tronk.analysis.service.DepartmentService;
 import com.tronk.analysis.mapper.Department.DepartmentMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +26,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DepartmentServiceImpl implements DepartmentService {
 	DepartmentRepository departmentRepository;
+	LecturerRepository lecturerRepository;
 	@Override
 	public DepartmentResponse createDepartment(UploadDepartmentRequest request) {
 		Department department = new Department();
@@ -64,5 +70,51 @@ public class DepartmentServiceImpl implements DepartmentService {
 		entity.setDeletedAt(LocalDateTime.now());
 		departmentRepository.save(entity);
 		return "Department with ID " + id + " has been soft deleted";
+	}
+
+	@Override
+	public void addLecturerList(AddLecturerListRequest request) {
+		checkAddLecturerListRequest(request);
+
+		Department department = departmentRepository.findById(request.getDepartmentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
+		List<Lecturer> lecturers = lecturerRepository.findAllById(request.getLecturerIds());
+		checkLecturers(lecturers, request);
+
+		lecturers.forEach(lecturer -> {
+			checkIfLecturerAlreadyInDepartment(lecturer, department);
+			lecturer.setDepartment(department);
+		});
+
+		lecturerRepository.saveAll(lecturers);
+	}
+
+	private void checkAddLecturerListRequest(AddLecturerListRequest request){
+		if (request == null || request.getLecturerIds() == null || request.getLecturerIds().isEmpty()) {
+			throw new IllegalArgumentException("Request or lecturer IDs cannot be null or empty");
+		}
+	}
+
+	private void checkLecturers(List<Lecturer> lecturers, AddLecturerListRequest request) {
+		if (lecturers.size() != request.getLecturerIds().size()) {
+			List<UUID> foundIds = lecturers.stream()
+					.map(Lecturer::getId)
+					.toList();
+
+			List<UUID> notFoundIds = request.getLecturerIds().stream()
+					.filter(id -> !foundIds.contains(id))
+					.toList();
+
+			throw new ApplicationException(ErrorCode.LECTURER_NOT_FOUND,
+					"Lecturers not found with IDs: " + notFoundIds);
+		}
+	}
+
+	private void checkIfLecturerAlreadyInDepartment(Lecturer lecturer, Department department) {
+		if (lecturer.getDepartment() != null && lecturer.getDepartment().equals(department)) {
+			throw new ApplicationException(ErrorCode.LECTURER_ALREADY_IN_DEPARTMENT,
+					"Lecturer with ID " + lecturer.getId() + " already in this department");
+		}
 	}
 }
