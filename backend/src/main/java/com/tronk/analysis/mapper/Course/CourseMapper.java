@@ -11,7 +11,11 @@ public class CourseMapper {
 
 	public static CourseResponse toResponse(Course course) {
 		return CourseResponse.builder()
-			.build();
+				.id(course.getId())
+				.name(course.getName())
+				.credit(course.getCredit())
+				.baseFeeCredit(course.getBaseFeeCredit())
+				.build();
 	}
 
 	public static List<CourseResponse> toResponseList(List<Course> courses) {

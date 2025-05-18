@@ -4,6 +4,7 @@ import lombok.*;
 import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReceiptResponse implements Serializable {
+	UUID id;
 	BigDecimal totalAmount;
 	boolean status;
 	String description;

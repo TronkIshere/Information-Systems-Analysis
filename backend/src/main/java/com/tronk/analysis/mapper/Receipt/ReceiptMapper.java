@@ -11,7 +11,11 @@ public class ReceiptMapper {
 
 	public static ReceiptResponse toResponse(Receipt receipt) {
 		return ReceiptResponse.builder()
-			.build();
+				.id(receipt.getId())
+				.description(receipt.getDescription())
+				.status(receipt.isStatus())
+				.totalAmount(receipt.getTotalAmount())
+				.build();
 	}
 
 	public static List<ReceiptResponse> toResponseList(List<Receipt> receipts) {
