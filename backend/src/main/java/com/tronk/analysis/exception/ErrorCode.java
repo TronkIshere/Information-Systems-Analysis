@@ -38,11 +38,42 @@ public enum ErrorCode {
     // System/Generic errors
     INVALID_KEY(5001, "Invalid key", HttpStatus.BAD_REQUEST),
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_OTP(5002, "Invalid or expired OTP", HttpStatus.UNAUTHORIZED);
+    INVALID_OTP(5002, "Invalid or expired OTP", HttpStatus.UNAUTHORIZED),
 
-    public String formatMessage(Object... args) {
-        return String.format(message, args);
-    }
+    // Course related errors (41xx)
+    COURSE_NOT_FOUND(4101, "Course not found", HttpStatus.NOT_FOUND),
+    COURSE_ALREADY_EXISTS(4102, "Course already exists", HttpStatus.CONFLICT),
+    COURSE_CREDIT_INVALID(4103, "Invalid credit value", HttpStatus.BAD_REQUEST),
+    COURSE_FEE_INVALID(4104, "Invalid course fee", HttpStatus.BAD_REQUEST),
+    COURSE_PREREQUISITE_CONFLICT(4105, "Course prerequisite conflict", HttpStatus.CONFLICT),
+
+    // Department related errors (42xx)
+    DEPARTMENT_NOT_FOUND(4201, "Department not found", HttpStatus.NOT_FOUND),
+    DEPARTMENT_ALREADY_EXISTS(4202, "Department already exists", HttpStatus.CONFLICT),
+    DEPARTMENT_HAS_LECTURERS(4203, "Cannot delete department with active lecturers", HttpStatus.CONFLICT),
+    DEPARTMENT_NAME_INVALID(4204, "Invalid department name", HttpStatus.BAD_REQUEST),
+
+    // Lecturer related errors (43xx)
+    LECTURER_NOT_FOUND(4301, "Lecturer not found", HttpStatus.NOT_FOUND),
+    LECTURER_ALREADY_EXISTS(4302, "Lecturer already exists", HttpStatus.CONFLICT),
+    LECTURER_CODE_INVALID(4303, "Invalid lecturer code", HttpStatus.BAD_REQUEST),
+    LECTURER_SALARY_INVALID(4304, "Invalid salary value", HttpStatus.BAD_REQUEST),
+    LECTURER_HAS_COURSES(4305, "Cannot delete lecturer with assigned courses", HttpStatus.CONFLICT),
+
+    // Receipt related errors (44xx)
+    RECEIPT_NOT_FOUND(4401, "Receipt not found", HttpStatus.NOT_FOUND),
+    RECEIPT_ALREADY_PAID(4402, "Receipt already paid", HttpStatus.CONFLICT),
+    RECEIPT_AMOUNT_INVALID(4403, "Invalid receipt amount", HttpStatus.BAD_REQUEST),
+    RECEIPT_STATUS_INVALID(4404, "Invalid receipt status", HttpStatus.BAD_REQUEST),
+    RECEIPT_STUDENT_MISMATCH(4405, "Receipt does not belong to this student", HttpStatus.FORBIDDEN),
+
+    // Student related errors (45xx)
+    STUDENT_NOT_FOUND(4501, "Student not found", HttpStatus.NOT_FOUND),
+    STUDENT_ALREADY_EXISTS(4502, "Student already exists", HttpStatus.CONFLICT),
+    STUDENT_CODE_INVALID(4503, "Invalid student code", HttpStatus.BAD_REQUEST),
+    STUDENT_GPA_INVALID(4504, "Invalid GPA value", HttpStatus.BAD_REQUEST),
+    STUDENT_HAS_RECEIPTS(4505, "Cannot delete student with existing receipts", HttpStatus.CONFLICT),
+    STUDENT_MAJOR_INVALID(4506, "Invalid major specification", HttpStatus.BAD_REQUEST);
 
     int code;
     String message;
