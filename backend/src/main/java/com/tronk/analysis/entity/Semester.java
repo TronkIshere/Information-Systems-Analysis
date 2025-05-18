@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Date;
 
@@ -18,4 +20,7 @@ public class Semester extends AbstractEntity<UUID> {
 	String name;
 	Date startDate;
 	Date endDate;
+
+	@OneToMany(mappedBy = "semester")
+	Set<Receipt> receipts = new HashSet<>();
 }

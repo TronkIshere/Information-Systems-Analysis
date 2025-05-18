@@ -36,6 +36,13 @@ public class User extends AbstractEntity<UUID> {
 
     @Column(name = "refresh_token", columnDefinition = "TEXT")
     String refreshToken;
+
+    @OneToOne(mappedBy = "app_user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Student student;
+
+    @OneToOne(mappedBy = "app_user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Lecturer lecturer;
+
 }
 
 

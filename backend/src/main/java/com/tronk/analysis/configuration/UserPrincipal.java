@@ -20,15 +20,15 @@ import java.util.stream.Collectors;
 public class UserPrincipal implements UserDetails {
     UUID id;
     String name;
-    String email;
+    String loginName;
     String password;
     String principalName;
     Collection<Role> roles = new HashSet<>();
     Map<String, Object> attributes;
 
-    public UserPrincipal(UUID id, String email, String name, String password, Collection<Role> roles, String principalName) {
+    public UserPrincipal(UUID id, String loginName, String name, String password, Collection<Role> roles, String principalName) {
         this.id = id;
-        this.email = email;
+        this.loginName = loginName;
         this.name = name;
         this.password = password;
         this.roles = roles;
@@ -68,7 +68,7 @@ public class UserPrincipal implements UserDetails {
     public String toString() {
         return "UserPrincipal{" +
                 "id=" + id +
-                ", email='" + email + '\'' +
+                ", email='" + loginName + '\'' +
                 ", password='" + password + '\'' +
                 ", roles=" + roles +
                 ", attributes=" + attributes +
@@ -84,7 +84,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.loginName;
     }
 
     @Override

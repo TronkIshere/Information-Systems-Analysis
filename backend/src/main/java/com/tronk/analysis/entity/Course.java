@@ -1,13 +1,15 @@
 package com.tronk.analysis.entity;
 
 import com.tronk.analysis.entity.common.AbstractEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
 import java.math.BigDecimal;
-import java.lang.Integer;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -19,4 +21,10 @@ public class Course extends AbstractEntity<UUID> {
 	String name;
 	int credit;
 	BigDecimal baseFeeCredit;
+
+	@ManyToMany(mappedBy = "courses")
+	Collection<Department> departments = new HashSet<>();
+
+	@ManyToMany(mappedBy = "courses")
+	Collection<Receipt> receipts = new HashSet<>();
 }
