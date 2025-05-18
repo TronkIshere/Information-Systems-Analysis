@@ -11,7 +11,11 @@ public class StudentMapper {
 
 	public static StudentResponse toResponse(Student student) {
 		return StudentResponse.builder()
-			.build();
+				.id(student.getId())
+				.student_code(student.getStudentCode())
+				.major(student.getMajor())
+				.gpa(student.getGpa())
+				.build();
 	}
 
 	public static List<StudentResponse> toResponseList(List<Student> students) {

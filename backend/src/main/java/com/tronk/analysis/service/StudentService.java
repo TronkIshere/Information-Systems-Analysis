@@ -2,13 +2,20 @@ package com.tronk.analysis.service;
 
 import com.tronk.analysis.dto.request.student.UploadStudentRequest;
 import com.tronk.analysis.dto.request.student.UpdateStudentRequest;
+import com.tronk.analysis.dto.request.student.UploadStudentWithUserRequest;
 import com.tronk.analysis.dto.response.student.StudentResponse;
+import com.tronk.analysis.dto.response.student.StudentWithUserResponse;
+
 import java.util.UUID;
 import java.util.List;
 
 public interface StudentService {
 
 	StudentResponse createStudent(UploadStudentRequest request);
+
+	StudentWithUserResponse createStudentWithUser(UploadStudentWithUserRequest request);
+
+	List<StudentWithUserResponse> getAllStudentsWithUserInfo();
 
 	StudentResponse getStudentById(UUID id);
 

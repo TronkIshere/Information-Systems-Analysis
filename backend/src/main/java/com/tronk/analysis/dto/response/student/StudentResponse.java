@@ -13,6 +13,7 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StudentResponse implements Serializable {
+	UUID id;
 	UUID student_code;
 	String major;
 	BigDecimal gpa;

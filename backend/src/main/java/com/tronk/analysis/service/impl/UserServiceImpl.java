@@ -9,7 +9,7 @@ import com.tronk.analysis.entity.Role;
 import com.tronk.analysis.entity.User;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
-import com.tronk.analysis.mapper.UserMapper;
+import com.tronk.analysis.mapper.user.UserMapper;
 import com.tronk.analysis.repository.RoleRepository;
 import com.tronk.analysis.repository.UserRepository;
 import com.tronk.analysis.service.UserService;
@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse registerUser(UploadUserRequest request) {
-
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());

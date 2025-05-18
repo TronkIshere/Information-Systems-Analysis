@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Student extends AbstractEntity<UUID> {
-	UUID student_code;
+	UUID studentCode;
 	String major;
 	BigDecimal gpa;
 

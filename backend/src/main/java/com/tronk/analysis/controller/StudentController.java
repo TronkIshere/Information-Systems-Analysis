@@ -1,10 +1,12 @@
 package com.tronk.analysis.controller;
 
+import com.tronk.analysis.dto.request.student.UploadStudentWithUserRequest;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.request.student.UploadStudentRequest;
 import com.tronk.analysis.dto.request.student.UpdateStudentRequest;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.dto.response.student.StudentResponse;
+import com.tronk.analysis.dto.response.student.StudentWithUserResponse;
 import com.tronk.analysis.service.StudentService;
 import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,16 @@ public class StudentController {
 				.build();
 	}
 
+	@GetMapping("/list/StudentsWithUserInfo")
+	ResponseAPI<List<StudentWithUserResponse>> getAllStudentsWithUserInfo() {
+		var result = studentService.getAllStudentsWithUserInfo();
+		return ResponseAPI.<List<StudentWithUserResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
+
 	@PostMapping
 	public ResponseAPI<StudentResponse> createStudent(
 			@RequestBody UploadStudentRequest request) {
@@ -38,6 +50,17 @@ public class StudentController {
 			.message("success")
 			.data(result)
 			.build();
+	}
+
+	@PostMapping("/StudentWithUserInfo")
+	public ResponseAPI<StudentWithUserResponse> createStudentWithUserInfo(
+			@RequestBody UploadStudentWithUserRequest request) {
+		var result = studentService.createStudentWithUser(request);
+		return ResponseAPI.<StudentWithUserResponse>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
 	}
 
 	@GetMapping("/{id}")
