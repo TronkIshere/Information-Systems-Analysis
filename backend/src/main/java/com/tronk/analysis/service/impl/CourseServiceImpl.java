@@ -1,26 +1,34 @@
 package com.tronk.analysis.service.impl;
 
-import com.tronk.analysis.dto.request.course.UploadCourseRequest;
 import com.tronk.analysis.dto.request.course.UpdateCourseRequest;
+import com.tronk.analysis.dto.request.course.UploadCourseRequest;
+import com.tronk.analysis.dto.request.department.AssignCourseToDepartmentRequest;
+import com.tronk.analysis.dto.request.department.RemoveCourseFromDepartmentRequest;
 import com.tronk.analysis.dto.response.course.CourseResponse;
 import com.tronk.analysis.entity.Course;
-import com.tronk.analysis.repository.CourseRepository;
-import com.tronk.analysis.service.CourseService;
+import com.tronk.analysis.entity.Department;
+import com.tronk.analysis.exception.ApplicationException;
+import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.mapper.Course.CourseMapper;
+import com.tronk.analysis.repository.CourseRepository;
+import com.tronk.analysis.repository.DepartmentRepository;
+import com.tronk.analysis.service.CourseService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CourseServiceImpl implements CourseService {
 	CourseRepository courseRepository;
+	DepartmentRepository departmentRepository;
 
 	@Override
 	public CourseResponse createCourse(UploadCourseRequest request) {
@@ -69,5 +77,47 @@ public class CourseServiceImpl implements CourseService {
 		entity.setDeletedAt(LocalDateTime.now());
 		courseRepository.save(entity);
 		return "Course with ID " + id + " has been soft deleted";
+	}
+
+	@Override
+	public void removeCourseFromDepartment(RemoveCourseFromDepartmentRequest request) {
+		Course course = courseRepository.findById(request.getCourseId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
+
+		Department department = departmentRepository.findById(request.getDepartmentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
+		if(!department.getCourses().contains(course)) {
+			throw new ApplicationException(ErrorCode.DEPARTMENT_DOES_NOT_HAVE_COURSES);
+		}
+
+		removeDepartmentFromCourse(department, course);
+		departmentRepository.save(department);
+	}
+
+	private void removeDepartmentFromCourse(Department department, Course course) {
+		department.getCourses().remove(course);
+		course.getDepartments().remove(department);
+	}
+
+	@Override
+	public void assignCourseToDepartment(AssignCourseToDepartmentRequest request) {
+		Course course = courseRepository.findById(request.getCourseId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
+
+		Department department = departmentRepository.findById(request.getDepartmentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
+		if(department.getCourses().contains(course)) {
+			throw new ApplicationException(ErrorCode.DEPARTMENT_ALREADY_EXIST_COURSES);
+		}
+		
+		assignDepartmentFromCourse(department, course);
+		departmentRepository.save(department);
+	}
+
+	private void assignDepartmentFromCourse(Department department, Course course) {
+		department.getCourses().add(course);
+		course.getDepartments().add(department);
 	}
 }

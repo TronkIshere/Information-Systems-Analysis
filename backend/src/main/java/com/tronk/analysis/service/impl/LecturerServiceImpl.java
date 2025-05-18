@@ -1,32 +1,32 @@
 package com.tronk.analysis.service.impl;
 
-import com.tronk.analysis.dto.request.lecturer.UpdateLecturerWithUserRequest;
-import com.tronk.analysis.dto.request.lecturer.UploadLecturerRequest;
-import com.tronk.analysis.dto.request.lecturer.UpdateLecturerRequest;
-import com.tronk.analysis.dto.request.lecturer.UploadLecturerWithUserRequest;
+import com.tronk.analysis.dto.request.lecturer.*;
 import com.tronk.analysis.dto.response.lecturer.LecturerResponse;
 import com.tronk.analysis.dto.response.lecturer.LecturerWithUserResponse;
+import com.tronk.analysis.entity.Course;
 import com.tronk.analysis.entity.Lecturer;
 import com.tronk.analysis.entity.Role;
 import com.tronk.analysis.entity.User;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
+import com.tronk.analysis.mapper.Lecturer.LecturerMapper;
 import com.tronk.analysis.mapper.Lecturer.LecturerWithUserMapper;
+import com.tronk.analysis.repository.CourseRepository;
 import com.tronk.analysis.repository.LecturerRepository;
 import com.tronk.analysis.repository.RoleRepository;
 import com.tronk.analysis.repository.UserRepository;
 import com.tronk.analysis.service.LecturerService;
-import com.tronk.analysis.mapper.Lecturer.LecturerMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LecturerServiceImpl implements LecturerService {
 	LecturerRepository lecturerRepository;
+	CourseRepository courseRepository;
 	PasswordEncoder passwordEncoder;
 	UserRepository userRepository;
 	RoleRepository roleRepository;
@@ -57,7 +58,7 @@ public class LecturerServiceImpl implements LecturerService {
 				.collect(Collectors.toList());
 
 		return LecturerWithUserMapper.toResponseList(lecturers, users);
-	};
+	}
 
 	@Override
 	public LecturerWithUserResponse createLecturer(UploadLecturerWithUserRequest request) {
@@ -183,5 +184,47 @@ public class LecturerServiceImpl implements LecturerService {
 		entity.setDeletedAt(LocalDateTime.now());
 		lecturerRepository.save(entity);
 		return "Lecturer with ID " + id + " has been soft deleted";
+	}
+
+	@Override
+	public void removeLecturerFromCourse(RemoveLecturerFromCourseRequest request) {
+		Lecturer lecturer = lecturerRepository.findById(request.getLecturerId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.LECTURER_NOT_FOUND));
+
+		Course course = courseRepository.findById(request.getCourseId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
+
+		if (!lecturer.getCourses().contains(course)) {
+			throw new ApplicationException(ErrorCode.LECTURER_DOES_NOT_HAVE_COURSE);
+		}
+
+		removeCourseFromLecturer(lecturer, course);
+		lecturerRepository.save(lecturer);
+	}
+
+	private void removeCourseFromLecturer(Lecturer lecturer, Course course) {
+		lecturer.getCourses().remove(course);
+		course.getLecturers().remove(lecturer);
+	}
+
+	@Override
+	public void assignLecturerToCourse(AssignLecturerToCourseRequest request) {
+		Lecturer lecturer = lecturerRepository.findById(request.getLecturerId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.LECTURER_NOT_FOUND));
+
+		Course course = courseRepository.findById(request.getCourseId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
+
+		if (lecturer.getCourses().contains(course)) {
+			throw new ApplicationException(ErrorCode.LECTURER_ALREADY_HAS_COURSE);
+		}
+
+		assignCourseToLecturer(lecturer, course);
+		lecturerRepository.save(lecturer);
+	}
+
+	private void assignCourseToLecturer(Lecturer lecturer, Course course) {
+		lecturer.getCourses().add(course);
+		course.getLecturers().add(lecturer);
 	}
 }

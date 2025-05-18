@@ -27,4 +27,7 @@ public class Course extends AbstractEntity<UUID> {
 
 	@ManyToMany(mappedBy = "courses")
 	Collection<Receipt> receipts = new HashSet<>();
+
+	@ManyToMany(mappedBy = "courses")
+	Collection<Lecturer> lecturers = new HashSet<>();
 }

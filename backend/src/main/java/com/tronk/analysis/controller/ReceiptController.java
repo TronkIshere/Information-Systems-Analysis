@@ -1,10 +1,15 @@
 package com.tronk.analysis.controller;
 
+import com.tronk.analysis.dto.request.lecturer.AssignLecturerToCourseRequest;
+import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
+import com.tronk.analysis.dto.request.receipt.AssignReceiptToCourseRequest;
+import com.tronk.analysis.dto.request.receipt.RemoveReceiptFromCourseRequest;
 import com.tronk.analysis.dto.request.receipt.UpdateReceiptRequest;
 import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.service.ReceiptService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -78,5 +83,38 @@ public class ReceiptController {
 			.message("success")
 			.data("success")
 			.build();
+	}
+
+	@PostMapping("/remove-receipt-from-course")
+	public ResponseAPI<String> removeReceiptFromCourse(
+			@RequestBody RemoveReceiptFromCourseRequest request) {
+		receiptService.removeReceiptFromCourse(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data("success")
+				.build();
+	}
+
+	@PostMapping("/assign-receipt-to-course")
+	ResponseAPI<String> assignReceiptToCourse(
+			@RequestBody AssignReceiptToCourseRequest request) {
+		receiptService.assignReceiptToCourse(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data("success")
+				.build();
+	}
+
+	@PostMapping("/assign-to-semester")
+	public ResponseAPI<String> assignReceiptToSemester(
+			@Valid @RequestBody AssignReceiptToSemesterRequest request) {
+		receiptService.assignReceiptToSemester(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("Receipt assigned to semester successfully")
+				.data("success")
+				.build();
 	}
 }

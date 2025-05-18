@@ -30,6 +30,7 @@ public enum ErrorCode {
     USER_NOT_EXISTED(4041, "User not found", HttpStatus.NOT_FOUND),
     USER_ALREADY_EXIST_EXCEPTION(4091, "User already exists", HttpStatus.CONFLICT),
     USER_ALREADY_HAS_THIS_ROLE(4092, "User already has this role", HttpStatus.CONFLICT),
+    USER_DOES_NOT_HAVE_ROLE(4091, "User does not have this role", HttpStatus.CONFLICT),
 
     // Role related errors
     ROLE_NOT_EXISTED(4091, "Role not found", HttpStatus.CONFLICT),
@@ -52,6 +53,8 @@ public enum ErrorCode {
     DEPARTMENT_ALREADY_EXISTS(4202, "Department already exists", HttpStatus.CONFLICT),
     DEPARTMENT_HAS_LECTURERS(4203, "Cannot delete department with active lecturers", HttpStatus.CONFLICT),
     DEPARTMENT_NAME_INVALID(4204, "Invalid department name", HttpStatus.BAD_REQUEST),
+    DEPARTMENT_DOES_NOT_HAVE_COURSES(4201, "Department does not have this course", HttpStatus.CONFLICT),
+    DEPARTMENT_ALREADY_EXIST_COURSES(4202, "Department already exists", HttpStatus.CONFLICT),
 
     // Lecturer related errors (43xx)
     LECTURER_NOT_FOUND(4301, "Lecturer not found", HttpStatus.NOT_FOUND),
@@ -60,6 +63,8 @@ public enum ErrorCode {
     LECTURER_SALARY_INVALID(4304, "Invalid salary value", HttpStatus.BAD_REQUEST),
     LECTURER_HAS_COURSES(4305, "Cannot delete lecturer with assigned courses", HttpStatus.CONFLICT),
     LECTURER_ALREADY_IN_DEPARTMENT(4306, "Lecturer already belongs to this department", HttpStatus.CONFLICT),
+    LECTURER_DOES_NOT_HAVE_COURSE(4306, "Lecturer does not have this course", HttpStatus.BAD_REQUEST),
+    LECTURER_ALREADY_HAS_COURSE(4307, "Lecturer already has this course", HttpStatus.CONFLICT),
 
     // Receipt related errors (44xx)
     RECEIPT_NOT_FOUND(4401, "Receipt not found", HttpStatus.NOT_FOUND),
@@ -67,6 +72,11 @@ public enum ErrorCode {
     RECEIPT_AMOUNT_INVALID(4403, "Invalid receipt amount", HttpStatus.BAD_REQUEST),
     RECEIPT_STATUS_INVALID(4404, "Invalid receipt status", HttpStatus.BAD_REQUEST),
     RECEIPT_STUDENT_MISMATCH(4405, "Receipt does not belong to this student", HttpStatus.FORBIDDEN),
+    RECEIPT_ALREADY_HAS_COURSE(4402, "Receipt already has this course", HttpStatus.CONFLICT),
+    RECEIPT_DOES_NOT_HAVE_COURSE(4403, "Receipt does not have this course", HttpStatus.BAD_REQUEST),
+    RECEIPT_ALREADY_IN_SEMESTER(4404, "Receipt already belongs to this semester", HttpStatus.CONFLICT),
+    RECEIPT_BELONGS_TO_ANOTHER_SEMESTER(4405, "Receipt belongs to another semester", HttpStatus.CONFLICT),
+    RECEIPT_OR_SEMESTER_NOT_FOUND(4406, "Receipt or Semester not found", HttpStatus.NOT_FOUND),
 
     // Student related errors (45xx)
     STUDENT_NOT_FOUND(4501, "Student not found", HttpStatus.NOT_FOUND),
@@ -74,7 +84,10 @@ public enum ErrorCode {
     STUDENT_CODE_INVALID(4503, "Invalid student code", HttpStatus.BAD_REQUEST),
     STUDENT_GPA_INVALID(4504, "Invalid GPA value", HttpStatus.BAD_REQUEST),
     STUDENT_HAS_RECEIPTS(4505, "Cannot delete student with existing receipts", HttpStatus.CONFLICT),
-    STUDENT_MAJOR_INVALID(4506, "Invalid major specification", HttpStatus.BAD_REQUEST);
+    STUDENT_MAJOR_INVALID(4506, "Invalid major specification", HttpStatus.BAD_REQUEST),
+
+    // Semester related errors
+    SEMESTER_NOT_FOUND(4601, "Semester not found", HttpStatus.NOT_FOUND);
 
     public String formatMessage(Object... args) {
         return String.format(message, args);

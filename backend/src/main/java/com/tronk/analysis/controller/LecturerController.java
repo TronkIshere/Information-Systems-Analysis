@@ -1,9 +1,6 @@
 package com.tronk.analysis.controller;
 
-import com.tronk.analysis.dto.request.lecturer.UpdateLecturerRequest;
-import com.tronk.analysis.dto.request.lecturer.UpdateLecturerWithUserRequest;
-import com.tronk.analysis.dto.request.lecturer.UploadLecturerRequest;
-import com.tronk.analysis.dto.request.lecturer.UploadLecturerWithUserRequest;
+import com.tronk.analysis.dto.request.lecturer.*;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.lecturer.LecturerResponse;
 import com.tronk.analysis.dto.response.lecturer.LecturerWithUserResponse;
@@ -124,5 +121,27 @@ public class LecturerController {
 			.message("success")
 			.data("success")
 			.build();
+	}
+
+	@PostMapping("/remove-lecturer-from-course")
+	public ResponseAPI<String> removeLecturerFromCourse(
+			@RequestBody RemoveLecturerFromCourseRequest request) {
+		lecturerService.removeLecturerFromCourse(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data("success")
+				.build();
+	}
+
+	@PostMapping("/assign-lecturer-to-course")
+	ResponseAPI<String> assignCourseToCourse(
+			@RequestBody AssignLecturerToCourseRequest request) {
+		lecturerService.assignLecturerToCourse(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data("success")
+				.build();
 	}
 }

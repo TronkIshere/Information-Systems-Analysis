@@ -1,5 +1,8 @@
 package com.tronk.analysis.service;
 
+import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
+import com.tronk.analysis.dto.request.receipt.AssignReceiptToCourseRequest;
+import com.tronk.analysis.dto.request.receipt.RemoveReceiptFromCourseRequest;
 import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
 import com.tronk.analysis.dto.request.receipt.UpdateReceiptRequest;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
@@ -20,4 +23,9 @@ public interface ReceiptService {
 
 	String softDeleteReceipt(UUID id);
 
+    void removeReceiptFromCourse(RemoveReceiptFromCourseRequest request);
+
+	void assignReceiptToCourse(AssignReceiptToCourseRequest request);
+
+	void assignReceiptToSemester(AssignReceiptToSemesterRequest request);
 }

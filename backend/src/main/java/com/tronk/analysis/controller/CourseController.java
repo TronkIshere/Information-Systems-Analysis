@@ -2,6 +2,8 @@ package com.tronk.analysis.controller;
 
 import com.tronk.analysis.dto.request.course.UpdateCourseRequest;
 import com.tronk.analysis.dto.request.course.UploadCourseRequest;
+import com.tronk.analysis.dto.request.department.AssignCourseToDepartmentRequest;
+import com.tronk.analysis.dto.request.department.RemoveCourseFromDepartmentRequest;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.course.CourseResponse;
 import com.tronk.analysis.service.CourseService;
@@ -78,5 +80,27 @@ public class CourseController {
 			.message("success")
 			.data("success")
 			.build();
+	}
+
+	@PostMapping("/remove-course-from-department")
+	public ResponseAPI<String> removeCourseFromDepartment(
+			@RequestBody RemoveCourseFromDepartmentRequest request) {
+		courseService.removeCourseFromDepartment(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data("success")
+				.build();
+	}
+
+	@PostMapping("/assign-course-to-department")
+	ResponseAPI<String> assignCourseToRole(
+			@RequestBody AssignCourseToDepartmentRequest request) {
+		courseService.assignCourseToDepartment(request);
+		return ResponseAPI.<String>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data("success")
+				.build();
 	}
 }

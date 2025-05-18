@@ -7,3 +7,5 @@
 1747493909411:addEntity --name Receipt --fields "BigDecimal:totalAmount,boolean:status,String:description"
 1747493985292:addEntity --name Senester --fields "String:name,Date:startDate,Date:endDate"
 1747494154498:addService
+1747578893230:addSerivce
+1747578899385:addService

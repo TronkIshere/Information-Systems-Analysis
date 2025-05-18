@@ -1,9 +1,6 @@
 package com.tronk.analysis.service;
 
-import com.tronk.analysis.dto.request.lecturer.UpdateLecturerWithUserRequest;
-import com.tronk.analysis.dto.request.lecturer.UploadLecturerRequest;
-import com.tronk.analysis.dto.request.lecturer.UpdateLecturerRequest;
-import com.tronk.analysis.dto.request.lecturer.UploadLecturerWithUserRequest;
+import com.tronk.analysis.dto.request.lecturer.*;
 import com.tronk.analysis.dto.response.lecturer.LecturerResponse;
 import com.tronk.analysis.dto.response.lecturer.LecturerWithUserResponse;
 
@@ -32,4 +29,7 @@ public interface LecturerService {
 
 	String softDeleteLecturer(UUID id);
 
+	void removeLecturerFromCourse(RemoveLecturerFromCourseRequest request);
+
+	void assignLecturerToCourse(AssignLecturerToCourseRequest request);
 }

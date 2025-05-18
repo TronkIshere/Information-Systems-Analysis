@@ -76,11 +76,11 @@ public class RoleServiceImpl implements RoleService {
         User user = userService.getUserById(request.getUserId());
         Role role = roleRepository.getReferenceById(request.getRoleId());
 
-        if (user.getRoles().contains(role)) {
-            throw new ApplicationException(ErrorCode.USER_ALREADY_HAS_THIS_ROLE);
+        if (!user.getRoles().contains(role)) {
+            throw new ApplicationException(ErrorCode.USER_DOES_NOT_HAVE_ROLE);
         }
 
-        assignRoleToUser(user, role);
+        removeRoleFromUser(user, role);
         roleRepository.save(role);
         return UserMapper.toUserResponse(user);
     }
@@ -103,5 +103,10 @@ public class RoleServiceImpl implements RoleService {
     private void assignRoleToUser(User user, Role role) {
         user.getRoles().add(role);
         role.getUsers().add(user);
+    }
+
+    private void removeRoleFromUser(User user, Role role) {
+        user.getRoles().remove(role);
+        role.getUsers().remove(user);
     }
 }
