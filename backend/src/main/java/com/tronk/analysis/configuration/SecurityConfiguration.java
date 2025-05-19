@@ -44,6 +44,12 @@ public class SecurityConfiguration {
             "/api/v1/auth/**",
             "/api/v1/roles/**",
             "/api/v1/users/**",
+            "/api/v1/courses/**",
+            "/api/v1/departments/**",
+            "/api/v1/lecturers/**",
+            "/api/v1/receipts/**",
+            "/api/v1/semesters/**",
+            "/api/v1/students/**"
     };
 
     @Bean
