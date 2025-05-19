@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/form/input";
 import { useState } from "react";
 import { AuthResponse } from "@/types/api";
 type LoginFormProps = {
-  onSuccess?: (data:AuthResponse) => void;
+  onSuccess?: (data: AuthResponse) => void;
 };
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
@@ -40,7 +40,6 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
     },
   }));
 
-
   return (
     <Stack
       direction="row"
@@ -54,11 +53,11 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           Đăng nhập
         </Typography>
         <Typography component="p" className="text-center !mb-[37px] paragraph">
-          Vui lòng nhập email và mật khẩu của bạn để tiếp tục
+          Vui lòng nhập loginName và mật khẩu của bạn để tiếp tục
         </Typography>
         <Form
           onSubmit={(values: {
-            email: string;
+            loginName: string;
             password: string;
             remember: boolean;
           }) => {
@@ -70,11 +69,11 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           {({ register, formState }) => (
             <>
               <Input
-                type="email"
-                label="Email:"
+                type="loginName"
+                label="loginName:"
                 className="bg-input"
-                error={formState.errors["email"]}
-                registration={register("email")}
+                error={formState.errors["loginName"]}
+                registration={register("loginName")}
               />
               <Input
                 type="password"

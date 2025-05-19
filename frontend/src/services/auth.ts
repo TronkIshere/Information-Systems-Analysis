@@ -77,7 +77,10 @@ const logout = (): Promise<void> => {
 };
 
 export const loginInputSchema = z.object({
-  email: z.string().min(1, "Vui lòng nhập email").email("Email không hợp lệ"),
+  loginName: z
+    .string()
+    .min(1, "Vui lòng nhập loginName")
+    .email("loginName không hợp lệ"),
   password: z.string().min(5, "Vui lòng nhập mật khẩu"),
 });
 
@@ -87,7 +90,7 @@ const loginWithEmailAndPassword = (data: LoginInput): Promise<AuthResponse> => {
 };
 
 export const registerInputSchema = z.object({
-  email: z.string().min(1, "Required"),
+  loginName: z.string().min(1, "Required"),
   name: z.string().min(1, "Required"),
   password: z.string().min(5, "Required"),
   phoneNumber: z.string(),

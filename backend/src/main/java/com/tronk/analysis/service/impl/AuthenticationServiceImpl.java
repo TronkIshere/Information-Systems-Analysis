@@ -45,7 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public SignInResponse signIn(SignInRequest request, HttpServletResponse response) {
-        UserPrincipal userPrincipal = authenticateAndGetUserPrincipal(request.getEmail(), request.getPassword());
+        UserPrincipal userPrincipal = authenticateAndGetUserPrincipal(request.getLoginName(), request.getPassword());
         User user = getUserById(userPrincipal.getId());
 
         return generateTokenResponse(userPrincipal, user, response);
