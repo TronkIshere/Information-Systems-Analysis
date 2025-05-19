@@ -28,7 +28,6 @@ public class SemesterServiceImpl implements SemesterService {
 		semester.setName(request.getName());
 		semester.setStartDate(request.getStartDate());
 		semester.setEndDate(request.getEndDate());
-		semester.setReceipts(request.getReceipts());
 		Semester savedEntity = semesterRepository.save(semester);
 		return SemesterMapper.toResponse(savedEntity);
 	}

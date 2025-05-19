@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
@@ -21,7 +22,7 @@ public class Lecturer extends AbstractEntity<UUID> {
 	String lecturerCode;
 	String academicRank;
 	BigDecimal salary;
-	Date hireDate;
+	LocalDate hireDate;
 	String researchField;
 
 	@OneToOne(fetch = FetchType.LAZY)

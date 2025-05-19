@@ -4,7 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -20,13 +20,13 @@ public class UpdateLecturerWithUserRequest {
     String email;
     String phoneNumber;
     String password; // optional
-    Date birthDay;
+    LocalDate birthDay;
     boolean gender;
     // lecturer
     UUID lecturerId;
     String lecturerCode;
     String academicRank;
     BigDecimal salary;
-    Date hireDate;
+    LocalDate hireDate;
     String researchField;
 }

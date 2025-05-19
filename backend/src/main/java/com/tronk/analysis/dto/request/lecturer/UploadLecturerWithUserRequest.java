@@ -5,7 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,12 +20,12 @@ public class UploadLecturerWithUserRequest implements Serializable {
     String phoneNumber;
     String status;
     String password;
-    Date birthDay;
+    LocalDate birthDay;
     boolean gender;
     // lecture
     String lecturerCode;
     String academicRank;
     BigDecimal salary;
-    Date hireDate;
+    LocalDate hireDate;
     String researchField;
 }

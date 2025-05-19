@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -17,7 +17,7 @@ public class UploadUserRequest implements Serializable {
     String phoneNumber;
     String status;
     String password;
-    Date birthDay;
+    LocalDate birthDay;
     boolean gender;
 }
 

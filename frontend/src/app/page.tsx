@@ -16,7 +16,7 @@ export default function Home() {
           <header className="bg-transparent w-full relative z-1">
             <div className="container mx-auto px-4 flex justify-between items-center">
               <div className="flex items-center space-x-2">
-                <Image src={Logo} width={244} height={66} alt="logo" />
+                <Image src={Logo} width={120} height={120} alt="logo" />
               </div>
 
               <div>

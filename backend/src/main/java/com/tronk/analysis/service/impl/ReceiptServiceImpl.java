@@ -3,27 +3,27 @@ package com.tronk.analysis.service.impl;
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
 import com.tronk.analysis.dto.request.receipt.AssignReceiptToCourseRequest;
 import com.tronk.analysis.dto.request.receipt.RemoveReceiptFromCourseRequest;
-import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
 import com.tronk.analysis.dto.request.receipt.UpdateReceiptRequest;
+import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.entity.Course;
 import com.tronk.analysis.entity.Receipt;
-import com.tronk.analysis.entity.Semester;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
+import com.tronk.analysis.mapper.Receipt.ReceiptMapper;
 import com.tronk.analysis.repository.CourseRepository;
 import com.tronk.analysis.repository.ReceiptRepository;
 import com.tronk.analysis.repository.SemesterRepository;
 import com.tronk.analysis.service.ReceiptService;
-import com.tronk.analysis.mapper.Receipt.ReceiptMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

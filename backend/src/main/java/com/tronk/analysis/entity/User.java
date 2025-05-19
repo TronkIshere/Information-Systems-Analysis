@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ public class User extends AbstractEntity<UUID> {
     String status;
     String loginName;
     String password;
-    Date birthDay;
+    LocalDate birthDay;
     boolean gender;
 
     @ManyToMany(fetch = FetchType.EAGER,

@@ -11,7 +11,12 @@ public class LecturerMapper {
 
 	public static LecturerResponse toResponse(Lecturer lecturer) {
 		return LecturerResponse.builder()
-			.build();
+				.id(lecturer.getId())
+				.lecturerCode(lecturer.getLecturerCode())
+				.salary(lecturer.getSalary())
+				.hireDate(lecturer.getHireDate())
+				.researchField(lecturer.getResearchField())
+				.build();
 	}
 
 	public static List<LecturerResponse> toResponseList(List<Lecturer> lecturers) {

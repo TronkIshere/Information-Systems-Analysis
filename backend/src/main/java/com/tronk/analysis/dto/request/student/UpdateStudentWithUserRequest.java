@@ -5,7 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -21,7 +21,7 @@ public class UpdateStudentWithUserRequest implements Serializable {
     String email;
     String phoneNumber;
     String password; // optional
-    Date birthDay;
+    LocalDate birthDay;
     boolean gender;
     // student
     UUID studentId;

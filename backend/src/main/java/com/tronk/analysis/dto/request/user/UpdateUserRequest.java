@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -15,7 +15,7 @@ public class UpdateUserRequest {
     String name;
     String email;
     String phoneNumber;
-    Date birthDay;
+    LocalDate birthDay;
     boolean gender;
 }
 

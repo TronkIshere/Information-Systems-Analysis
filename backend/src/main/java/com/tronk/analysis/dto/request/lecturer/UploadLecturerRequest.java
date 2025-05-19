@@ -1,10 +1,11 @@
 package com.tronk.analysis.dto.request.lecturer;
 
 import lombok.*;
-import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
-import java.util.Date;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -17,7 +18,7 @@ public class UploadLecturerRequest implements Serializable {
 	String lecturerCode;
 	String academicRank;
 	BigDecimal salary;
-	Date hireDate;
+	LocalDate hireDate;
 	String researchField;
 	UUID id;
 }
