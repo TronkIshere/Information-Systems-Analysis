@@ -13,11 +13,32 @@ GO
 SELECT DISTINCT local_net_address, local_tcp_port 
 FROM sys.dm_exec_connections;
 
+USE master;
+GO
+
+ALTER DATABASE analysis SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
+
+DROP DATABASE analysis;
+GO
+
+CREATE DATABASE analysis;
+GO
+
 USE analysis;
-SELECT * FROM app_user;
+
 SELECT * FROM app_role;
-SELECT * FROM user_roles;
+SELECT * FROM app_user;
+SELECT * FROM course;
+SELECT * FROM department;
+SELECT * FROM department_course;
+SELECT * FROM lecturer;
+SELECT * FROM lecturer_course;
+SELECT * FROM receipt;
+SELECT * FROM receipt_courses;
+SELECT * FROM semester;
 SELECT * FROM student;
+SELECT * FROM user_roles;
 
 SELECT 
     COLUMN_NAME, 
