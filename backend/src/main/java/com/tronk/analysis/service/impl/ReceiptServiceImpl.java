@@ -1,19 +1,19 @@
 package com.tronk.analysis.service.impl;
 
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
-import com.tronk.analysis.dto.request.receipt.AssignReceiptToCourseRequest;
-import com.tronk.analysis.dto.request.receipt.RemoveReceiptFromCourseRequest;
-import com.tronk.analysis.dto.request.receipt.UpdateReceiptRequest;
-import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
+import com.tronk.analysis.dto.request.receipt.*;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.entity.Course;
 import com.tronk.analysis.entity.Receipt;
+import com.tronk.analysis.entity.Semester;
+import com.tronk.analysis.entity.Student;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.mapper.Receipt.ReceiptMapper;
 import com.tronk.analysis.repository.CourseRepository;
 import com.tronk.analysis.repository.ReceiptRepository;
 import com.tronk.analysis.repository.SemesterRepository;
+import com.tronk.analysis.repository.StudentRepository;
 import com.tronk.analysis.service.ReceiptService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
@@ -21,7 +21,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +32,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ReceiptServiceImpl implements ReceiptService {
 	SemesterRepository semesterRepository;
+	StudentRepository studentRepository;
 	ReceiptRepository receiptRepository;
 	CourseRepository courseRepository;
 	@Override
@@ -56,13 +59,12 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 	@Override
 	public ReceiptResponse updateReceipt(UpdateReceiptRequest request) {
-		Receipt entity = receiptRepository.findById(request.getId())
+		Receipt receipt = receiptRepository.findById(request.getId())
 			.orElseThrow(() -> new EntityNotFoundException("Receipt not found"));
-		Receipt receipt = new Receipt();
 		receipt.setTotalAmount(request.getTotalAmount());
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
-		return ReceiptMapper.toResponse(receiptRepository.save(entity));
+		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
 
 	@Override
@@ -127,5 +129,42 @@ public class ReceiptServiceImpl implements ReceiptService {
 		if (updatedRows == 0) {
 			throw new ApplicationException(ErrorCode.RECEIPT_OR_SEMESTER_NOT_FOUND);
 		}
+	}
+
+	@Override
+	public ReceiptResponse createReceiptWithFullInfo(UploadReceiptWithFullInfoRequest request) {
+		Student student = studentRepository.findById(request.getStudentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
+		Semester semester = semesterRepository.findById(request.getSemesterId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+		List<Course> courses = courseRepository.findAllById(request.getCourseId());
+
+		if (courses.isEmpty()) {
+			throw new ApplicationException(ErrorCode.COURSE_NOT_FOUND);
+		}
+
+		BigDecimal totalAmount = courses.stream()
+				.map(course -> course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit())))
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		Receipt receipt = new Receipt();
+		receipt.setStatus(request.isStatus());
+		receipt.setDescription(request.getDescription());
+		receipt.setStudent(student);
+		receipt.setSemester(semester);
+		receipt.setCourses(new HashSet<>(courses));
+		receipt.setTotalAmount(totalAmount);
+
+		receiptRepository.save(receipt);
+		return ReceiptMapper.toResponse(receipt);
+	}
+
+	@Override
+	public ReceiptResponse markAsPaid(UUID id) {
+		Receipt receipt = receiptRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Receipt not found"));
+		receipt.setStatus(true);
+		receiptRepository.save(receipt);
+		return ReceiptMapper.toResponse(receipt);
 	}
 }

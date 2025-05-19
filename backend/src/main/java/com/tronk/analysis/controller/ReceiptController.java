@@ -2,10 +2,7 @@ package com.tronk.analysis.controller;
 
 import com.tronk.analysis.dto.request.lecturer.AssignLecturerToCourseRequest;
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
-import com.tronk.analysis.dto.request.receipt.AssignReceiptToCourseRequest;
-import com.tronk.analysis.dto.request.receipt.RemoveReceiptFromCourseRequest;
-import com.tronk.analysis.dto.request.receipt.UpdateReceiptRequest;
-import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
+import com.tronk.analysis.dto.request.receipt.*;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.service.ReceiptService;
@@ -42,6 +39,27 @@ public class ReceiptController {
 			.message("success")
 			.data(result)
 			.build();
+	}
+
+	@PostMapping("/uploadReceiptWithFullInfo")
+	public ResponseAPI<ReceiptResponse> createReceiptWithFullInfo(
+			@RequestBody UploadReceiptWithFullInfoRequest request) {
+		var result = receiptService.createReceiptWithFullInfo(request);
+		return ResponseAPI.<ReceiptResponse>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
+
+	@PostMapping("/{id}/paid-status")
+	public ResponseAPI<ReceiptResponse> markReceiptAsPaid(@PathVariable UUID id) {
+		var result = receiptService.markAsPaid(id);
+		return ResponseAPI.<ReceiptResponse>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
 	}
 
 	@GetMapping("/{id}")

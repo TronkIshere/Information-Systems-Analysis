@@ -1,4 +1,4 @@
-package com.tronk.analysis.mapper;
+package com.tronk.analysis.mapper.semester;
 
 import com.tronk.analysis.entity.Semester;
 import com.tronk.analysis.dto.response.semester.SemesterResponse;

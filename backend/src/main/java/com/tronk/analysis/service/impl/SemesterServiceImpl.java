@@ -4,7 +4,7 @@ import com.tronk.analysis.dto.request.semester.UpdateSemesterRequest;
 import com.tronk.analysis.dto.request.semester.UploadSemesterRequest;
 import com.tronk.analysis.dto.response.semester.SemesterResponse;
 import com.tronk.analysis.entity.Semester;
-import com.tronk.analysis.mapper.SemesterMapper;
+import com.tronk.analysis.mapper.semester.SemesterMapper;
 import com.tronk.analysis.repository.SemesterRepository;
 import com.tronk.analysis.service.SemesterService;
 import jakarta.persistence.EntityNotFoundException;
