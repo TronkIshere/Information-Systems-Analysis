@@ -15,6 +15,7 @@ public class CourseMapper {
 				.name(course.getName())
 				.credit(course.getCredit())
 				.baseFeeCredit(course.getBaseFeeCredit())
+				.subjectType(course.isSubjectType())
 				.build();
 	}
 

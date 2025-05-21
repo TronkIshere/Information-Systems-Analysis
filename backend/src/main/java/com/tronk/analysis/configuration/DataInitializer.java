@@ -70,16 +70,16 @@ public class DataInitializer {
         Department itDepartment = departmentRepository.findAll().get(0);
 
         List<Course> courses = List.of(
-                createCourse("Lập trình Java", 3, BigDecimal.valueOf(500000)),
-                createCourse("Cơ sở dữ liệu", 3, BigDecimal.valueOf(450000)),
-                createCourse("Mạng máy tính", 2, BigDecimal.valueOf(400000)),
-                createCourse("Trí tuệ nhân tạo", 4, BigDecimal.valueOf(600000)),
-                createCourse("Hệ điều hành", 3, BigDecimal.valueOf(450000)),
-                createCourse("Phân tích thiết kế hệ thống", 3, BigDecimal.valueOf(500000)),
-                createCourse("Lập trình Web", 3, BigDecimal.valueOf(500000)),
-                createCourse("An toàn thông tin", 2, BigDecimal.valueOf(400000)),
-                createCourse("Đồ án chuyên ngành", 4, BigDecimal.valueOf(700000)),
-                createCourse("Toán rời rạc", 3, BigDecimal.valueOf(450000))
+                createCourse("Lập trình Java", 3, BigDecimal.valueOf(500000), true),
+                createCourse("Cơ sở dữ liệu", 3, BigDecimal.valueOf(450000), true),
+                createCourse("Mạng máy tính", 2, BigDecimal.valueOf(400000), true),
+                createCourse("Trí tuệ nhân tạo", 4, BigDecimal.valueOf(600000), true),
+                createCourse("Hệ điều hành", 3, BigDecimal.valueOf(450000), true),
+                createCourse("Phân tích thiết kế hệ thống", 3, BigDecimal.valueOf(500000), false),
+                createCourse("Lập trình Web", 3, BigDecimal.valueOf(500000), false),
+                createCourse("An toàn thông tin", 2, BigDecimal.valueOf(400000), false),
+                createCourse("Đồ án chuyên ngành", 4, BigDecimal.valueOf(700000), false),
+                createCourse("Toán rời rạc", 3, BigDecimal.valueOf(450000), false)
         );
 
         courses.forEach(course -> {
@@ -173,11 +173,12 @@ public class DataInitializer {
         log.info("Initial receipt inserted!");
     }
 
-    private Course createCourse(String name, int credit, BigDecimal baseFeeCredit) {
+    private Course createCourse(String name, int credit, BigDecimal baseFeeCredit, boolean subjectType) {
         Course course = new Course();
         course.setName(name);
         course.setCredit(credit);
         course.setBaseFeeCredit(baseFeeCredit);
+        course.setSubjectType(subjectType);
         return course;
     }
 

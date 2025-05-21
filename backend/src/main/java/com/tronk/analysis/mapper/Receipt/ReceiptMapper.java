@@ -15,6 +15,7 @@ public class ReceiptMapper {
 				.description(receipt.getDescription())
 				.status(receipt.isStatus())
 				.totalAmount(receipt.getTotalAmount())
+				.paymentDate(receipt.getPaymentDate())
 				.build();
 	}
 

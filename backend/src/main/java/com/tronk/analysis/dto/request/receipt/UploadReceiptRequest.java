@@ -4,6 +4,7 @@ import lombok.*;
 import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -16,5 +17,6 @@ public class UploadReceiptRequest implements Serializable {
 	BigDecimal totalAmount;
 	boolean status;
 	String description;
+	LocalDate paymentDate;
 	UUID id;
 }

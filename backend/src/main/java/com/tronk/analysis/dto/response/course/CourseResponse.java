@@ -18,4 +18,5 @@ public class CourseResponse implements Serializable {
 	String name;
 	int credit;
 	BigDecimal baseFeeCredit;
+	boolean subjectType;
 }

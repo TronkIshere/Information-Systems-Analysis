@@ -36,6 +36,7 @@ public class CourseServiceImpl implements CourseService {
 		course.setName(request.getName());
 		course.setCredit(request.getCredit());
 		course.setBaseFeeCredit(request.getBaseFeeCredit());
+		course.setSubjectType(request.isSubjectType());
 		Course savedEntity = courseRepository.save(course);
 		return CourseMapper.toResponse(savedEntity);
 	}
@@ -60,6 +61,7 @@ public class CourseServiceImpl implements CourseService {
 		course.setName(request.getName());
 		course.setCredit(request.getCredit());
 		course.setBaseFeeCredit(request.getBaseFeeCredit());
+		course.setSubjectType(request.isSubjectType());
 		return CourseMapper.toResponse(courseRepository.save(entity));
 	}
 

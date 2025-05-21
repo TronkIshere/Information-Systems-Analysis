@@ -17,5 +17,6 @@ public class UploadCourseRequest implements Serializable {
 	String name;
 	int credit;
 	BigDecimal baseFeeCredit;
+	boolean subjectType;
 	UUID id;
 }

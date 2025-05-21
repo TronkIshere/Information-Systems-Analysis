@@ -22,6 +22,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +42,8 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receipt.setTotalAmount(request.getTotalAmount());
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
+		receipt.setPaymentDate(receipt.getPaymentDate());
+		receipt.setPaymentDate(LocalDate.now());
 		Receipt savedEntity = receiptRepository.save(receipt);
 		return ReceiptMapper.toResponse(savedEntity);
 	}
@@ -64,6 +67,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receipt.setTotalAmount(request.getTotalAmount());
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
+		receipt.setPaymentDate(receipt.getPaymentDate());
 		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
 
@@ -150,6 +154,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 		Receipt receipt = new Receipt();
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
+		receipt.setPaymentDate(receipt.getPaymentDate());
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
 		receipt.setCourses(new HashSet<>(courses));
