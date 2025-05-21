@@ -1,172 +1,90 @@
 package com.tronk.analysis.service.impl;
 
-import com.tronk.analysis.dto.request.student.UpdateStudentWithUserRequest;
-import com.tronk.analysis.dto.request.student.UploadStudentRequest;
 import com.tronk.analysis.dto.request.student.UpdateStudentRequest;
-import com.tronk.analysis.dto.request.student.UploadStudentWithUserRequest;
+import com.tronk.analysis.dto.request.student.UploadStudentRequest;
 import com.tronk.analysis.dto.response.student.StudentResponse;
-import com.tronk.analysis.dto.response.student.StudentWithUserResponse;
-import com.tronk.analysis.entity.Role;
 import com.tronk.analysis.entity.Student;
-import com.tronk.analysis.entity.User;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
-import com.tronk.analysis.mapper.student.StudentWithUserMapper;
-import com.tronk.analysis.repository.RoleRepository;
-import com.tronk.analysis.repository.StudentRepository;
-import com.tronk.analysis.repository.UserRepository;
-import com.tronk.analysis.service.StudentService;
 import com.tronk.analysis.mapper.student.StudentMapper;
-import jakarta.persistence.EntityNotFoundException;
+import com.tronk.analysis.repository.StudentRepository;
+import com.tronk.analysis.service.StudentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.UUID;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StudentServiceImpl implements StudentService {
-	StudentRepository studentRepository;
-	PasswordEncoder passwordEncoder;
-	RoleRepository roleRepository;
-	UserRepository userRepository;
-	@Override
-	public StudentResponse createStudent(UploadStudentRequest request) {
-		Student student = new Student();
-		student.setStudentCode(request.getStudent_code());
-		student.setMajor(request.getMajor());
-		student.setGpa(request.getGpa());
+    StudentRepository studentRepository;
+    PasswordEncoder passwordEncoder;
 
-		User user = userRepository.findById(request.getUserId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
-		student.setApp_user(user);
+    @Override
+    public StudentResponse createStudent(UploadStudentRequest request) {
+        Student student = new Student();
+        student.setStudentCode(request.getStudent_code());
+        student.setMajor(request.getMajor());
+        student.setGpa(request.getGpa());
+        student.setName(request.getName());
+        student.setEmail(request.getEmail());
+        student.setPhoneNumber(request.getPhoneNumber());
+        student.setLoginName(request.getLoginName());
+        student.setPassword(passwordEncoder.encode(request.getPassword()));
+        student.setBirthDay(request.getBirthDay());
+        student.setGender(request.isGender());
+        student.setStatus("ACTIVE");
+        studentRepository.save(student);
+        return StudentMapper.toResponse(student);
+    }
 
-		Student savedEntity = studentRepository.save(student);
-		return StudentMapper.toResponse(savedEntity);
-	}
+    @Override
+    public StudentResponse getStudentById(UUID id) {
+        return StudentMapper.toResponse(
+                studentRepository.findById(id)
+                        .orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND)));
+    }
 
-	@Override
-	public StudentWithUserResponse createStudentWithUser(UploadStudentWithUserRequest request) {
-		if (request == null) {
-			throw new IllegalArgumentException("Request cannot be null");
-		}
+    @Override
+    public List<StudentResponse> getAllStudents() {
+        return StudentMapper.toResponseList(studentRepository.findAll());
+    }
 
-		User user = createUser(request);
-		User savedUser = userRepository.save(user);
+    @Override
+    public StudentResponse updateStudent(UpdateStudentRequest request) {
+        Student student = studentRepository.findById(request.getId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+        student.setStudentCode(request.getStudentCode());
+        student.setMajor(request.getMajor());
+        student.setGpa(request.getGpa());
+        student.setName(request.getName());
+        student.setEmail(request.getEmail());
+        student.setPhoneNumber(request.getPhoneNumber());
+        student.setBirthDay(request.getBirthDay());
+        student.setGender(request.isGender());
+        studentRepository.save(student);
+        return StudentMapper.toResponse(student);
+    }
 
-		Student student = createStudent(request, savedUser);
-		Student savedStudent = studentRepository.save(student);
+    @Override
+    public void deleteStudentById(UUID id) {
+        Student entity = studentRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+        studentRepository.delete(entity);
+    }
 
-		return StudentWithUserMapper.toResponse(savedStudent, savedUser);
-	}
-
-	private User createUser(UploadStudentWithUserRequest request) {
-		User user = new User();
-		user.setName(request.getName());
-		user.setEmail(request.getEmail());
-		user.setPhoneNumber(request.getPhoneNumber());
-		user.setLoginName(request.getEmail());
-		user.setPassword(passwordEncoder.encode(request.getPassword()));
-		user.setBirthDay(request.getBirthDay());
-		user.setGender(request.isGender());
-		user.setStatus("ACTIVE");
-
-		Role studentRole = roleRepository.findByName("ROLE_STUDENT")
-				.orElseThrow(() -> new RuntimeException("ROLE_STUDENT not found"));
-		user.setRoles(Collections.singletonList(studentRole));
-
-		return user;
-	}
-
-	private Student createStudent(UploadStudentWithUserRequest request, User savedUser) {
-		Student student = new Student();
-		student.setStudentCode(request.getStudent_code());
-		student.setMajor(request.getMajor());
-		student.setGpa(request.getGpa());
-		student.setApp_user(savedUser);
-
-		return student;
-	}
-
-	@Override
-	public List<StudentWithUserResponse> getAllStudentsWithUserInfo() {
-		List<Student> students = studentRepository.findAll();
-		List<User> users = students.stream()
-				.map(Student::getApp_user)
-				.collect(Collectors.toList());
-
-		return StudentWithUserMapper.toResponseList(students, users);
-	}
-
-	@Override
-	public List<StudentResponse> getAllStudents() {
-		return StudentMapper.toResponseList(studentRepository.findAll());
-	}
-
-	@Override
-	public StudentResponse getStudentById(UUID id) {
-		return StudentMapper.toResponse(
-			studentRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("Student not found")));
-	}
-
-	@Override
-	public StudentResponse updateStudent(UpdateStudentRequest request) {
-		Student entity = studentRepository.findById(request.getId())
-			.orElseThrow(() -> new EntityNotFoundException("Student not found"));
-		Student student = new Student();
-		student.setStudentCode(request.getStudent_code());
-		student.setMajor(request.getMajor());
-		student.setGpa(request.getGpa());
-		return StudentMapper.toResponse(studentRepository.save(entity));
-	}
-
-	@Override
-	public StudentWithUserResponse updateStudentWithUserInfo(UpdateStudentWithUserRequest request) {
-		Student student = studentRepository.findById(request.getStudentId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
-
-		User user = student.getApp_user();
-		user.setName(request.getName());
-		user.setEmail(request.getEmail());
-		user.setPhoneNumber(request.getPhoneNumber());
-		user.setBirthDay(request.getBirthDay());
-		user.setGender(request.isGender());
-
-		if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-			user.setPassword(passwordEncoder.encode(request.getPassword()));
-		}
-
-		student.setStudentCode(request.getStudentCode());
-		student.setMajor(request.getMajor());
-		student.setGpa(request.getGpa());
-
-		User updatedUser = userRepository.save(user);
-		Student updatedStudent = studentRepository.save(student);
-
-		return StudentWithUserMapper.toResponse(updatedStudent, updatedUser);
-	}
-
-	@Override
-	public void deleteStudentById(UUID id) {
-		Student entity = studentRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException("Student not found"));
-		studentRepository.delete(entity);
-	}
-
-	@Override
-	public String softDeleteStudent(UUID id) {
-		Student entity = studentRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException("Student not found"));
-		entity.setDeletedAt(LocalDateTime.now());
-		studentRepository.save(entity);
-		return "Student with ID " + id + " has been soft deleted";
-	}
+    @Override
+    public String softDeleteStudent(UUID id) {
+        Student entity = studentRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+        entity.setDeletedAt(LocalDateTime.now());
+        studentRepository.save(entity);
+        return "Student with ID " + id + " has been soft deleted";
+    }
 }

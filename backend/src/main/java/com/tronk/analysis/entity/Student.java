@@ -1,7 +1,9 @@
 package com.tronk.analysis.entity;
 
-import com.tronk.analysis.entity.common.AbstractEntity;
-import jakarta.persistence.*;
+import com.tronk.analysis.entity.common.User;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,14 +18,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Student extends AbstractEntity<UUID> {
+public class Student extends User {
 	UUID studentCode;
 	String major;
 	BigDecimal gpa;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "app_user_id")
-	User app_user;
 
 	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
 	Set<Receipt> receipts = new HashSet<>();

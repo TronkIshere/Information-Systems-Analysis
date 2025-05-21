@@ -1,7 +1,8 @@
 package com.tronk.analysis.configuration;
 
-import com.tronk.analysis.entity.Role;
-import com.tronk.analysis.entity.User;
+import com.tronk.analysis.entity.Lecturer;
+import com.tronk.analysis.entity.Student;
+import com.tronk.analysis.entity.common.User;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,64 +23,39 @@ public class UserPrincipal implements UserDetails {
     String name;
     String loginName;
     String password;
-    String principalName;
-    Collection<Role> roles = new HashSet<>();
+    String userType;
+    Collection<? extends GrantedAuthority> authorities;
     Map<String, Object> attributes;
-
-    public UserPrincipal(UUID id, String loginName, String name, String password, Collection<Role> roles, String principalName) {
-        this.id = id;
-        this.loginName = loginName;
-        this.name = name;
-        this.password = password;
-        this.roles = roles;
-        this.principalName = principalName;
-    }
 
     public static UserPrincipal create(User user) {
         return new UserPrincipal(
                 user.getId(),
-                user.getLoginName(),
                 user.getName(),
+                user.getLoginName(),
                 user.getPassword(),
-                user.getRoles(),
-                determinePrincipalName(user)
+                determineUserType(user),
+                parseAuthorities(user.getRoles()),
+                null
         );
     }
 
-    public static UserPrincipal create(User user, Map<String, Object> attributes) {
-        UserPrincipal userPrincipal = UserPrincipal.create(user);
-        userPrincipal.setAttributes(attributes);
-
-        if (attributes != null && attributes.containsKey("name")) {
-            userPrincipal.setName((String) attributes.get("name"));
-        }
-
-        return userPrincipal;
+    private static String determineUserType(User user) {
+        if (user instanceof Student) return "STUDENT";
+        if (user instanceof Lecturer) return "LECTURER";
+        return "UNKNOWN";
     }
 
-    private static String determinePrincipalName(User user) {
-        if (StringUtils.hasText(user.getLoginName())) {
-            return user.getLoginName();
-        }
-        throw new IllegalArgumentException("Cannot determine principal name - user has neither email nor any auth provider");
-    }
-
-    @Override
-    public String toString() {
-        return "UserPrincipal{" +
-                "id=" + id +
-                ", email='" + loginName + '\'' +
-                ", password='" + password + '\'' +
-                ", roles=" + roles +
-                ", attributes=" + attributes +
-                '}';
+    private static Collection<GrantedAuthority> parseAuthorities(String roles) {
+        if (!StringUtils.hasText(roles)) return Collections.emptyList();
+        return Arrays.stream(roles.split(","))
+                .map(String::trim)
+                .map(role -> new SimpleGrantedAuthority(role))
+                .collect(Collectors.toList());
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toSet());
+        return this.authorities;
     }
 
     @Override

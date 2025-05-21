@@ -27,6 +27,7 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(4011, "Invalid credentials", HttpStatus.UNAUTHORIZED),
 
     // User related errors
+    USER_TYPE_INVALID(4041, "User type invalid", HttpStatus.CONFLICT),
     USER_NOT_EXISTED(4041, "User not found", HttpStatus.NOT_FOUND),
     USER_ALREADY_EXIST_EXCEPTION(4091, "User already exists", HttpStatus.CONFLICT),
     USER_ALREADY_HAS_THIS_ROLE(4092, "User already has this role", HttpStatus.CONFLICT),

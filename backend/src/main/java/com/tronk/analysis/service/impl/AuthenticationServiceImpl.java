@@ -1,6 +1,7 @@
 package com.tronk.analysis.service.impl;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.tronk.analysis.configuration.UserPrincipal;
 import com.tronk.analysis.dto.request.authentication.LogoutRequest;
@@ -8,10 +9,13 @@ import com.tronk.analysis.dto.request.authentication.SignInRequest;
 import com.tronk.analysis.dto.response.authentication.RefreshTokenResponse;
 import com.tronk.analysis.dto.response.authentication.SignInResponse;
 import com.tronk.analysis.dto.response.authentication.SignInStatus;
-import com.tronk.analysis.entity.User;
+import com.tronk.analysis.entity.Lecturer;
+import com.tronk.analysis.entity.Student;
+import com.tronk.analysis.entity.common.User;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
-import com.tronk.analysis.repository.UserRepository;
+import com.tronk.analysis.repository.LecturerRepository;
+import com.tronk.analysis.repository.StudentRepository;
 import com.tronk.analysis.service.AuthenticationService;
 import com.tronk.analysis.service.JwtService;
 import com.tronk.analysis.service.RedisService;
@@ -28,6 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -38,15 +43,16 @@ import java.util.concurrent.TimeUnit;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationServiceImpl implements AuthenticationService {
     UserDetailsServiceCustomizer userDetailsServiceCustomizer;
+    LecturerRepository lecturerRepository;
+    StudentRepository studentRepository;
     AuthenticationManager authenticationManager;
-    UserRepository userRepository;
     RedisService redisService;
     JwtService jwtService;
 
     @Override
     public SignInResponse signIn(SignInRequest request, HttpServletResponse response) {
         UserPrincipal userPrincipal = authenticateAndGetUserPrincipal(request.getLoginName(), request.getPassword());
-        User user = getUserById(userPrincipal.getId());
+        User user = getUserByIdAndType(userPrincipal.getId(), userPrincipal.getUserType());
 
         return generateTokenResponse(userPrincipal, user, response);
     }
@@ -57,17 +63,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return (UserPrincipal) authentication.getPrincipal();
     }
 
-    private User getUserById(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    private User getUserByIdAndType(UUID id, String userType) {
+        return switch (userType) {
+            case "STUDENT" -> studentRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Student not found"));
+            case "LECTURER" -> lecturerRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Lecturer not found"));
+            default -> throw new IllegalArgumentException("Invalid user type");
+        };
     }
 
     private SignInResponse generateTokenResponse(UserPrincipal userPrincipal, User user, HttpServletResponse response) {
         final String accessToken = jwtService.generateAccessToken(userPrincipal);
         final String refreshToken = jwtService.generateRefreshToken(userPrincipal);
 
-        user.setRefreshToken(refreshToken);
-        userRepository.save(user);
+        if (user instanceof Student) {
+            ((Student) user).setRefreshToken(refreshToken);
+            studentRepository.save((Student) user);
+        } else if (user instanceof Lecturer) {
+            ((Lecturer) user).setRefreshToken(refreshToken);
+            lecturerRepository.save((Lecturer) user);
+        }
 
         Cookie cookie = createCookie(refreshToken);
         response.addCookie(cookie);
@@ -98,8 +114,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String email = jwtService.extractUserName(refreshToken);
         UserPrincipal userDetails = userDetailsServiceCustomizer.loadUserByUsername(email);
 
-        User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userDetails.getId()));
+        User user = getUserByIdAndType(userDetails.getId(), userDetails.getUserType());
 
         isValidToken(user, refreshToken);
         String accessToken = jwtService.generateAccessToken(UserPrincipal.create(user));
@@ -139,26 +154,43 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void signOut(final LogoutRequest request, final HttpServletResponse response) {
-        final String email = jwtService.extractUserName(request.getAccessToken());
-        final User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
+        final String accessToken = request.getAccessToken();
 
-        final long accessTokenExp = jwtService.extractTokenExpired(request.getAccessToken());
-        if (accessTokenExp <= 0) {
-            return;
+        final String userType = jwtService.extractUserType(accessToken);
+        final UUID userId = jwtService.extractUserId(accessToken);
+
+        User user = switch (userType) {
+            case "STUDENT" -> studentRepository.findById(userId)
+                    .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
+            case "LECTURER" -> lecturerRepository.findById(userId)
+                    .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
+            default -> throw new ApplicationException(ErrorCode.USER_TYPE_INVALID);
+        };
+
+        user.setRefreshToken(null);
+        if (user instanceof Student) {
+            studentRepository.save((Student) user);
+        } else {
+            lecturerRepository.save((Lecturer) user);
         }
 
+        addTokenToBlacklist(accessToken);
+        deleteRefreshTokenCookie(response);
+    }
+
+    private void addTokenToBlacklist(String token) {
         try {
-            final String jwtId = SignedJWT.parse(request.getAccessToken())
-                    .getJWTClaimsSet().getJWTID();
-            redisService.save(jwtId, request.getAccessToken(), accessTokenExp, TimeUnit.MILLISECONDS);
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+            Date expiration = claims.getExpirationTime();
+            long ttl = expiration.getTime() - System.currentTimeMillis();
 
-            user.setRefreshToken(null);
-            userRepository.save(user);
-
-            deleteRefreshTokenCookie(response);
+            if (ttl > 0) {
+                String jti = claims.getJWTID();
+                redisService.save(jti, "blacklisted", ttl, TimeUnit.MILLISECONDS);
+            }
         } catch (ParseException e) {
-            throw new ApplicationException(ErrorCode.SIGN_OUT_FAILED);
+            throw new ApplicationException(ErrorCode.TOKEN_INVALID);
         }
     }
 

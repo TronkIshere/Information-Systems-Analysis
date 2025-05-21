@@ -42,8 +42,6 @@ public class SecurityConfiguration {
     static int CORS_FILTER_ORDER = -102;
     static String[] White_list = {
             "/api/v1/auth/**",
-            "/api/v1/roles/**",
-            "/api/v1/users/**",
             "/api/v1/courses/**",
             "/api/v1/departments/**",
             "/api/v1/lecturers/**",
@@ -96,8 +94,7 @@ public class SecurityConfiguration {
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://localhost:3000",
-                "https://witech.com.vn"));
+                "http://localhost:3000"));
         configuration.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,

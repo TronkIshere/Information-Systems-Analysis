@@ -4,6 +4,7 @@ import lombok.*;
 import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -14,7 +15,14 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StudentResponse implements Serializable {
 	UUID id;
-	UUID student_code;
+	UUID studentCode;
 	String major;
 	BigDecimal gpa;
+	String name;
+	String email;
+	String phoneNumber;
+	String status;
+	String loginName;
+	LocalDate birthDay;
+	boolean gender;
 }

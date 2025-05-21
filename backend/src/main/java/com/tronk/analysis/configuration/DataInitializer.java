@@ -10,11 +10,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -24,8 +22,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE ,makeFinal = true)
 public class DataInitializer {
-    RoleRepository roleRepository;
-    UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     CourseRepository courseRepository;
     DepartmentRepository departmentRepository;
@@ -39,8 +35,6 @@ public class DataInitializer {
         log.info("INIT DATA");
         return args -> {
             if (ifDatabaseEmpty()) {
-                createRoles();
-                createUsers();
                 createDepartments();
                 createCourses();
                 createLecturers();
@@ -53,51 +47,11 @@ public class DataInitializer {
     }
 
     private boolean ifDatabaseEmpty() {
-        return roleRepository.count() == 0
-                && userRepository.count() == 0
-                && courseRepository.count() == 0
+        return courseRepository.count() == 0
                 && departmentRepository.count() == 0
                 && lecturerRepository.count() == 0
                 && semesterRepository.count() == 0
                 && studentRepository.count() == 0;
-    }
-
-    private void createRoles() {
-        List<Role> roles = List.of(
-                createRole("ROLE_STUDENT"),
-                createRole("ROLE_ADMIN"),
-                createRole("ROLE_LECTURER")
-        );
-        roleRepository.saveAll(roles);
-        log.info("Initial roles inserted!");
-    }
-
-    private void createUsers() {
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found!"));
-
-        Role studentRole = roleRepository.findByName("ROLE_STUDENT")
-                .orElseThrow(() -> new RuntimeException("ROLE_STUDENT not found!"));
-
-        Role lecturerRole = roleRepository.findByName("ROLE_LECTURER")
-                .orElseThrow(() -> new RuntimeException("ROLE_LECTURER not found!"));
-
-        //create user admin
-        LocalDate date1 = LocalDate.of(2004, 8, 22); // 22/8/2004
-        User adminUser = createUser("Admin User", "adminUser@gmail.com", "0359256696", "ACTIVE", "admin", passwordEncoder.encode("1243"), date1, true);
-        adminUser.setRoles(Collections.singleton(adminRole));
-
-        //create user student
-        LocalDate date2 = LocalDate.of(2004, 8, 22);
-        User studentUser = createUser("Nguyễn Hữu Trọng", "nguyenhuutrong11133@gmail.com", "0359256696", "ACTIVE", "trong123", passwordEncoder.encode("1243"), date2, true);
-        studentUser.setRoles(Collections.singleton(studentRole));
-
-        //create user lecturerRole
-        LocalDate date3 = LocalDate.of(2004, 8, 22);
-        User lecturerUser = createUser("Giảng viên", "lecturer@gmail.com", "0359256696", "ACTIVE", "lecturer", passwordEncoder.encode("1243"), date3, true);
-        lecturerUser.setRoles(Collections.singleton(lecturerRole));
-
-        userRepository.saveAll(List.of(adminUser, studentUser, lecturerUser));
     }
 
     private void createDepartments() {
@@ -139,39 +93,59 @@ public class DataInitializer {
     }
 
     private void createLecturers() {
-        User lecturerUser = userRepository.findByLoginName("lecturer")
-                .orElseThrow(() -> new RuntimeException("Lecturer user not found!"));
         Department itDepartment = departmentRepository.findAll().get(0);
 
-        LocalDate hireDate = LocalDate.of(2004, 8, 22);
-        Lecturer lecturer = createLecturer("GV001", "Tiến sĩ", BigDecimal.valueOf(20000000), hireDate, "Trí tuệ nhân tạo");
-        lecturer.setApp_user(lecturerUser);
-        lecturer.setDepartment(itDepartment);
+        Lecturer lecturer = createLecturer(
+                "Nguyễn Văn Giảng",
+                "giang.nguyen@university.edu",
+                "0987654321",
+                "ACTIVE",
+                "lecturer01",
+                passwordEncoder.encode("lecturer@123"),
+                LocalDate.of(1980, 5, 15),
+                true,
+                "ROLE_LECTURER",
+                "GV001",
+                "Tiến sĩ",
+                BigDecimal.valueOf(20000000),
+                LocalDate.of(2015, 8, 22),
+                "Trí tuệ nhân tạo"
+        );
 
-        List<Course> allCourses = courseRepository.findAllWithLecturers();
-        lecturer.setCourses(allCourses);
+        lecturer.setDepartment(itDepartment);
+        List<Course> allCourses = courseRepository.findAll();
+        lecturer.setCourses(new HashSet<>(allCourses));
 
         lecturerRepository.save(lecturer);
-        courseRepository.saveAll(allCourses);
         log.info("Initial lecturer inserted!");
     }
 
     private void createStudents() {
-        User studentUser = userRepository.findByLoginName("trong123")
-                .orElseThrow(() -> new RuntimeException("Student user not found!"));
-
-        Student student = createStudent(UUID.randomUUID(), "Công nghệ Thông tin", BigDecimal.valueOf(3.5));
-        student.setApp_user(studentUser);
+        Student student = createStudent(
+                "Nguyễn Hữu Trọng",
+                "student01@university.edu",
+                "0123456789",
+                "ACTIVE",
+                "student01",
+                passwordEncoder.encode("student@123"),
+                LocalDate.of(2000, 3, 20),
+                false,
+                "ROLE_STUDENT",
+                UUID.randomUUID(),
+                "Công nghệ Thông tin",
+                BigDecimal.valueOf(3.5)
+        );
 
         studentRepository.save(student);
         log.info("Initial student inserted!");
     }
 
     private void createSemesters() {
-        LocalDate startDate = LocalDate.of(2013, 1, 1);
-        LocalDate endDate = LocalDate.of(2013, 1, 1);
-
-        Semester semester = createSemester("Học kỳ 1 - 2023", startDate, endDate);
+        Semester semester = createSemester(
+                "Học kỳ 1 - 2023",
+                LocalDate.of(2023, 9, 1),
+                LocalDate.of(2024, 1, 15)
+        );
         semesterRepository.save(semester);
         log.info("Initial semester inserted!");
     }
@@ -199,25 +173,6 @@ public class DataInitializer {
         log.info("Initial receipt inserted!");
     }
 
-    private Role createRole(String name) {
-        Role role = new Role();
-        role.setName(name);
-        return role;
-    }
-
-    private User createUser(String name, String email, String phoneNumber, String status, String loginName, String password, LocalDate birthDay, boolean gender) {
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhoneNumber(phoneNumber);
-        user.setStatus(status);
-        user.setLoginName(loginName);
-        user.setPassword(password);
-        user.setBirthDay(birthDay);
-        user.setGender(gender);
-        return user;
-    }
-
     private Course createCourse(String name, int credit, BigDecimal baseFeeCredit) {
         Course course = new Course();
         course.setName(name);
@@ -232,8 +187,20 @@ public class DataInitializer {
         return department;
     }
 
-    private Lecturer createLecturer(String lecturerCode, String academicRank, BigDecimal salary, LocalDate hireDate, String researchField){
+    private Lecturer createLecturer(String name, String email, String phoneNumber, String status,
+                                    String loginName, String password, LocalDate birthDay, boolean gender,
+                                    String roles, String lecturerCode, String academicRank,
+                                    BigDecimal salary, LocalDate hireDate, String researchField){
         Lecturer lecturer = new Lecturer();
+        lecturer.setName(name);
+        lecturer.setEmail(email);
+        lecturer.setPhoneNumber(phoneNumber);
+        lecturer.setStatus(status);
+        lecturer.setLoginName(loginName);
+        lecturer.setPassword(password);
+        lecturer.setBirthDay(birthDay);
+        lecturer.setGender(gender);
+        lecturer.setRoles(roles);
         lecturer.setLecturerCode(lecturerCode);
         lecturer.setAcademicRank(academicRank);
         lecturer.setSalary(salary);
@@ -242,20 +209,31 @@ public class DataInitializer {
         return lecturer;
     }
 
+    private Student createStudent(String name, String email, String phoneNumber, String status,
+                                  String loginName, String password, LocalDate birthDay, boolean gender,
+                                  String roles, UUID studentCode, String major, BigDecimal gpa) {
+        Student student = new Student();
+        student.setName(name);
+        student.setEmail(email);
+        student.setPhoneNumber(phoneNumber);
+        student.setStatus(status);
+        student.setLoginName(loginName);
+        student.setPassword(password);
+        student.setBirthDay(birthDay);
+        student.setGender(gender);
+        student.setRoles(roles);
+        student.setStudentCode(studentCode);
+        student.setMajor(major);
+        student.setGpa(gpa);
+        return student;
+    }
+
     private Semester createSemester(String name, LocalDate startDate, LocalDate endDate) {
         Semester semester = new Semester();
         semester.setName(name);
         semester.setStartDate(startDate);
         semester.setEndDate(endDate);
         return semester;
-    }
-
-    private Student createStudent(UUID studentCode, String major, BigDecimal gpa) {
-        Student student = new Student();
-        student.setStudentCode(studentCode);
-        student.setMajor(major);
-        student.setGpa(gpa);
-        return student;
     }
 
     private Receipt createReceipt(BigDecimal totalAmount, boolean status, String description) {

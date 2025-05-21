@@ -1,9 +1,11 @@
 package com.tronk.analysis.dto.request.student;
 
 import lombok.*;
-import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -13,9 +15,16 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadStudentRequest implements Serializable {
-	UUID student_code;
-	String major;
-	BigDecimal gpa;
-	UUID id;
-	UUID userId;
+    UUID id;
+    UUID student_code;
+    String major;
+    BigDecimal gpa;
+    String name;
+    String email;
+    String phoneNumber;
+    String status;
+    String loginName;
+    String password;
+    LocalDate birthDay;
+    boolean gender;
 }

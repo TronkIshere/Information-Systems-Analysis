@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.tronk.analysis.configuration.UserPrincipal;
 
 import java.text.ParseException;
+import java.util.UUID;
 
 public interface JwtService {
     String generateAccessToken(UserPrincipal user);
@@ -21,5 +22,9 @@ public interface JwtService {
     boolean validateToken(String authToken);
 
     String getEmailFromToken(String jwt);
+
+    UUID extractUserId(String token);
+
+    String extractUserType(String token);
 }
 

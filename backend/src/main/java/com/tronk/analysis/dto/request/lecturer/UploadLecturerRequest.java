@@ -20,5 +20,11 @@ public class UploadLecturerRequest implements Serializable {
 	BigDecimal salary;
 	LocalDate hireDate;
 	String researchField;
-	UUID id;
+	String name;
+	String email;
+	String phoneNumber;
+	String status;
+	String password;
+	LocalDate birthDay;
+	boolean gender;
 }

@@ -16,6 +16,12 @@ public class LecturerMapper {
 				.salary(lecturer.getSalary())
 				.hireDate(lecturer.getHireDate())
 				.researchField(lecturer.getResearchField())
+				.name(lecturer.getName())
+				.email(lecturer.getEmail())
+				.phoneNumber(lecturer.getPhoneNumber())
+				.status(lecturer.getStatus())
+				.birthDay(lecturer.getBirthDay())
+				.gender(lecturer.isGender())
 				.build();
 	}
 

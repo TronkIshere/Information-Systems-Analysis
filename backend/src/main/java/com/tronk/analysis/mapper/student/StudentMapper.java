@@ -12,9 +12,16 @@ public class StudentMapper {
 	public static StudentResponse toResponse(Student student) {
 		return StudentResponse.builder()
 				.id(student.getId())
-				.student_code(student.getStudentCode())
+				.studentCode(student.getStudentCode())
 				.major(student.getMajor())
 				.gpa(student.getGpa())
+				.name(student.getName())
+				.email(student.getEmail())
+				.phoneNumber(student.getPhoneNumber())
+				.status(student.getStatus())
+				.loginName(student.getLoginName())
+				.birthDay(student.getBirthDay())
+				.gender(student.isGender())
 				.build();
 	}
 

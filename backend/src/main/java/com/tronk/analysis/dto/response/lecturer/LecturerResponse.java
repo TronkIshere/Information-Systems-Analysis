@@ -21,4 +21,10 @@ public class LecturerResponse implements Serializable {
 	BigDecimal salary;
 	LocalDate hireDate;
 	String researchField;
+	String name;
+	String email;
+	String phoneNumber;
+	String status;
+	LocalDate birthDay;
+	boolean gender;
 }

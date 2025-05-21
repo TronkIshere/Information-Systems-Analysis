@@ -1,16 +1,14 @@
 package com.tronk.analysis.entity;
 
-import com.tronk.analysis.entity.common.AbstractEntity;
+import com.tronk.analysis.entity.common.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.UUID;
-import java.util.Date;
-import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -18,16 +16,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Lecturer extends AbstractEntity<UUID> {
+public class Lecturer extends User {
 	String lecturerCode;
 	String academicRank;
 	BigDecimal salary;
 	LocalDate hireDate;
 	String researchField;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "app_user_id")
-	User app_user;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "department_id")

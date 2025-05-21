@@ -1,18 +1,15 @@
 package com.tronk.analysis.service.impl;
 
-import com.tronk.analysis.configuration.UserPrincipal;
-import com.tronk.analysis.entity.Role;
-import com.tronk.analysis.entity.User;
-import com.tronk.analysis.exception.ApplicationException;
-import com.tronk.analysis.exception.ErrorCode;
-import com.tronk.analysis.repository.UserRepository;
-import com.tronk.analysis.service.JwtService;
-import com.tronk.analysis.service.RedisService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.tronk.analysis.configuration.UserPrincipal;
+import com.tronk.analysis.exception.ApplicationException;
+import com.tronk.analysis.exception.ErrorCode;
+import com.tronk.analysis.service.JwtService;
+import com.tronk.analysis.service.RedisService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.micrometer.common.util.StringUtils;
@@ -23,17 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -43,21 +39,22 @@ public class JwtServiceImpl implements JwtService {
     @Value("${spring.security.jwt.secret}")
     String jwtSecret;
     final RedisService redisService;
-    final UserRepository userRepository;
 
     @Override
-    public String generateAccessToken(UserPrincipal user) {
+    public String generateAccessToken(UserPrincipal userPrincipal) {
         byte[] secretKeyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getLoginName())
+                .subject(userPrincipal.getLoginName())
                 .issuer("identity-service")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(60, ChronoUnit.MINUTES).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
-                .claim("roles", buildRoles(user))
+                .claim("userId", userPrincipal.getId())
+                .claim("userType", userPrincipal.getUserType())
+                .claim("roles", userPrincipal.getAuthorities())
                 .build();
 
         Payload payload = new Payload(claimsSet.toJSONObject());
@@ -70,19 +67,6 @@ public class JwtServiceImpl implements JwtService {
         }
 
         return jwsObject.serialize();
-    }
-
-    private List<String> buildRoles(UserPrincipal userPrincipal) {
-        if (userPrincipal == null || userPrincipal.getRoles() == null) {
-            throw new ApplicationException(ErrorCode.USER_NOT_EXISTED);
-        }
-
-        User user = userRepository.findById(userPrincipal.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -257,6 +241,26 @@ public class JwtServiceImpl implements JwtService {
             throw new ApplicationException(ErrorCode.TOKEN_EXPIRED);
         } catch (Exception e) {
             throw new ApplicationException(ErrorCode.TOKEN_INVALID);
+        }
+    }
+
+    @Override
+    public UUID extractUserId(String token) {
+        return UUID.fromString(extractClaim(token, claims -> claims.get("userId").toString()));
+    }
+
+    @Override
+    public String extractUserType(String token) {
+        return extractClaim(token, claims -> claims.get("userType").toString());
+    }
+
+    private <T> T extractClaim(String token, Function<Map<String, Object>, T> claimsResolver) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+            return claimsResolver.apply(claimsSet.getClaims());
+        } catch (ParseException e) {
+            throw new RuntimeException("Invalid token", e);
         }
     }
 }
