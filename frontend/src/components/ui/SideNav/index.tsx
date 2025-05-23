@@ -3,7 +3,8 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 
-import Logo from "@/assets/images/logo-side-bar.svg";
+import Logo from "@/assets/images/logo.png";
+
 import {
   Box,
   List,
@@ -34,7 +35,7 @@ export default function SideNav() {
     ({ isactive = false }) => ({
       svg: {
         path: {
-          fill: isactive == 'true' ? "#fff" : "#202224",
+          fill: isactive == "true" ? "#fff" : "#202224",
         },
       },
     })
@@ -42,7 +43,7 @@ export default function SideNav() {
   return (
     <aside className="bg-white h-full w-fulls">
       <Box padding="24px 0" display="flex" justifyContent="center">
-        <Image src={Logo} width={121} height={27} alt="logo" />
+        <Image src={Logo} width={70} height={27} alt="logo" />
       </Box>
       <ListItemStyled
         sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}

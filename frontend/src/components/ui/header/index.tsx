@@ -92,33 +92,12 @@ export default function Header() {
         />
       </Box>
       <Box className="flex items-center gap-4">
-        <Button variant="primary">
-          <Link href={ADMIN_URL.COMPLETED_ORDER}>Xuất hoá đơn online</Link>
-        </Button>
-
         {/* Notification Button */}
         <IconButton onClick={handleNotifyClick}>
           <Badge badgeContent={6} color="error">
             <NotificationsIcon sx={{ color: "#4379EE" }} />
           </Badge>
         </IconButton>
-
-        {/* Language Selector */}
-        <Button
-          onClick={handleLangClick}
-          endIcon={<KeyboardArrowDownIcon />}
-          sx={{
-            textTransform: "none",
-            color: "text.primary",
-            "&:hover": { backgroundColor: "transparent" },
-            background: "#fff",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <span style={{ fontSize: "27px" }}>{currentLang.flag}</span>
-            {currentLang.name}
-          </Box>
-        </Button>
 
         <ProfileHeader />
       </Box>

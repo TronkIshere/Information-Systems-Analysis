@@ -4,6 +4,8 @@ import IconCustomer from "@/assets/icons/IconCustomer";
 import IconReport from "@/assets/icons/IconReport";
 import IconOrder from "@/assets/icons/IconOrder";
 import IconCompletedOrder from "@/assets/icons/IconCompletedOrder";
+import IconAccount from "@/assets/icons/IconAccount";
+import IconKey from "@/assets/icons/IconKey";
 
 export const getMenu = () => {
   return [
@@ -15,27 +17,39 @@ export const getMenu = () => {
     },
     {
       type: "single",
-      text: "Khách hàng",
+      text: "Giảng viên",
       icon: <IconCustomer />,
-      link: ADMIN_URL.CUSTOMER,
+      link: ADMIN_URL.LECTURER,
     },
     {
       type: "single",
-      text: "Báo cáo",
+      text: "Học sinh",
       icon: <IconReport />,
-      link: ADMIN_URL.REPORT,
+      link: ADMIN_URL.STUDENT,
     },
     {
       type: "single",
-      text: "Đơn hàng",
+      text: "Môn học",
+      icon: <IconKey />,
+      link: ADMIN_URL.COURSE,
+    },
+    {
+      type: "single",
+      text: "Bộ môn",
       icon: <IconOrder />,
-      link: ADMIN_URL.ORDER,
+      link: ADMIN_URL.DEPARTMENT,
     },
     {
       type: "single",
-      text: "Đơn hoàn",
+      text: "Biên lai",
       icon: <IconCompletedOrder />,
-      link: ADMIN_URL.COMPLETED_ORDER,
+      link: ADMIN_URL.RECEIPT,
+    },
+    {
+      type: "single",
+      text: "Học kì",
+      icon: <IconDashboard />,
+      link: ADMIN_URL.SEMESTER,
     },
   ];
 };

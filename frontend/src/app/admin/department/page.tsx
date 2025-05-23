@@ -1,76 +1,42 @@
 "use client";
 import IconBin from "@/assets/icons/IconBin";
 import IconEdit from "@/assets/icons/IconEdit";
-import CustomTable from "@/components/ui/table/CustomTable";
 import { SearchInput } from "@/components/ui/search/SearchInput";
-import { Stack, Typography, Button } from "@mui/material";
+import CustomTable from "@/components/ui/table/CustomTable";
+import { Button, Stack, Typography } from "@mui/material";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { useState } from "react";
 
 const data = [
   {
     id: 1,
-    id_order: "AHHEHSNNSN-123",
-    id_vat: "98373722",
-    name: "Nguyen van A",
-    address: "Tan Binh, Ho Chi Minh",
-    email: "nguyena@gmail.com",
-    status: 0,
+    name: "Khoa học Máy tính",
   },
   {
     id: 2,
-    id_order: "AHHEASDASDSN-123",
-    id_vat: "4342424",
-    name: "Nguyen van B",
-    address: "Tan Binh, Ho Chi Minh",
-    email: "nguyena@gmail.com",
-    status: 1,
+    name: "Kỹ thuật Phần mềm",
   },
   {
     id: 3,
-    id_order: "AHHEASDASDSN-123",
-    id_vat: "4342424",
-    name: "Nguyen van B",
-    address: "Tan Binh, Ho Chi Minh",
-    email: "nguyena@gmail.com",
-    status: 1,
+    name: "Trí tuệ Nhân tạo",
   },
   {
     id: 4,
-    id_order: "AHHEASDASDSN-123",
-    id_vat: "4342424",
-    name: "Nguyen van B",
-    address: "Tan Binh, Ho Chi Minh",
-    email: "nguyena@gmail.com",
-    status: 1,
+    name: "An toàn Thông tin",
   },
   {
     id: 5,
-    id_order: "AHHEASDASDSN-123",
-    id_vat: "4342424",
-    name: "Nguyen van B",
-    address: "Tan Binh, Ho Chi Minh",
-    email: "nguyena@gmail.com",
-    status: 1,
+    name: "Hệ thống Thông tin",
   },
   {
     id: 6,
-    id_order: "AHHEASDASDSN-123",
-    id_vat: "4342424",
-    name: "Nguyen van B",
-    address: "Tan Binh, Ho Chi Minh",
-    email: "nguyena@gmail.com",
-    status: 1,
+    name: "Mạng và Truyền thông Máy tính",
   },
 ];
 
 const columns: ColumnDef<any, any>[] = [
-  { accessorKey: "id_order", header: "Mã đơn hàng" },
-  { accessorKey: "id_vat", header: "Mã số thuế", sortingFn: "basic" },
-  { accessorKey: "name", header: "Tên khách hàng" },
-  { accessorKey: "address", header: "Địa chỉ" },
-  { accessorKey: "email", header: "Email" },
-  { accessorKey: "status", header: "Trạng thái" },
+  { accessorKey: "id", header: "ID" },
+  { accessorKey: "name", header: "Tên chuyên ngành" },
   {
     accessorKey: "actions",
     header: "Hành động",
@@ -91,7 +57,7 @@ const columns: ColumnDef<any, any>[] = [
   },
 ];
 
-function OrderPage() {
+function DepartmentPage() {
   const [filteredData, setFilteredData] = useState(data);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -124,15 +90,16 @@ function OrderPage() {
           Sản phẩm
         </Typography>
 
-        <Stack  display="flex" flexDirection="row" className="mb-4" gap={2}>
+        <Stack display="flex" flexDirection="row" className="mb-4" gap={2}>
           <SearchInput
             onSearch={handleSearch}
-            placeholder="Tìm kiếm đơn hàng..."
+            placeholder="Tìm kiếm chuyên ngành..."
             className="max-w-md"
             isLoading={isSearching}
           />
           <Button variant="primary" className="whitespace-nowrap">
-            Tìm kiếm</Button>
+            Tìm kiếm
+          </Button>
         </Stack>
       </Stack>
       <CustomTable columns={columns} data={filteredData} />
@@ -140,4 +107,4 @@ function OrderPage() {
   );
 }
 
-export default OrderPage;
+export default DepartmentPage;

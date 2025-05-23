@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { z } from "zod";
 
-import { AuthResponse, ErrorResponse, ResponseData, User } from "@/types/api";
+import { AuthResponse, ErrorResponse, User } from "@/types/api";
 
 import { api } from "@/lib/api-client";
 
@@ -77,10 +77,7 @@ const logout = (): Promise<void> => {
 };
 
 export const loginInputSchema = z.object({
-  loginName: z
-    .string()
-    .min(1, "Vui lòng nhập loginName")
-    .email("loginName không hợp lệ"),
+  loginName: z.string().min(5, "loginName không hợp lệ"),
   password: z.string().min(5, "Vui lòng nhập mật khẩu"),
 });
 

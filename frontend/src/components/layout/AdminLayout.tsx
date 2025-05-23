@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import Header from "@/components/ui/header";
 import SideNav from "@/components/ui/SideNav";
 
-function DashboardLayout({ children }: { children: ReactNode }) {
+function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid h-screen main-content bg-dashboard">
       <SideNav />
@@ -14,4 +14,4 @@ function DashboardLayout({ children }: { children: ReactNode }) {
   );
 }
 
-export default DashboardLayout;
+export default AdminLayout;

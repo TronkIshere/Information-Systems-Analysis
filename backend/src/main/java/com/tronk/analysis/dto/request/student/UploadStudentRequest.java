@@ -16,7 +16,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadStudentRequest implements Serializable {
     UUID id;
-    UUID student_code;
+    String studentCode;
     String major;
     BigDecimal gpa;
     String name;

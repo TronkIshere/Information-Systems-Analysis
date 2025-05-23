@@ -13,9 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Configuration
 @Slf4j(topic = "INIT-APPLICATION")
@@ -131,12 +129,28 @@ public class DataInitializer {
                 LocalDate.of(2000, 3, 20),
                 false,
                 "ROLE_STUDENT",
-                UUID.randomUUID(),
+                "253A10101",
                 "Công nghệ Thông tin",
                 BigDecimal.valueOf(3.5)
         );
 
-        studentRepository.save(student);
+        // for admin role demo
+        Student student2 = createStudent(
+                "Nguyễn Hữu Trọng",
+                "Admin01@university.edu",
+                "0123456789",
+                "ACTIVE",
+                "admin01",
+                passwordEncoder.encode("admin@123"),
+                LocalDate.of(2000, 3, 20),
+                false,
+                "ROLE_ADMIN",
+                "253A10100",
+                "Công nghệ Thông tin",
+                BigDecimal.valueOf(3.5)
+        );
+
+        studentRepository.saveAll(List.of(student, student2));
         log.info("Initial student inserted!");
     }
 
@@ -212,7 +226,7 @@ public class DataInitializer {
 
     private Student createStudent(String name, String email, String phoneNumber, String status,
                                   String loginName, String password, LocalDate birthDay, boolean gender,
-                                  String roles, UUID studentCode, String major, BigDecimal gpa) {
+                                  String roles, String studentCode, String major, BigDecimal gpa) {
         Student student = new Student();
         student.setName(name);
         student.setEmail(email);

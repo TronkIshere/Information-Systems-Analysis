@@ -40,7 +40,7 @@ export const RegisterForm = ({ onSuccess }: LoginFormProps) => {
         <Form
           onSubmit={(values: {
             name: string;
-            email: string;
+            loginName: string;
             password: string;
             phoneNumber: string;
           }) => {

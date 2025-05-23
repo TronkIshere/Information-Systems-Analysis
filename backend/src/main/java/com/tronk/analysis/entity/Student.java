@@ -10,7 +10,6 @@ import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Student extends User {
-	UUID studentCode;
+	String studentCode;
 	String major;
 	BigDecimal gpa;
 

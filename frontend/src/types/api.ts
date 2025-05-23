@@ -36,7 +36,7 @@ export type AuthResponse = {
   accessToken: string;
   refreshToken: string;
   status: string;
-  authProvider: string | null;
+  userType: "STUDENT" | "LECTURER" | "ADMIN";
   userId: string;
 };
 export type ErrorResponse = {

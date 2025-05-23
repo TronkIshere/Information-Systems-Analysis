@@ -29,7 +29,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentResponse createStudent(UploadStudentRequest request) {
         Student student = new Student();
-        student.setStudentCode(request.getStudent_code());
+        student.setStudentCode(request.getStudentCode());
         student.setMajor(request.getMajor());
         student.setGpa(request.getGpa());
         student.setName(request.getName());

@@ -27,8 +27,6 @@ GO
 
 USE analysis;
 
-SELECT * FROM app_role;
-SELECT * FROM app_user;
 SELECT * FROM course;
 SELECT * FROM department;
 SELECT * FROM department_course;
@@ -38,7 +36,6 @@ SELECT * FROM receipt;
 SELECT * FROM receipt_courses;
 SELECT * FROM semester;
 SELECT * FROM student;
-SELECT * FROM user_roles;
 
 SELECT 
     COLUMN_NAME, 
