@@ -8,6 +8,11 @@ export type ResponseData<T> = {
   message: string;
 };
 
+export interface ResponseAPI<T> {
+  code: number;
+  message: string;
+  data: T | null;
+}
 export type BaseEntity = {
   id: string;
   createdAt: number;
@@ -32,13 +37,14 @@ export type User = Entity<{
   bio: string;
 }>;
 
-export type AuthResponse = {
+export type AuthResponse = Entity<{
   accessToken: string;
   refreshToken: string;
   status: string;
   userType: "STUDENT" | "LECTURER" | "ADMIN";
   userId: string;
-};
+}>;
+
 export type ErrorResponse = {
   code: number;
   message: string;
@@ -62,3 +68,20 @@ export type Comment = Entity<{
   discussionId: string;
   author: User;
 }>;
+
+export interface LecturerResponse {
+  id: string;
+  lecturerCode: string;
+  academicRank?: string;
+  salary?: number;
+  hireDate?: string;
+  researchField?: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  birthDay?: string;
+  gender?: boolean;
+}
+
+export type LecturerListResponse = LecturerResponse[];

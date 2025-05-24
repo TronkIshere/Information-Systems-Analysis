@@ -18,6 +18,7 @@ import java.util.HashSet;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Lecturer extends User {
 	String lecturerCode;
+	@Column(columnDefinition = "NVARCHAR(255)")
 	String academicRank;
 	BigDecimal salary;
 	LocalDate hireDate;

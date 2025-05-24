@@ -12,6 +12,7 @@ import java.util.UUID;
 @Setter
 @MappedSuperclass
 public abstract class User extends AbstractEntity<UUID> {
+    @Column(columnDefinition = "NVARCHAR(255)")
     String name;
     String email;
     String phoneNumber;

@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Department extends AbstractEntity<UUID> {
+	@Column(columnDefinition = "NVARCHAR(255)")
 	String name;
 
 	@OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)

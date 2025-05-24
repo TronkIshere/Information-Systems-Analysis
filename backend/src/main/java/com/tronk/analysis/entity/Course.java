@@ -1,6 +1,7 @@
 package com.tronk.analysis.entity;
 
 import com.tronk.analysis.entity.common.AbstractEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import lombok.*;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Course extends AbstractEntity<UUID> {
+	@Column(columnDefinition = "NVARCHAR(255)")
 	String name;
 	int credit;
 	BigDecimal baseFeeCredit;

@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 public class Receipt extends AbstractEntity<UUID> {
 	BigDecimal totalAmount;
 	boolean status;
+	@Column(columnDefinition = "NVARCHAR(1000)")
 	String description;
 	LocalDate paymentDate;
 
