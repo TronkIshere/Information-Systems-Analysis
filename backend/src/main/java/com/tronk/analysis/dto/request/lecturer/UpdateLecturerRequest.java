@@ -21,7 +21,6 @@ public class UpdateLecturerRequest implements Serializable {
 	LocalDate hireDate;
 	String researchField;
 	UUID id;
-	UUID userId;
 	String name;
 	String email;
 	String phoneNumber;

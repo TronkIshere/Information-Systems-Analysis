@@ -116,7 +116,6 @@ public class DataInitializer {
         log.info("10 lecturers inserted successfully!");
     }
 
-
     private void createStudents() {
         List<Student> students = List.of(
                 createStudent("Nguyễn Hữu Trọng", "student01@university.edu", "0123456789", "ACTIVE", "student01", passwordEncoder.encode("student@123"), LocalDate.of(2000, 3, 20), false, "ROLE_STUDENT", "253A10101", "Công nghệ Thông tin", BigDecimal.valueOf(3.5)),

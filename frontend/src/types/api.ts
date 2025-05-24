@@ -85,3 +85,46 @@ export interface LecturerResponse {
 }
 
 export type LecturerListResponse = LecturerResponse[];
+
+export interface UpdateLecturerRequest {
+  id: string;
+  lecturerCode: string;
+  academicRank?: string;
+  salary?: number;
+  hireDate?: string;
+  researchField?: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  birthDay?: string;
+  gender?: boolean;
+}
+
+export interface StudentResponse {
+  id: string;
+  studentCode: string;
+  major?: string;
+  gpa?: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  birthDay?: string;
+  gender?: boolean;
+  loginName?: string;
+}
+
+export interface UpdateStudentRequest {
+  id: string;
+  studentCode: string;
+  major?: string;
+  gpa?: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  birthDay?: string;
+  gender?: boolean;
+  password?: string;
+}

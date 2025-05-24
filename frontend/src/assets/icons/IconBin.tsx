@@ -1,6 +1,11 @@
-import React from "react";
+import React, { SVGProps } from "react";
 
-function IconBin({width = 18, height= 16}) {
+interface IconProps extends SVGProps<SVGSVGElement> {
+  width?: number;
+  height?: number;
+}
+
+function IconBin({ width = 18, height = 16, ...props }: IconProps) {
   return (
     <svg
       width={width}
@@ -8,6 +13,7 @@ function IconBin({width = 18, height= 16}) {
       viewBox="0 0 18 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fillRule="evenodd"

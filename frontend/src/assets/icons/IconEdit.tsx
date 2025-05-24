@@ -1,6 +1,11 @@
-import React from "react";
+import React, { SVGProps } from "react";
 
-function IconEdit({ width = 18, height = 18 }) {
+interface IconProps extends SVGProps<SVGSVGElement> {
+  width?: number;
+  height?: number;
+}
+
+function IconEdit({ width = 18, height = 18, ...props }: IconProps) {
   return (
     <svg
       width={width}
@@ -8,6 +13,7 @@ function IconEdit({ width = 18, height = 18 }) {
       viewBox="0 0 18 18"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <g opacity="0.6">
         <path

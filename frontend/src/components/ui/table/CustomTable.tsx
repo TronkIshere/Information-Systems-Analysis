@@ -23,9 +23,14 @@ import {
 interface MuiTableProps<TData> {
   columns: ColumnDef<TData, any>[];
   data: TData[];
+  onRowClick?: (rowData: TData) => void;
 }
 
-const CustomTable = <TData,>({ columns, data }: MuiTableProps<TData>) => {
+const CustomTable = <TData,>({
+  columns,
+  data,
+  onRowClick,
+}: MuiTableProps<TData>) => {
   const [sorting, setSorting] = useState<any>([]);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -43,7 +48,7 @@ const CustomTable = <TData,>({ columns, data }: MuiTableProps<TData>) => {
               ? updater({ pageIndex: prevPageIndex, pageSize: prevPageSize })
               : updater;
 
-          return newPagination?.pageSize ?? prevPageSize; // Trả về giá trị hợp lệ
+          return newPagination?.pageSize ?? prevPageSize;
         });
 
         return typeof updater === "function"
@@ -83,7 +88,17 @@ const CustomTable = <TData,>({ columns, data }: MuiTableProps<TData>) => {
 
           <TableBody>
             {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                hover // Thêm hiệu ứng hover
+                onClick={() => onRowClick && onRowClick(row.original)}
+                sx={{
+                  cursor: onRowClick ? "pointer" : "default",
+                  "&:hover": {
+                    backgroundColor: onRowClick ? "action.hover" : "inherit",
+                  },
+                }}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
