@@ -239,7 +239,7 @@ export interface ReceiptResponse {
   totalAmount: number;
   status: boolean;
   description: string;
-  paymentDate: string;
+  paymentDate: Date | null;
   studentId: string;
   studentName: string;
   semesterId: string;
@@ -251,14 +251,21 @@ export interface UploadReceiptRequest {
   totalAmount: number;
   status: boolean;
   description: string;
-  paymentDate: string;
+  paymentDate: Date | null;
   studentId: string;
   semesterId: string;
   courseIds: string[];
 }
 
-export interface UpdateReceiptRequest extends UploadReceiptRequest {
+export interface UpdateReceiptRequest {
   id: string;
+  totalAmount: number;
+  status: boolean;
+  description: string;
+  paymentDate: Date | null;
+  studentId: string;
+  semesterId: string;
+  courseIds: string[];
 }
 
 // ========================

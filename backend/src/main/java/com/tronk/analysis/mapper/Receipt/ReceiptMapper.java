@@ -26,10 +26,9 @@ public class ReceiptMapper {
 				.collect(Collectors.toList());
 	}
 
-	// ✅ NEW MAPPER
 	public static ReceiptFullInfoResponse toFullInfoResponse(Receipt receipt) {
 		return ReceiptFullInfoResponse.builder()
-				.receiptId(receipt.getId())
+				.id(receipt.getId())
 				.totalAmount(receipt.getTotalAmount())
 				.status(receipt.isStatus())
 				.description(receipt.getDescription())

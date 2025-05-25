@@ -48,8 +48,15 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
 
+		BigDecimal totalAmount = request.getTotalAmount();
+		if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) == 0) {
+			totalAmount = courses.stream()
+					.map(course -> course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit())))
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+		}
+
 		Receipt receipt = new Receipt();
-		receipt.setTotalAmount(request.getTotalAmount());
+		receipt.setTotalAmount(totalAmount);
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
 		receipt.setPaymentDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDate.now());
@@ -60,6 +67,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
+
 
 	@Override
 	public List<ReceiptFullInfoResponse> getAllReceipts() {

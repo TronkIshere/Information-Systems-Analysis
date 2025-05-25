@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReceiptFullInfoResponse implements Serializable {
-    UUID receiptId;
+    UUID id;
     BigDecimal totalAmount;
     boolean status;
     String description;

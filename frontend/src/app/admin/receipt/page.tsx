@@ -72,7 +72,28 @@ function ReceiptPage() {
     {
       accessorKey: "paymentDate",
       header: "Ngày thanh toán",
-      cell: ({ row }) => row.original.paymentDate || "Chưa thanh toán",
+      cell: ({ row }) => {
+        const rawDate = row.original.paymentDate;
+
+        if (!rawDate) return "Chưa thanh toán";
+
+        try {
+          const date = new Date(rawDate);
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString("vi-VN");
+          }
+        } catch (e) {}
+
+        const dateStr = rawDate.toString();
+        if (dateStr.length === 8 && /^\d+$/.test(dateStr)) {
+          const year = dateStr.slice(0, 4);
+          const month = dateStr.slice(4, 6);
+          const day = dateStr.slice(6, 8);
+          return `${day}/${month}/${year}`;
+        }
+
+        return rawDate;
+      },
     },
     {
       accessorKey: "actions",
@@ -207,7 +228,7 @@ function ReceiptPage() {
                 totalAmount: 0,
                 status: false,
                 description: "",
-                paymentDate: "",
+                paymentDate: null,
                 studentId: "",
                 semesterId: "",
                 courseIds: [],
@@ -324,17 +345,21 @@ function ReceiptPage() {
                   <MenuItem value="false">Chưa đóng</MenuItem>
                 </Select>
               </FormControl>
-
               <TextField
                 fullWidth
                 label="Ngày thanh toán"
                 name="paymentDate"
                 type="date"
                 InputLabelProps={{ shrink: true }}
-                value={selectedReceipt.paymentDate?.split("T")[0] || ""}
+                value={
+                  selectedReceipt.paymentDate
+                    ? new Date(selectedReceipt.paymentDate)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
                 onChange={handleInputChange}
               />
-
               <TextField
                 fullWidth
                 label="Mô tả"

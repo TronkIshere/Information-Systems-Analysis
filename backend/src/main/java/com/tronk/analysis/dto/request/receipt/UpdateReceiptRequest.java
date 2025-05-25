@@ -21,6 +21,6 @@ public class UpdateReceiptRequest implements Serializable {
 	String description;
 	LocalDate paymentDate;
 	UUID studentId;
-	UUID SemesterId;
+	UUID semesterId;
 	List<UUID> courseIds;
 }
