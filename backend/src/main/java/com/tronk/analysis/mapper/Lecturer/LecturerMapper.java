@@ -18,6 +18,7 @@ public class LecturerMapper {
 				.researchField(lecturer.getResearchField())
 				.name(lecturer.getName())
 				.email(lecturer.getEmail())
+				.academicRank(lecturer.getAcademicRank())
 				.phoneNumber(lecturer.getPhoneNumber())
 				.status(lecturer.getStatus())
 				.birthDay(lecturer.getBirthDay())

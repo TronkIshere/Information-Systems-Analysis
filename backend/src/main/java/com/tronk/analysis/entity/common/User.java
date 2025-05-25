@@ -16,6 +16,7 @@ public abstract class User extends AbstractEntity<UUID> {
     String name;
     String email;
     String phoneNumber;
+    @Column(columnDefinition = "NVARCHAR(255)")
     String status;
     String loginName;
     String password;

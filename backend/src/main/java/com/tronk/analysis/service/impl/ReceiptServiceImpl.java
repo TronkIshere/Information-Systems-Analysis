@@ -2,6 +2,7 @@ package com.tronk.analysis.service.impl;
 
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
 import com.tronk.analysis.dto.request.receipt.*;
+import com.tronk.analysis.dto.response.receipt.ReceiptFullInfoResponse;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.entity.Course;
 import com.tronk.analysis.entity.Receipt;
@@ -26,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -38,19 +40,30 @@ public class ReceiptServiceImpl implements ReceiptService {
 	CourseRepository courseRepository;
 	@Override
 	public ReceiptResponse createReceipt(UploadReceiptRequest request) {
+		Student student = studentRepository.findById(request.getStudentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+
+		Semester semester = semesterRepository.findById(request.getSemesterId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+
+		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
+
 		Receipt receipt = new Receipt();
 		receipt.setTotalAmount(request.getTotalAmount());
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
-		receipt.setPaymentDate(receipt.getPaymentDate());
-		receipt.setPaymentDate(LocalDate.now());
-		Receipt savedEntity = receiptRepository.save(receipt);
-		return ReceiptMapper.toResponse(savedEntity);
+		receipt.setPaymentDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDate.now());
+
+		receipt.setStudent(student);
+		receipt.setSemester(semester);
+		receipt.setCourses(courses);
+
+		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
 
 	@Override
-	public List<ReceiptResponse> getAllReceipts() {
-		return ReceiptMapper.toResponseList(receiptRepository.findAll());
+	public List<ReceiptFullInfoResponse> getAllReceipts() {
+		return ReceiptMapper.toFullInfoList(receiptRepository.findAll());
 	}
 
 	@Override
@@ -63,11 +76,24 @@ public class ReceiptServiceImpl implements ReceiptService {
 	@Override
 	public ReceiptResponse updateReceipt(UpdateReceiptRequest request) {
 		Receipt receipt = receiptRepository.findById(request.getId())
-			.orElseThrow(() -> new EntityNotFoundException("Receipt not found"));
+				.orElseThrow(() -> new ApplicationException(ErrorCode.RECEIPT_NOT_FOUND));
+
+		Student student = studentRepository.findById(request.getStudentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+
+		Semester semester = semesterRepository.findById(request.getSemesterId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+
+		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
+
 		receipt.setTotalAmount(request.getTotalAmount());
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
-		receipt.setPaymentDate(receipt.getPaymentDate());
+		receipt.setPaymentDate(request.getPaymentDate());
+		receipt.setStudent(student);
+		receipt.setSemester(semester);
+		receipt.setCourses(courses);
+
 		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
 

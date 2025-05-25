@@ -2,6 +2,7 @@ package com.tronk.analysis.service;
 
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
 import com.tronk.analysis.dto.request.receipt.*;
+import com.tronk.analysis.dto.response.receipt.ReceiptFullInfoResponse;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import java.util.UUID;
 import java.util.List;
@@ -12,7 +13,7 @@ public interface ReceiptService {
 
 	ReceiptResponse getReceiptById(UUID id);
 
-	List<ReceiptResponse> getAllReceipts();
+	List<ReceiptFullInfoResponse> getAllReceipts();
 
 	ReceiptResponse updateReceipt(UpdateReceiptRequest request);
 

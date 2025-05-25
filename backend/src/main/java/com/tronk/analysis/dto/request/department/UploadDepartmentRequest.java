@@ -1,10 +1,9 @@
 package com.tronk.analysis.dto.request.department;
 
 import lombok.*;
-import java.io.Serializable;
-import java.util.UUID;
-
 import lombok.experimental.FieldDefaults;
+
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -14,5 +13,4 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadDepartmentRequest implements Serializable {
 	String name;
-	UUID id;
 }

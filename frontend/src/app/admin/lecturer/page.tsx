@@ -7,6 +7,7 @@ import {
   useDeleteLecturer,
   useLecturers,
   useUpdateLecturer,
+  useCreateLecturer,
 } from "@/services/lecturer";
 import { LecturerResponse } from "@/types/api";
 import {
@@ -26,6 +27,7 @@ function LecturerPage() {
   const { data: lecturers, isLoading, error } = useLecturers();
   const { mutate: updateLecturer } = useUpdateLecturer();
   const { mutate: deleteLecturer } = useDeleteLecturer();
+  const { mutate: createLecturer } = useCreateLecturer();
 
   const [filteredData, setFilteredData] = useState<LecturerResponse[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -35,61 +37,11 @@ function LecturerPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [lecturerToDelete, setLecturerToDelete] =
     useState<LecturerResponse | null>(null);
-
-  const handleRowClick = (lecturer: LecturerResponse) => {
-    setSelectedLecturer(lecturer);
-    setIsEditModalOpen(true);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setSelectedLecturer((prev) => ({
-      ...prev!,
-      [name]: value,
-    }));
-  };
-
-  const handleUpdate = () => {
-    if (selectedLecturer) {
-      updateLecturer(selectedLecturer, {
-        onSuccess: () => {
-          setIsEditModalOpen(false);
-          setSelectedLecturer(null);
-        },
-      });
-    }
-  };
-
-  const handleDeleteClick = (lecturer: LecturerResponse) => {
-    setLecturerToDelete(lecturer);
-    setIsDeleteModalOpen(true);
-  };
-
-  const confirmDelete = () => {
-    if (lecturerToDelete?.id) {
-      deleteLecturer(lecturerToDelete.id, {
-        onSuccess: () => {
-          setIsDeleteModalOpen(false);
-          setIsEditModalOpen(false);
-          setLecturerToDelete(null);
-          setSelectedLecturer(null);
-        },
-      });
-    }
-  };
-
-  const cancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setLecturerToDelete(null);
-  };
+  const [isCreating, setIsCreating] = useState(false);
 
   const columns: ColumnDef<LecturerResponse>[] = [
     { accessorKey: "id", header: "ID" },
-    {
-      accessorKey: "lecturerCode",
-      header: "Mã giảng viên",
-      sortingFn: "basic",
-    },
+    { accessorKey: "lecturerCode", header: "Mã giảng viên" },
     { accessorKey: "name", header: "Tên giảng viên" },
     { accessorKey: "phoneNumber", header: "Số điện thoại" },
     { accessorKey: "email", header: "Email" },
@@ -123,6 +75,48 @@ function LecturerPage() {
     },
   ];
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSelectedLecturer((prev) => ({
+      ...prev!,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    if (selectedLecturer) {
+      const operation = isCreating ? createLecturer : updateLecturer;
+      operation(selectedLecturer, {
+        onSuccess: () => {
+          setIsEditModalOpen(false);
+          setSelectedLecturer(null);
+          setIsCreating(false);
+        },
+      });
+    }
+  };
+
+  const handleDeleteClick = (lecturer: LecturerResponse) => {
+    setLecturerToDelete(lecturer);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (lecturerToDelete?.id) {
+      deleteLecturer(lecturerToDelete.id, {
+        onSuccess: () => {
+          setIsDeleteModalOpen(false);
+          setLecturerToDelete(null);
+        },
+      });
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setLecturerToDelete(null);
+  };
+
   const handleSearch = async (searchTerm: string) => {
     setIsSearching(true);
     try {
@@ -151,7 +145,7 @@ function LecturerPage() {
     <>
       <Stack display="flex" flexDirection="row" justifyContent="space-between">
         <Typography variant="display-small" className="mb-4">
-          Sản phẩm
+          Quản lý giảng viên
         </Typography>
 
         <Stack display="flex" flexDirection="row" className="mb-4" gap={2}>
@@ -161,18 +155,39 @@ function LecturerPage() {
             className="max-w-md"
             isLoading={isSearching}
           />
-          <Button variant="primary" className="whitespace-nowrap">
-            Tìm kiếm
+          <Button
+            variant="primary"
+            className="whitespace-nowrap"
+            onClick={() => {
+              setSelectedLecturer({
+                id: "",
+                lecturerCode: "",
+                name: "",
+                phoneNumber: "",
+                email: "",
+                academicRank: "",
+                salary: null,
+                hireDate: null,
+                researchField: "",
+                birthDay: null,
+                gender: null,
+                status: "Hoạt động",
+                password: "",
+              });
+              setIsCreating(true);
+              setIsEditModalOpen(true);
+            }}
+          >
+            Thêm mới
           </Button>
         </Stack>
       </Stack>
       <CustomTable
         columns={columns}
         data={filteredData.length > 0 ? filteredData : lecturers || []}
-        onRowClick={handleRowClick}
       />
 
-      {/* Edit Modal */}
+      {/* Edit/Create Modal */}
       <Dialog
         open={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -180,7 +195,7 @@ function LecturerPage() {
         fullWidth
       >
         <DialogTitle>
-          {selectedLecturer ? "Chỉnh sửa thông tin" : "Thêm giảng viên mới"}
+          {isCreating ? "Thêm giảng viên mới" : "Chỉnh sửa thông tin"}
         </DialogTitle>
         <DialogContent>
           {selectedLecturer && (
@@ -215,25 +230,107 @@ function LecturerPage() {
               />
               <TextField
                 fullWidth
-                label="Trạng thái"
-                name="status"
-                value={selectedLecturer.status || ""}
+                label="Học hàm"
+                name="academicRank"
+                value={selectedLecturer.academicRank || ""}
                 onChange={handleInputChange}
               />
+              <TextField
+                fullWidth
+                label="Lĩnh vực nghiên cứu"
+                name="researchField"
+                value={selectedLecturer.researchField || ""}
+                onChange={handleInputChange}
+              />
+              <TextField
+                fullWidth
+                label="Lương cơ bản"
+                type="number"
+                name="salary"
+                value={selectedLecturer.salary ?? ""}
+                onChange={handleInputChange}
+              />
+              <TextField
+                fullWidth
+                label="Ngày tuyển dụng"
+                type="date"
+                name="hireDate"
+                value={
+                  selectedLecturer.hireDate
+                    ? new Date(selectedLecturer.hireDate)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+                onChange={handleInputChange}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              <TextField
+                fullWidth
+                label="Ngày sinh"
+                type="date"
+                name="birthDay"
+                value={
+                  selectedLecturer.birthDay
+                    ? new Date(selectedLecturer.birthDay)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+                onChange={handleInputChange}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              <TextField
+                select
+                fullWidth
+                label="Giới tính"
+                name="gender"
+                value={
+                  selectedLecturer.gender !== null &&
+                  selectedLecturer.gender !== undefined
+                    ? selectedLecturer.gender.toString()
+                    : ""
+                }
+                onChange={handleInputChange}
+                SelectProps={{ native: true }}
+              >
+                <option value="">-- Chọn giới tính --</option>
+                <option value="true">Nam</option>
+                <option value="false">Nữ</option>
+              </TextField>
+
+              <TextField
+                select
+                fullWidth
+                label="Trạng thái"
+                name="status"
+                value={selectedLecturer.status || "ACTIVE"}
+                onChange={handleInputChange}
+                SelectProps={{ native: true }}
+              >
+                <option value="Hoạt động">Hoạt động</option>
+                <option value="Ngừng hoạt động">Ngừng hoạt động</option>
+              </TextField>
+              {isCreating && (
+                <TextField
+                  fullWidth
+                  label="Mật khẩu"
+                  name="password"
+                  type="password"
+                  value={selectedLecturer.password || ""}
+                  onChange={handleInputChange}
+                />
+              )}
             </Stack>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsEditModalOpen(false)}>Hủy</Button>
-          <Button onClick={handleUpdate}>Lưu thay đổi</Button>
-          {selectedLecturer?.id && (
-            <Button
-              color="error"
-              onClick={() => handleDeleteClick(selectedLecturer)}
-            >
-              Xóa giảng viên
-            </Button>
-          )}
+          <Button onClick={handleSubmit}>
+            {isCreating ? "Tạo mới" : "Lưu thay đổi"}
+          </Button>
         </DialogActions>
       </Dialog>
 

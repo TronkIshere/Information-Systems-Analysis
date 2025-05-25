@@ -22,6 +22,7 @@ public class Lecturer extends User {
 	String academicRank;
 	BigDecimal salary;
 	LocalDate hireDate;
+	@Column(columnDefinition = "NVARCHAR(255)")
 	String researchField;
 
 	@ManyToOne(fetch = FetchType.LAZY)

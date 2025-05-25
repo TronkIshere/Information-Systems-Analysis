@@ -27,4 +27,5 @@ public class UpdateLecturerRequest implements Serializable {
 	String password;
 	LocalDate birthDay;
 	boolean gender;
+	String status;
 }

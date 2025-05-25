@@ -46,13 +46,13 @@ public class SemesterServiceImpl implements SemesterService {
 
 	@Override
 	public SemesterResponse updateSemester(UpdateSemesterRequest request) {
-		Semester entity = semesterRepository.findById(request.getId())
+		Semester semester = semesterRepository.findById(request.getId())
 			.orElseThrow(() -> new EntityNotFoundException("Semester not found"));
-		Semester semester = new Semester();
 		semester.setName(request.getName());
 		semester.setStartDate(request.getStartDate());
 		semester.setEndDate(request.getEndDate());
-		return SemesterMapper.toResponse(semesterRepository.save(entity));
+		semesterRepository.save(semester);
+		return SemesterMapper.toResponse(semester);
 	}
 
 	@Override

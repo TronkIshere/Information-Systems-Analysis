@@ -55,14 +55,14 @@ public class CourseServiceImpl implements CourseService {
 
 	@Override
 	public CourseResponse updateCourse(UpdateCourseRequest request) {
-		Course entity = courseRepository.findById(request.getId())
+		Course course = courseRepository.findById(request.getId())
 			.orElseThrow(() -> new EntityNotFoundException("Course not found"));
-		Course course = new Course();
 		course.setName(request.getName());
 		course.setCredit(request.getCredit());
 		course.setBaseFeeCredit(request.getBaseFeeCredit());
 		course.setSubjectType(request.isSubjectType());
-		return CourseMapper.toResponse(courseRepository.save(entity));
+		courseRepository.save(course);
+		return CourseMapper.toResponse(course);
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import {
   LecturerResponse,
   ResponseAPI,
   UpdateLecturerRequest,
+  UploadLecturerRequest,
 } from "@/types/api";
 import { api } from "@/lib/api-client";
 
@@ -32,6 +33,17 @@ export const getLecturersQueryOptions = () => {
 
 export const useLecturers = () => {
   return useQuery(getLecturersQueryOptions());
+};
+
+export const useCreateLecturer = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (department: UploadLecturerRequest) =>
+      api.post<LecturerResponse>("/lecturers", department),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: lecturerQueryKey });
+    },
+  });
 };
 
 export const useUpdateLecturer = () => {

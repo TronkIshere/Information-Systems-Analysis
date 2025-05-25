@@ -11,7 +11,11 @@ public class SemesterMapper {
 
 	public static SemesterResponse toResponse(Semester semester) {
 		return SemesterResponse.builder()
-			.build();
+				.id(semester.getId())
+				.name(semester.getName())
+				.startDate(semester.getStartDate())
+				.endDate(semester.getEndDate())
+				.build();
 	}
 
 	public static List<SemesterResponse> toResponseList(List<Semester> semesters) {

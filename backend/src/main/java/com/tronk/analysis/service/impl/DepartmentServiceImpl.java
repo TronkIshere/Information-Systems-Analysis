@@ -49,11 +49,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	public DepartmentResponse updateDepartment(UpdateDepartmentRequest request) {
-		Department entity = departmentRepository.findById(request.getId())
+		Department department = departmentRepository.findById(request.getId())
 			.orElseThrow(() -> new EntityNotFoundException("Department not found"));
-		Department department = new Department();
 		department.setName(request.getName());
-		return DepartmentMapper.toResponse(departmentRepository.save(entity));
+		departmentRepository.save(department);
+		return DepartmentMapper.toResponse(department);
 	}
 
 	@Override

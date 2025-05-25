@@ -1,13 +1,15 @@
 package com.tronk.analysis.controller;
 
-import com.tronk.analysis.dto.response.common.ResponseAPI;
-import com.tronk.analysis.dto.request.semester.UploadSemesterRequest;
 import com.tronk.analysis.dto.request.semester.UpdateSemesterRequest;
+import com.tronk.analysis.dto.request.semester.UploadSemesterRequest;
+import com.tronk.analysis.dto.response.common.ResponseAPI;
 import com.tronk.analysis.dto.response.semester.SemesterResponse;
 import com.tronk.analysis.service.SemesterService;
-import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -15,6 +17,16 @@ import java.util.UUID;
 @RequestMapping("/api/v1/semesters")
 public class SemesterController {
 	private final SemesterService semesterService;
+
+	@GetMapping("/list")
+	ResponseAPI<List<SemesterResponse>> getAllSemester() {
+		var result = semesterService.getAllSemesters();
+		return ResponseAPI.<List<SemesterResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
 
 	@PostMapping
 	public ResponseAPI<SemesterResponse> createSemester(

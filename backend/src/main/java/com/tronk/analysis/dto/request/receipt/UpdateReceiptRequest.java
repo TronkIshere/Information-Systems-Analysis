@@ -5,6 +5,7 @@ import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -14,9 +15,12 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateReceiptRequest implements Serializable {
+	UUID id;
 	BigDecimal totalAmount;
 	boolean status;
 	String description;
 	LocalDate paymentDate;
-	UUID id;
+	UUID studentId;
+	UUID SemesterId;
+	List<UUID> courseIds;
 }

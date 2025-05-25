@@ -2,6 +2,7 @@ package com.tronk.analysis.entity;
 
 import com.tronk.analysis.entity.common.User;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.*;
@@ -19,6 +20,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Student extends User {
 	String studentCode;
+	@Column(columnDefinition = "NVARCHAR(255)")
 	String major;
 	BigDecimal gpa;
 

@@ -41,7 +41,7 @@ public class LecturerServiceImpl implements LecturerService {
 		lecturer.setPassword(passwordEncoder.encode(request.getPassword()));
 		lecturer.setBirthDay(request.getBirthDay());
 		lecturer.setGender(request.isGender());
-		lecturer.setStatus("ACTIVE");
+		lecturer.setStatus(request.getStatus());
 		lecturer.setRoles("ROLE_LECTURER");
 
 		lecturer.setLecturerCode(request.getLecturerCode());
@@ -87,10 +87,12 @@ public class LecturerServiceImpl implements LecturerService {
 		}
 
 		lecturer.setLecturerCode(request.getLecturerCode());
+		System.out.println("Demo: " + request.getAcademicRank());
 		lecturer.setAcademicRank(request.getAcademicRank());
 		lecturer.setSalary(request.getSalary());
 		lecturer.setHireDate(request.getHireDate());
 		lecturer.setResearchField(request.getResearchField());
+		lecturer.setStatus(request.getStatus());
 		lecturerRepository.save(lecturer);
 		return LecturerMapper.toResponse(lecturer);
 	}

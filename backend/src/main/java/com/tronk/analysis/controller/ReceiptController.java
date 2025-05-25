@@ -1,9 +1,9 @@
 package com.tronk.analysis.controller;
 
-import com.tronk.analysis.dto.request.lecturer.AssignLecturerToCourseRequest;
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
 import com.tronk.analysis.dto.request.receipt.*;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
+import com.tronk.analysis.dto.response.receipt.ReceiptFullInfoResponse;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.service.ReceiptService;
 import jakarta.validation.Valid;
@@ -21,9 +21,9 @@ public class ReceiptController {
 	private final ReceiptService receiptService;
 
 	@GetMapping("/list")
-	ResponseAPI<List<ReceiptResponse>> getAllUsers() {
+	ResponseAPI<List<ReceiptFullInfoResponse>> getAllUsers() {
 		var result = receiptService.getAllReceipts();
-		return ResponseAPI.<List<ReceiptResponse>>builder()
+		return ResponseAPI.<List<ReceiptFullInfoResponse>>builder()
 				.code(HttpStatus.OK.value())
 				.message("success")
 				.data(result)
