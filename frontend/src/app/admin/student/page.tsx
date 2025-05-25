@@ -4,17 +4,23 @@ import IconEdit from "@/assets/icons/IconEdit";
 import { SearchInput } from "@/components/ui/search/SearchInput";
 import CustomTable from "@/components/ui/table/CustomTable";
 import {
+  useCreateStudent,
   useDeleteStudent,
   useStudents,
   useUpdateStudent,
 } from "@/services/student";
-import { StudentResponse } from "@/types/api";
+import {
+  StudentResponse,
+  UpdateStudentRequest,
+  UploadStudentRequest,
+} from "@/types/api";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -26,41 +32,44 @@ function StudentPage() {
   const { data: students, isLoading, error } = useStudents();
   const { mutate: updateStudent } = useUpdateStudent();
   const { mutate: deleteStudent } = useDeleteStudent();
+  const { mutate: createStudent } = useCreateStudent();
 
   const [filteredData, setFilteredData] = useState<StudentResponse[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedStudent, setSelectedStudent] =
-    useState<StudentResponse | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<Partial<
+    UpdateStudentRequest | UploadStudentRequest
+  > | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] =
     useState<StudentResponse | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   const columns: ColumnDef<StudentResponse>[] = [
     { accessorKey: "id", header: "ID" },
-    {
-      accessorKey: "studentCode",
-      header: "Mã sinh viên",
-      sortingFn: "basic",
-    },
+    { accessorKey: "studentCode", header: "Mã SV", sortingFn: "basic" },
     { accessorKey: "name", header: "Tên sinh viên" },
-    { accessorKey: "phoneNumber", header: "Số điện thoại" },
+    { accessorKey: "phoneNumber", header: "SĐT" },
     { accessorKey: "email", header: "Email" },
-    { accessorKey: "status", header: "Trạng thái" },
+    {
+      accessorKey: "status",
+      header: "Trạng thái",
+      cell: ({ row }) =>
+        row.original.status === "ACTIVE" ? "Hoạt động" : "Khóa",
+    },
     { accessorKey: "major", header: "Chuyên ngành" },
-    { accessorKey: "gpa", header: "GPA" },
+    {
+      accessorKey: "gpa",
+      header: "GPA",
+      cell: ({ row }) => row.original.gpa?.toFixed(2) || "N/A",
+    },
     {
       accessorKey: "actions",
-      header: "Hành động",
+      header: "Thao tác",
       cell: ({ row }) => (
-        <Stack
-          direction="row"
-          alignItems="center"
-          gap="16px"
-          justifyContent="space-between"
-          className="border border-solid border-[#D5D5D5] rounded-lg py-2 px-4"
-        >
+        <Stack direction="row" gap={1}>
           <IconEdit
+            className="cursor-pointer text-blue-500"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedStudent(row.original);
@@ -68,6 +77,7 @@ function StudentPage() {
             }}
           />
           <IconBin
+            className="cursor-pointer text-red-500"
             onClick={(e) => {
               e.stopPropagation();
               handleDeleteClick(row.original);
@@ -82,16 +92,40 @@ function StudentPage() {
     const { name, value } = e.target;
     setSelectedStudent((prev) => ({
       ...prev!,
-      [name]: value,
+      [name]: name === "gpa" ? Number(value) : value,
     }));
   };
 
-  const handleUpdate = () => {
+  const handleDateChange = (name: string, value: string) => {
+    setSelectedStudent((prev) => ({
+      ...prev!,
+      [name]: new Date(value).toISOString(),
+    }));
+  };
+
+  const handleGenderChange = (value: string) => {
+    setSelectedStudent((prev) => ({
+      ...prev!,
+      gender: value === "null" ? null : value === "true",
+    }));
+  };
+
+  const handleSubmit = () => {
     if (selectedStudent) {
-      updateStudent(selectedStudent, {
+      const payload = {
+        ...selectedStudent,
+        birthDay: selectedStudent.birthDay
+          ? new Date(selectedStudent.birthDay).toISOString()
+          : undefined,
+        gender: selectedStudent.gender ?? null,
+      };
+
+      const operation = isCreating ? createStudent : updateStudent;
+      operation(payload as any, {
         onSuccess: () => {
           setIsEditModalOpen(false);
           setSelectedStudent(null);
+          setIsCreating(false);
         },
       });
     }
@@ -107,27 +141,15 @@ function StudentPage() {
       deleteStudent(studentToDelete.id, {
         onSuccess: () => {
           setIsDeleteModalOpen(false);
-          setIsEditModalOpen(false);
           setStudentToDelete(null);
-          setSelectedStudent(null);
         },
       });
     }
   };
 
-  const cancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setStudentToDelete(null);
-  };
-
   const handleSearch = async (searchTerm: string) => {
     setIsSearching(true);
     try {
-      if (!searchTerm) {
-        setFilteredData(students || []);
-        return;
-      }
-
       const filtered = (students || []).filter((item) =>
         Object.values(item).some(
           (value) =>
@@ -146,29 +168,42 @@ function StudentPage() {
 
   return (
     <>
-      <Stack display="flex" flexDirection="row" justifyContent="space-between">
-        <Typography variant="display-small" className="mb-4">
-          Quản lý sinh viên
-        </Typography>
-
-        <Stack display="flex" flexDirection="row" className="mb-4" gap={2}>
+      <div className="flex justify-between items-center mb-4">
+        <Typography variant="h4">Quản lý sinh viên</Typography>
+        <div className="flex gap-2">
           <SearchInput
             onSearch={handleSearch}
             placeholder="Tìm kiếm sinh viên..."
-            className="max-w-md"
-            isLoading={isSearching}
+            className="w-64"
           />
-          <Button variant="primary" className="whitespace-nowrap">
-            Tìm kiếm
+          <Button
+            color="primary"
+            className="whitespace-nowrap"
+            onClick={() => {
+              setSelectedStudent({
+                studentCode: "",
+                name: "",
+                phoneNumber: "",
+                email: "",
+                status: "ACTIVE",
+                password: "",
+                gender: null,
+              });
+              setIsCreating(true);
+              setIsEditModalOpen(true);
+            }}
+          >
+            Thêm mới
           </Button>
-        </Stack>
-      </Stack>
+        </div>
+      </div>
+
       <CustomTable
         columns={columns}
         data={filteredData.length > 0 ? filteredData : students || []}
       />
 
-      {/* Edit Modal */}
+      {/* Edit/Create Modal */}
       <Dialog
         open={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -176,31 +211,59 @@ function StudentPage() {
         fullWidth
       >
         <DialogTitle>
-          {selectedStudent ? "Chỉnh sửa thông tin" : "Thêm sinh viên mới"}
+          {isCreating ? "Thêm sinh viên mới" : "Cập nhật thông tin"}
         </DialogTitle>
         <DialogContent>
           {selectedStudent && (
-            <Stack spacing={3} sx={{ mt: 2 }}>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              {isCreating && (
+                <>
+                  <TextField
+                    fullWidth
+                    label="Tên đăng nhập"
+                    name="loginName"
+                    value={
+                      (selectedStudent as UploadStudentRequest).loginName || ""
+                    }
+                    onChange={handleInputChange}
+                    required
+                  />
+                  <TextField
+                    fullWidth
+                    label="Mật khẩu"
+                    type="password"
+                    name="password"
+                    value={selectedStudent.password || ""}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </>
+              )}
+
               <TextField
                 fullWidth
                 label="Mã sinh viên"
                 name="studentCode"
                 value={selectedStudent.studentCode || ""}
                 onChange={handleInputChange}
+                required
               />
               <TextField
                 fullWidth
-                label="Tên sinh viên"
+                label="Họ và tên"
                 name="name"
                 value={selectedStudent.name || ""}
                 onChange={handleInputChange}
+                required
               />
               <TextField
                 fullWidth
                 label="Email"
+                type="email"
                 name="email"
                 value={selectedStudent.email || ""}
                 onChange={handleInputChange}
+                required
               />
               <TextField
                 fullWidth
@@ -208,6 +271,7 @@ function StudentPage() {
                 name="phoneNumber"
                 value={selectedStudent.phoneNumber || ""}
                 onChange={handleInputChange}
+                required
               />
               <TextField
                 fullWidth
@@ -219,72 +283,88 @@ function StudentPage() {
               <TextField
                 fullWidth
                 label="GPA"
-                name="gpa"
                 type="number"
+                name="gpa"
                 value={selectedStudent.gpa || ""}
                 onChange={handleInputChange}
+                inputProps={{
+                  step: "0.01",
+                  min: "0",
+                  max: "4",
+                  pattern: "\\d+(\\.\\d{1,2})?",
+                }}
               />
               <TextField
                 fullWidth
                 label="Ngày sinh"
-                name="birthDay"
                 type="date"
+                name="birthDay"
+                value={
+                  selectedStudent.birthDay
+                    ? new Date(selectedStudent.birthDay)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+                onChange={(e) => handleDateChange("birthDay", e.target.value)}
                 InputLabelProps={{ shrink: true }}
-                value={selectedStudent.birthDay || ""}
-                onChange={handleInputChange}
               />
               <TextField
                 select
                 fullWidth
                 label="Giới tính"
-                name="gender"
-                value={selectedStudent.gender ? "true" : "false"}
-                onChange={handleInputChange}
-                SelectProps={{
-                  native: true,
-                }}
+                value={
+                  selectedStudent.gender === null
+                    ? "null"
+                    : String(selectedStudent.gender)
+                }
+                onChange={(e) => handleGenderChange(e.target.value)}
               >
-                <option value="true">Nam</option>
-                <option value="false">Nữ</option>
+                <MenuItem value="null">Chưa xác định</MenuItem>
+                <MenuItem value="true">Nam</MenuItem>
+                <MenuItem value="false">Nữ</MenuItem>
               </TextField>
-            </Stack>
+              <TextField
+                select
+                fullWidth
+                label="Trạng thái"
+                name="status"
+                value={selectedStudent.status || "Hoạt động"}
+                onChange={handleInputChange}
+              >
+                <MenuItem value="Hoạt động">Hoạt động</MenuItem>
+                <MenuItem value="Khóa">Khóa</MenuItem>
+              </TextField>
+            </div>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsEditModalOpen(false)}>Hủy</Button>
-          <Button onClick={handleUpdate}>Lưu thay đổi</Button>
-          {selectedStudent?.id && (
-            <Button
-              color="error"
-              onClick={() => handleDeleteClick(selectedStudent)}
-            >
-              Xóa sinh viên
-            </Button>
-          )}
+          <Button onClick={handleSubmit}>
+            {isCreating ? "Tạo mới" : "Cập nhật"}
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog
         open={isDeleteModalOpen}
-        onClose={cancelDelete}
-        maxWidth="sm"
-        fullWidth
+        onClose={() => setIsDeleteModalOpen(false)}
       >
         <DialogTitle>Xác nhận xóa</DialogTitle>
         <DialogContent>
           {studentToDelete && (
             <Typography>
-              Bạn có chắc chắn muốn xóa sinh viên{" "}
-              <strong>{studentToDelete.name}</strong> (Mã:{" "}
-              {studentToDelete.studentCode}) không?
+              Bạn có chắc muốn xóa sinh viên {studentToDelete.name}?
+              <br />
+              <small>(Mã SV: {studentToDelete.studentCode})</small>
             </Typography>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={cancelDelete}>Hủy</Button>
-          <Button color="error" onClick={confirmDelete}>
-            Xóa
+          <Button onClick={() => setIsDeleteModalOpen(false)}>Hủy</Button>
+          <Button onClick={confirmDelete} color="error">
+            Xác nhận xóa
           </Button>
         </DialogActions>
       </Dialog>

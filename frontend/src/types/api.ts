@@ -120,8 +120,8 @@ export interface StudentResponse {
   email: string;
   phoneNumber: string;
   status: string;
-  birthDay?: string;
-  gender?: boolean;
+  birthDay?: Date;
+  gender: boolean | null;
   loginName?: string;
 }
 
@@ -134,8 +134,24 @@ export interface UpdateStudentRequest {
   email: string;
   phoneNumber: string;
   status: string;
-  birthDay?: string;
-  gender?: boolean;
+  birthDay?: Date;
+  gender: boolean | null;
+  loginName?: string;
+  password?: string;
+}
+
+export interface UploadStudentRequest {
+  id: string;
+  studentCode: string;
+  major?: string;
+  gpa?: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  birthDay?: Date;
+  gender: boolean | null;
+  loginName?: string;
   password?: string;
 }
 

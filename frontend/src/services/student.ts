@@ -5,7 +5,11 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import { StudentResponse, UpdateStudentRequest } from "@/types/api";
+import {
+  StudentResponse,
+  UpdateStudentRequest,
+  UploadStudentRequest,
+} from "@/types/api";
 
 export type StudentListResponse = StudentResponse[];
 
@@ -25,6 +29,17 @@ export const getStudentsQueryOptions = () => {
 
 export const useStudents = () => {
   return useQuery(getStudentsQueryOptions());
+};
+
+export const useCreateStudent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (student: UploadStudentRequest) =>
+      api.post<StudentResponse>("/students", student),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: studentQueryKey });
+    },
+  });
 };
 
 export const useUpdateStudent = () => {
