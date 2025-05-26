@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,12 +16,13 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateLecturerRequest implements Serializable {
+	// lecturer
+	UUID id;
 	String lecturerCode;
 	String academicRank;
 	BigDecimal salary;
 	LocalDate hireDate;
 	String researchField;
-	UUID id;
 	String name;
 	String email;
 	String phoneNumber;
@@ -28,4 +30,8 @@ public class UpdateLecturerRequest implements Serializable {
 	LocalDate birthDay;
 	boolean gender;
 	String status;
+	// course
+	List<UUID> courseIds;
+	// department
+	UUID departmentId;
 }

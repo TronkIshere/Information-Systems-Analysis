@@ -1,5 +1,6 @@
 package com.tronk.analysis.mapper.Lecturer;
 
+import com.tronk.analysis.entity.Course;
 import com.tronk.analysis.entity.Lecturer;
 import com.tronk.analysis.dto.response.lecturer.LecturerResponse;
 import java.util.List;
@@ -11,6 +12,7 @@ public class LecturerMapper {
 
 	public static LecturerResponse toResponse(Lecturer lecturer) {
 		return LecturerResponse.builder()
+				// lecturer
 				.id(lecturer.getId())
 				.lecturerCode(lecturer.getLecturerCode())
 				.salary(lecturer.getSalary())
@@ -23,6 +25,15 @@ public class LecturerMapper {
 				.status(lecturer.getStatus())
 				.birthDay(lecturer.getBirthDay())
 				.gender(lecturer.isGender())
+				// department
+				.departmentId(lecturer.getDepartment().getId())
+				// courses
+				.courseIds(
+						lecturer.getCourses()
+								.stream()
+								.map(Course::getId)
+								.collect(Collectors.toList())
+				)
 				.build();
 	}
 

@@ -3,6 +3,8 @@ import IconBin from "@/assets/icons/IconBin";
 import IconEdit from "@/assets/icons/IconEdit";
 import { SearchInput } from "@/components/ui/search/SearchInput";
 import CustomTable from "@/components/ui/table/CustomTable";
+import { useCourses } from "@/services/course";
+import { useDepartments } from "@/services/department";
 import {
   useDeleteLecturer,
   useLecturers,
@@ -19,12 +21,22 @@ import {
   Stack,
   TextField,
   Typography,
+  Autocomplete,
+  Checkbox,
+  ListItemText,
+  InputLabel,
+  MenuItem,
+  Select,
+  FormControl,
+  SelectChangeEvent,
 } from "@mui/material";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { useState } from "react";
 
 function LecturerPage() {
   const { data: lecturers, isLoading, error } = useLecturers();
+  const { data: courses } = useCourses();
+  const { data: departments } = useDepartments();
   const { mutate: updateLecturer } = useUpdateLecturer();
   const { mutate: deleteLecturer } = useDeleteLecturer();
   const { mutate: createLecturer } = useCreateLecturer();
@@ -46,6 +58,21 @@ function LecturerPage() {
     { accessorKey: "phoneNumber", header: "Số điện thoại" },
     { accessorKey: "email", header: "Email" },
     { accessorKey: "status", header: "Trạng thái" },
+    {
+      accessorKey: "departmentId",
+      header: "bộ môn",
+      cell: ({ row }) => {
+        const department = departments?.find(
+          (d) => d.id === row.original.departmentId
+        );
+        return department?.name || "Chưa nằm trong bộ môn";
+      },
+    },
+    {
+      accessorKey: "courseIds",
+      header: "Số môn dạy",
+      cell: ({ row }) => row.original.courseIds?.length || 0,
+    },
     {
       accessorKey: "actions",
       header: "Hành động",
@@ -77,6 +104,14 @@ function LecturerPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setSelectedLecturer((prev) => ({
+      ...prev!,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const { name, value } = event.target;
     setSelectedLecturer((prev) => ({
       ...prev!,
       [name]: value,
@@ -173,6 +208,8 @@ function LecturerPage() {
                 gender: null,
                 status: "Hoạt động",
                 password: "",
+                departmentId: "",
+                courseIds: [],
               });
               setIsCreating(true);
               setIsEditModalOpen(true);
@@ -214,6 +251,21 @@ function LecturerPage() {
                 value={selectedLecturer.name || ""}
                 onChange={handleInputChange}
               />
+              <FormControl fullWidth>
+                <InputLabel>Phòng ban</InputLabel>
+                <Select
+                  name="departmentId"
+                  value={selectedLecturer.departmentId || ""}
+                  onChange={handleSelectChange}
+                  label="Phòng ban"
+                >
+                  {departments?.map((department) => (
+                    <MenuItem key={department.id} value={department.id}>
+                      {department.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
                 fullWidth
                 label="Email"
@@ -313,6 +365,43 @@ function LecturerPage() {
                 <option value="Hoạt động">Hoạt động</option>
                 <option value="Ngừng hoạt động">Ngừng hoạt động</option>
               </TextField>
+              <Autocomplete
+                multiple
+                options={courses?.map((course) => course.id) || []}
+                getOptionLabel={(option) =>
+                  courses?.find((c) => c.id === option)?.name || ""
+                }
+                value={selectedLecturer.courseIds || []}
+                onChange={(event, newValue) => {
+                  setSelectedLecturer((prev) => ({
+                    ...prev!,
+                    courseIds: newValue,
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Môn học giảng dạy"
+                    placeholder="Chọn môn học"
+                  />
+                )}
+                renderOption={(props, option) => {
+                  const course = courses?.find((c) => c.id === option);
+                  return (
+                    <li {...props}>
+                      <Checkbox
+                        checked={
+                          selectedLecturer.courseIds?.includes(option) || false
+                        }
+                      />
+                      <ListItemText
+                        primary={course?.name}
+                        secondary={`${course?.credit} tín chỉ`}
+                      />
+                    </li>
+                  );
+                }}
+              />
               {isCreating && (
                 <TextField
                   fullWidth

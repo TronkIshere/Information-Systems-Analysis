@@ -6,11 +6,13 @@ import com.tronk.analysis.dto.request.lecturer.UpdateLecturerRequest;
 import com.tronk.analysis.dto.request.lecturer.UploadLecturerRequest;
 import com.tronk.analysis.dto.response.lecturer.LecturerResponse;
 import com.tronk.analysis.entity.Course;
+import com.tronk.analysis.entity.Department;
 import com.tronk.analysis.entity.Lecturer;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.mapper.Lecturer.LecturerMapper;
 import com.tronk.analysis.repository.CourseRepository;
+import com.tronk.analysis.repository.DepartmentRepository;
 import com.tronk.analysis.repository.LecturerRepository;
 import com.tronk.analysis.service.LecturerService;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,7 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -31,6 +35,7 @@ public class LecturerServiceImpl implements LecturerService {
 	LecturerRepository lecturerRepository;
 	CourseRepository courseRepository;
 	PasswordEncoder passwordEncoder;
+	DepartmentRepository departmentRepository;
 	@Override
 	public LecturerResponse createLecturer(UploadLecturerRequest request) {
 		Lecturer lecturer = new Lecturer();
@@ -50,6 +55,13 @@ public class LecturerServiceImpl implements LecturerService {
 		lecturer.setHireDate(request.getHireDate());
 		lecturer.setResearchField(request.getResearchField());
 		Lecturer savedEntity = lecturerRepository.save(lecturer);
+
+		Department department = departmentRepository.findById(request.getDepartmentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.DEPARTMENT_NOT_FOUND));
+		lecturer.setDepartment(department);
+
+		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
+		lecturer.setCourses(courses);
 		return LecturerMapper.toResponse(savedEntity);
 	}
 
@@ -93,6 +105,14 @@ public class LecturerServiceImpl implements LecturerService {
 		lecturer.setHireDate(request.getHireDate());
 		lecturer.setResearchField(request.getResearchField());
 		lecturer.setStatus(request.getStatus());
+
+		Department department = departmentRepository.findById(request.getDepartmentId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.DEPARTMENT_NOT_FOUND));
+		lecturer.setDepartment(department);
+
+		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
+		lecturer.setCourses(courses);
+
 		lecturerRepository.save(lecturer);
 		return LecturerMapper.toResponse(lecturer);
 	}

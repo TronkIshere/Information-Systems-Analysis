@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadLecturerRequest implements Serializable {
+	// lecturer
 	String lecturerCode;
 	String academicRank;
 	BigDecimal salary;
@@ -27,4 +29,8 @@ public class UploadLecturerRequest implements Serializable {
 	String password;
 	LocalDate birthDay;
 	boolean gender;
+	// course
+	List<UUID> courseIds;
+	// department
+	UUID departmentId;
 }

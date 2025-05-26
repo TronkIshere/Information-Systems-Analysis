@@ -73,6 +73,8 @@ export interface LecturerResponse {
   birthDay: Date | null;
   gender: boolean | null;
   password?: string;
+  departmentId: string;
+  courseIds: string[];
 }
 
 export type LecturerListResponse = LecturerResponse[];
@@ -90,6 +92,8 @@ export interface UploadLecturerRequest {
   birthDay: Date | null;
   gender: boolean | null;
   password?: string;
+  departmentId: string;
+  courseIds: string[];
 }
 
 export interface UpdateLecturerRequest {
@@ -105,6 +109,8 @@ export interface UpdateLecturerRequest {
   status: string;
   birthDay: Date | null;
   gender: boolean | null;
+  departmentId: string;
+  courseIds: string[];
 }
 
 // ========================
