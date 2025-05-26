@@ -14,6 +14,7 @@ export default function LoginPage() {
 
   const onSucessLogin = (data: AuthResponse) => {
     ClientSession.setAuthToken(data.accessToken);
+    ClientSession.setUserId(data.userId);
     ClientSession.setRoles(data.roles.split(",").map((role) => role.trim()));
 
     UIHelper.showToast({

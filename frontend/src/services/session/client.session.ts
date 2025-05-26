@@ -23,4 +23,17 @@ export default class ClientSession {
       return [];
     }
   }
+
+  static setUserId(userId: string) {
+    localStorage.setItem("userId", userId);
+  }
+
+  static getUserId(): string {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("userId") || "";
+  }
+
+  static removeUserId() {
+    localStorage.removeItem("userId");
+  }
 }
