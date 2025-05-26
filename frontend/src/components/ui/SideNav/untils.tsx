@@ -1,4 +1,4 @@
-import { ADMIN_URL } from "@/types/app.url.type";
+import { ADMIN_URL, STUDENT_URL } from "@/types/app.url.type";
 import IconDashboard from "@/assets/icons/IconDashboard";
 import IconCustomer from "@/assets/icons/IconCustomer";
 import IconReport from "@/assets/icons/IconReport";
@@ -6,8 +6,9 @@ import IconOrder from "@/assets/icons/IconOrder";
 import IconCompletedOrder from "@/assets/icons/IconCompletedOrder";
 import IconAccount from "@/assets/icons/IconAccount";
 import IconKey from "@/assets/icons/IconKey";
+import { MenuItem } from "@/types/api";
 
-export const getMenu = () => {
+export const getAdminMenu = () => {
   return [
     {
       type: "single",
@@ -53,3 +54,18 @@ export const getMenu = () => {
     },
   ];
 };
+
+export const getStudentMenu = () => [
+  {
+    text: "Tổng quan",
+    icon: <IconDashboard />,
+    link: STUDENT_URL.HOME,
+    type: "single",
+  },
+  {
+    text: "Đăng ký môn học",
+    icon: <IconCompletedOrder />,
+    link: STUDENT_URL.REGISTER_COURSE,
+    type: "single",
+  },
+];

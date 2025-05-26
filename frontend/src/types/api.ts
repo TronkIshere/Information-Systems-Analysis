@@ -51,7 +51,7 @@ export type AuthResponse = Entity<{
   accessToken: string;
   refreshToken: string;
   status: string;
-  userType: "STUDENT" | "LECTURER" | "ADMIN";
+  roles: string;
   userId: string;
 }>;
 
@@ -296,3 +296,10 @@ export type Comment = Entity<{
   discussionId: string;
   author: User;
 }>;
+
+export interface MenuItem {
+  text: string;
+  icon: React.ReactNode;
+  link: string;
+  type?: string;
+}

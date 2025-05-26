@@ -1,10 +1,8 @@
 "use client";
 import Image from "next/image";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
 
 import Logo from "@/assets/images/logo.png";
-
 import {
   Box,
   List,
@@ -13,12 +11,12 @@ import {
   ListItemText,
   styled,
 } from "@mui/material";
-import { getMenu } from "./untils";
 import useAppRoute from "@/utils/route";
+import { MenuItem } from "@/types/api";
 
-export default function SideNav() {
+export default function SideNav({ menu }: { menu: MenuItem[] }) {
   const { pathName } = useAppRoute();
-  const menu = getMenu();
+
   const ListItemStyled = styled(List)(({ theme }) => ({
     ".MuiButtonBase-root": {
       display: "flex !important",
@@ -31,6 +29,7 @@ export default function SideNav() {
       minWidth: 0,
     },
   }));
+
   const StyledListItemIcon = styled(ListItemIcon)<{ isactive?: string }>(
     ({ isactive = false }) => ({
       svg: {
@@ -40,6 +39,7 @@ export default function SideNav() {
       },
     })
   );
+
   return (
     <aside className="bg-white h-full w-fulls">
       <Box padding="24px 0" display="flex" justifyContent="center">
@@ -53,8 +53,9 @@ export default function SideNav() {
           return (
             <NextLink href={link} key={index}>
               <ListItemButton
-                key={index}
-                className={`!px-[40px] !py-[12px] ${isActive ? "!bg-[#4880FF] !text-[#ffffff]" : ""}`}
+                className={`!px-[40px] !py-[12px] ${
+                  isActive ? "!bg-[#4880FF] !text-[#ffffff]" : ""
+                }`}
               >
                 <StyledListItemIcon isactive={String(isActive)}>
                   {icon}

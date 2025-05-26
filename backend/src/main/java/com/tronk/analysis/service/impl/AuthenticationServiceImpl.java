@@ -93,6 +93,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .userId(user.getId())
+                .roles(user.getRoles())
                 .build();
     }
 

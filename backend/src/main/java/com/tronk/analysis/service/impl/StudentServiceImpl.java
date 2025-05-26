@@ -40,6 +40,7 @@ public class StudentServiceImpl implements StudentService {
         student.setBirthDay(request.getBirthDay());
         student.setGender(request.isGender());
         student.setStatus("ACTIVE");
+        student.setRoles("STUDENT_LECTURER");
         studentRepository.save(student);
         return StudentMapper.toResponse(student);
     }
