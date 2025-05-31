@@ -41,8 +41,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 		Semester semester = semesterRepository.findById(request.getSemesterId())
 				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
 
-		Cashier cashier = cashierRepository.findById(request.getSemesterId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+		Cashier cashier = null;
+		if (request.getCashierId() != null) {
+			cashier = cashierRepository.findById(request.getCashierId())
+					.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+		}
 
 		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
 
@@ -94,8 +97,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 		Semester semester = semesterRepository.findById(request.getSemesterId())
 				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
 
-		Cashier cashier = cashierRepository.findById(request.getSemesterId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+		Cashier cashier = null;
+		if (request.getCashierId() != null) {
+			cashier = cashierRepository.findById(request.getCashierId())
+					.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+		}
 
 		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
 

@@ -1,17 +1,22 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useCourses } from "@/services/course";
 import { useSemesters } from "@/services/semester";
 import { useCreateReceipt } from "@/services/receipt";
 import ClientSession from "@/services/session/client.session";
 import {
+  Box,
   Button,
   Checkbox,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
+  SelectChangeEvent,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { SearchInput } from "@/components/ui/search/SearchInput";
@@ -26,22 +31,64 @@ function RegisterCoursePage() {
   const { data: semesters } = useSemesters();
   const { mutate: createReceipt } = useCreateReceipt();
 
-  const [selectedSemester, setSelectedSemester] = useState("");
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [newReceipt, setNewReceipt] = useState<UploadReceiptRequest>({
+    studentId: ClientSession.getUserId() || "",
+    semesterId: "",
+    courseIds: [],
+    studentName: "",
+    studentClass: "",
+    studentCode: "",
+    status: false,
+    totalAmount: 0,
+    description: "Đăng ký môn học mới",
+    paymentDate: null,
+    cashierId: "",
+  });
+
   const [searchTerm, setSearchTerm] = useState("");
 
-  const studentId = ClientSession.getUserId();
+  const totalAmount = useMemo(() => {
+    if (!courses || newReceipt.courseIds.length === 0) return 0;
+
+    return newReceipt.courseIds.reduce((sum, courseId) => {
+      const course = courses.find((c) => c.id === courseId);
+      return sum + (course ? course.credit * course.baseFeeCredit : 0);
+    }, 0);
+  }, [newReceipt.courseIds, courses]);
 
   const handleCourseSelect = (courseId: string) => {
-    setSelectedCourses((prev) =>
-      prev.includes(courseId)
-        ? prev.filter((id) => id !== courseId)
-        : [...prev, courseId]
-    );
+    setNewReceipt((prev) => {
+      const newCourseIds = prev.courseIds.includes(courseId)
+        ? prev.courseIds.filter((id) => id !== courseId)
+        : [...prev.courseIds, courseId];
+
+      return { ...prev, courseIds: newCourseIds };
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewReceipt((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setNewReceipt((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleExportReceipt = () => {
+    UIHelper.showToast({
+      message: "Chức năng xuất biên lai PDF sẽ được triển khai sau",
+      type: ToastType.info,
+    });
   };
 
   const handleSubmit = () => {
-    if (!studentId || !selectedSemester || selectedCourses.length === 0) {
+    if (
+      !newReceipt.studentId ||
+      !newReceipt.semesterId ||
+      newReceipt.courseIds.length === 0
+    ) {
       UIHelper.showToast({
         message: "Vui lòng chọn học kỳ và ít nhất một môn học",
         type: ToastType.error,
@@ -49,35 +96,31 @@ function RegisterCoursePage() {
       return;
     }
 
-    const newReceipt: UploadReceiptRequest = {
-      studentId: studentId,
-      semesterId: selectedSemester,
-      courseIds: selectedCourses,
-      status: false,
-      totalAmount: 0,
-      description: "Đăng ký môn học mới",
-      paymentDate: null,
-    };
-
-    createReceipt(newReceipt, {
-      onSuccess: () => {
-        UIHelper.showToast({
-          message: "Đăng ký thành công! Vui lòng thanh toán",
-          type: ToastType.success,
-        });
-        setSelectedCourses([]);
-        setSelectedSemester("");
-      },
-      onError: () => {
-        UIHelper.showToast({
-          message: "Đăng ký thất bại! Vui lòng thử lại",
-          type: ToastType.error,
-        });
-      },
-    });
+    createReceipt(
+      { ...newReceipt, totalAmount },
+      {
+        onSuccess: () => {
+          UIHelper.showToast({
+            message: "Đăng ký thành công! Vui lòng thanh toán",
+            type: ToastType.success,
+          });
+          setNewReceipt((prev) => ({
+            ...prev,
+            courseIds: [],
+            semesterId: "",
+          }));
+        },
+        onError: () => {
+          UIHelper.showToast({
+            message: "Đăng ký thất bại! Vui lòng thử lại",
+            type: ToastType.error,
+          });
+        },
+      }
+    );
   };
 
-  if (!studentId) {
+  if (!newReceipt.studentId) {
     replace("/login");
     return null;
   }
@@ -96,11 +139,50 @@ function RegisterCoursePage() {
         Đăng ký môn học mới
       </Typography>
 
+      <Paper elevation={3} className="p-4">
+        <Typography variant="h5" gutterBottom>
+          Thông tin sinh viên
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Họ và tên"
+              name="studentName"
+              value={newReceipt.studentName}
+              onChange={handleInputChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Lớp"
+              name="studentClass"
+              value={newReceipt.studentClass}
+              onChange={handleInputChange}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Mã sinh viên"
+              name="studentCode"
+              value={newReceipt.studentCode}
+              onChange={handleInputChange}
+              required
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
       <FormControl fullWidth>
         <InputLabel>Chọn học kỳ</InputLabel>
         <Select
-          value={selectedSemester}
-          onChange={(e) => setSelectedSemester(e.target.value)}
+          name="semesterId"
+          value={newReceipt.semesterId}
+          onChange={handleSelectChange}
           label="Chọn học kỳ"
         >
           {semesters?.map((semester) => (
@@ -122,7 +204,7 @@ function RegisterCoursePage() {
             className="p-4 border rounded-lg hover:bg-gray-50"
           >
             <Checkbox
-              checked={selectedCourses.includes(course.id)}
+              checked={newReceipt.courseIds.includes(course.id)}
               onChange={() => handleCourseSelect(course.id)}
             />
             <Stack>
@@ -136,14 +218,43 @@ function RegisterCoursePage() {
         ))}
       </Stack>
 
-      <Button
-        size="large"
-        onClick={handleSubmit}
-        disabled={!selectedSemester || selectedCourses.length === 0}
-        className="self-center px-8 py-3 text-lg"
-      >
-        Xác nhận đăng ký
-      </Button>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={5}>
+          <Box display="flex" justifyContent="flex-end" gap={2} mt={2}></Box>
+        </Grid>
+        <Grid item xs={12} md={7}>
+          <Paper elevation={3} className="p-4">
+            <Typography variant="h6" gutterBottom>
+              Tổng thanh toán
+            </Typography>
+            <Typography variant="h5" className="text-red-600 font-bold">
+              {totalAmount.toLocaleString()} VND
+            </Typography>
+            <Box display="flex" gap={2} mt={2}>
+              <Button
+                color="primary"
+                className="whitespace-nowrap"
+                fullWidth
+                onClick={handleSubmit}
+                disabled={
+                  !newReceipt.semesterId || newReceipt.courseIds.length === 0
+                }
+              >
+                Xác nhận đăng ký
+              </Button>
+              <Button
+                variant="primary"
+                className="whitespace-nowrap"
+                fullWidth
+                onClick={handleExportReceipt}
+                disabled={totalAmount === 0}
+              >
+                Xuất biên lai
+              </Button>
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
     </Stack>
   );
 }
