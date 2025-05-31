@@ -21,12 +21,12 @@ public class ReceiptFullInfoResponse implements Serializable {
     boolean status;
     String description;
     LocalDate paymentDate;
-    // student
     UUID studentId;
     String studentName;
-    // semester;
+    String studentCode;
+    String studentClass;
     UUID semesterId;
     String semesterName;
-    // course;
+    UUID cashierId;
     List<UUID> courseIds;
 }

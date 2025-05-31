@@ -4,17 +4,11 @@ import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
 import com.tronk.analysis.dto.request.receipt.*;
 import com.tronk.analysis.dto.response.receipt.ReceiptFullInfoResponse;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
-import com.tronk.analysis.entity.Course;
-import com.tronk.analysis.entity.Receipt;
-import com.tronk.analysis.entity.Semester;
-import com.tronk.analysis.entity.Student;
+import com.tronk.analysis.entity.*;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.mapper.Receipt.ReceiptMapper;
-import com.tronk.analysis.repository.CourseRepository;
-import com.tronk.analysis.repository.ReceiptRepository;
-import com.tronk.analysis.repository.SemesterRepository;
-import com.tronk.analysis.repository.StudentRepository;
+import com.tronk.analysis.repository.*;
 import com.tronk.analysis.service.ReceiptService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
@@ -38,12 +32,16 @@ public class ReceiptServiceImpl implements ReceiptService {
 	StudentRepository studentRepository;
 	ReceiptRepository receiptRepository;
 	CourseRepository courseRepository;
+	CashierRepository cashierRepository;
 	@Override
 	public ReceiptResponse createReceipt(UploadReceiptRequest request) {
 		Student student = studentRepository.findById(request.getStudentId())
 				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
 
 		Semester semester = semesterRepository.findById(request.getSemesterId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+
+		Cashier cashier = cashierRepository.findById(request.getSemesterId())
 				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
 
 		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
@@ -60,10 +58,14 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
 		receipt.setPaymentDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDate.now());
+		receipt.setStudentName(request.getStudentName());
+		receipt.setStudentCode(request.getStudentCode());
+		receipt.setStudentClass(request.getStudentClass());
 
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
 		receipt.setCourses(courses);
+		receipt.setCashier(cashier);
 
 		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
@@ -92,15 +94,23 @@ public class ReceiptServiceImpl implements ReceiptService {
 		Semester semester = semesterRepository.findById(request.getSemesterId())
 				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
 
+		Cashier cashier = cashierRepository.findById(request.getSemesterId())
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+
 		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
 
 		receipt.setTotalAmount(request.getTotalAmount());
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
 		receipt.setPaymentDate(request.getPaymentDate());
+		receipt.setStudentName(request.getStudentName());
+		receipt.setStudentCode(request.getStudentCode());
+		receipt.setStudentClass(request.getStudentClass());
+
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
 		receipt.setCourses(courses);
+		receipt.setCashier(cashier);
 
 		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
@@ -189,6 +199,9 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receipt.setStatus(request.isStatus());
 		receipt.setDescription(request.getDescription());
 		receipt.setPaymentDate(receipt.getPaymentDate());
+		receipt.setStudentName(request.getStudentName());
+		receipt.setStudentCode(request.getStudentCode());
+		receipt.setStudentClass(request.getStudentClass());
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
 		receipt.setCourses(new HashSet<>(courses));

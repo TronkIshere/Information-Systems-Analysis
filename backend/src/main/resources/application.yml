@@ -22,10 +22,10 @@ spring:
       max-request-size: 10MB
   data:
     redis:
-      host: redis-18661.c259.us-central1-2.gce.redns.redis-cloud.com
-      port: 18661
-      username: default
-      password: 3oz76doZwwSOb1bfEUkXZRtGql6PXR8S
+      host: localhost
+      port: 6379
+      username: redis-server
+      password: 1234
       timeout: 5000
   mail:
     host: smtp.gmail.com

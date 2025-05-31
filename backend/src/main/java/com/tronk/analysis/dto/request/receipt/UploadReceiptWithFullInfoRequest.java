@@ -16,15 +16,15 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadReceiptWithFullInfoRequest implements Serializable {
-    // receipt
     BigDecimal totalAmount;
     boolean status;
     String description;
     LocalDate paymentDate;
-    // student
+    String studentCode;
+    String studentName;
+    String studentClass;
     UUID studentId;
-    // semester
     UUID semesterId;
-    // course
     List<UUID> courseId;
+    UUID cashierId;
 }

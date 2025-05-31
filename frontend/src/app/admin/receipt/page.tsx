@@ -3,6 +3,7 @@ import IconBin from "@/assets/icons/IconBin";
 import IconEdit from "@/assets/icons/IconEdit";
 import { SearchInput } from "@/components/ui/search/SearchInput";
 import CustomTable from "@/components/ui/table/CustomTable";
+import { useCashiers } from "@/services/cashier";
 import { useCourses } from "@/services/course";
 import {
   useDeleteReceipt,
@@ -39,6 +40,7 @@ function ReceiptPage() {
   const { data: students } = useStudents();
   const { data: semesters } = useSemesters();
   const { data: courses } = useCourses();
+  const { data: cashiers } = useCashiers();
   const { mutate: updateReceipt } = useUpdateReceipt();
   const { mutate: createReceipt } = useCreateReceipt();
   const { mutate: deleteReceipt } = useDeleteReceipt();
@@ -233,7 +235,10 @@ function ReceiptPage() {
                 semesterId: "",
                 courseIds: [],
                 studentName: "",
+                studentClass: "",
+                studentCode: "",
                 semesterName: "",
+                cashierId: "",
               });
               setIsCreating(true);
               setIsEditModalOpen(true);
@@ -293,6 +298,22 @@ function ReceiptPage() {
                 </Select>
               </FormControl>
 
+              <FormControl fullWidth>
+                <InputLabel>Thu ngân</InputLabel>
+                <Select
+                  name="cashierId"
+                  value={selectedReceipt.cashierId || ""}
+                  onChange={handleSelectChange}
+                  label="Thu ngân"
+                >
+                  {cashiers?.map((cashier) => (
+                    <MenuItem key={cashier.id} value={cashier.id}>
+                      {cashier.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
               <Autocomplete
                 multiple
                 options={courses?.map((course) => course.id) || []}
@@ -345,6 +366,7 @@ function ReceiptPage() {
                   <MenuItem value="false">Chưa đóng</MenuItem>
                 </Select>
               </FormControl>
+
               <TextField
                 fullWidth
                 label="Ngày thanh toán"
@@ -367,6 +389,33 @@ function ReceiptPage() {
                 multiline
                 rows={3}
                 value={selectedReceipt.description}
+                onChange={handleInputChange}
+              />
+
+              <TextField
+                fullWidth
+                label="Tên sinh viên"
+                name="studentName"
+                rows={3}
+                value={selectedReceipt.studentName}
+                onChange={handleInputChange}
+              />
+
+              <TextField
+                fullWidth
+                label="Mã sinh viên"
+                name="studentCode"
+                rows={3}
+                value={selectedReceipt.studentCode}
+                onChange={handleInputChange}
+              />
+
+              <TextField
+                fullWidth
+                label="Lớp sinh viên"
+                name="studentClass"
+                rows={3}
+                value={selectedReceipt.studentClass}
                 onChange={handleInputChange}
               />
             </Stack>

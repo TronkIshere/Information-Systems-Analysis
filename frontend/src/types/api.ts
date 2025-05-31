@@ -247,10 +247,13 @@ export interface ReceiptResponse {
   description: string;
   paymentDate: Date | null;
   studentId: string;
-  studentName: string;
-  semesterId: string;
   semesterName: string;
+  studentName: string;
+  studentClass: string;
+  studentCode: string;
+  semesterId: string;
   courseIds: string[];
+  cashierId: string;
 }
 
 export interface UploadReceiptRequest {
@@ -259,8 +262,12 @@ export interface UploadReceiptRequest {
   description: string;
   paymentDate: Date | null;
   studentId: string;
+  studentName: string;
+  studentClass: string;
+  studentCode: string;
   semesterId: string;
   courseIds: string[];
+  cashierId: string;
 }
 
 export interface UpdateReceiptRequest {
@@ -269,9 +276,13 @@ export interface UpdateReceiptRequest {
   status: boolean;
   description: string;
   paymentDate: Date | null;
+  studentClass: string;
+  studentName: string;
+  studentCode: string;
   studentId: string;
   semesterId: string;
   courseIds: string[];
+  cashierId: string;
 }
 
 // ========================
@@ -302,4 +313,45 @@ export interface MenuItem {
   icon: React.ReactNode;
   link: string;
   type?: string;
+}
+
+export interface CashierResponse {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  loginName: string;
+  birthDay: string;
+  gender: boolean;
+  salary: number;
+  hireDate: string;
+}
+
+export interface UploadCashierRequest {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  loginName: string;
+  birthDay: string;
+  gender: boolean;
+  salary: number;
+  hireDate: string;
+  password?: string;
+}
+
+export interface UpdateCashierRequest {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  status: string;
+  loginName: string;
+  birthDay: string;
+  gender: boolean;
+  salary: number;
+  hireDate: string;
+  password?: string;
 }

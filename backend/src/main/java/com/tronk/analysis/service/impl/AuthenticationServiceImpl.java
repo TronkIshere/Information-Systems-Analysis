@@ -9,11 +9,13 @@ import com.tronk.analysis.dto.request.authentication.SignInRequest;
 import com.tronk.analysis.dto.response.authentication.RefreshTokenResponse;
 import com.tronk.analysis.dto.response.authentication.SignInResponse;
 import com.tronk.analysis.dto.response.authentication.SignInStatus;
+import com.tronk.analysis.entity.Cashier;
 import com.tronk.analysis.entity.Lecturer;
 import com.tronk.analysis.entity.Student;
 import com.tronk.analysis.entity.common.User;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
+import com.tronk.analysis.repository.CashierRepository;
 import com.tronk.analysis.repository.LecturerRepository;
 import com.tronk.analysis.repository.StudentRepository;
 import com.tronk.analysis.service.AuthenticationService;
@@ -46,6 +48,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     LecturerRepository lecturerRepository;
     StudentRepository studentRepository;
     AuthenticationManager authenticationManager;
+    CashierRepository cashierRepository;
     RedisService redisService;
     JwtService jwtService;
 
@@ -69,6 +72,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .orElseThrow(() -> new RuntimeException("Student not found"));
             case "LECTURER" -> lecturerRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Lecturer not found"));
+            case "CASHIER" -> cashierRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Lecturer not found"));
             default -> throw new IllegalArgumentException("Invalid user type");
         };
     }
@@ -83,6 +88,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else if (user instanceof Lecturer) {
             ((Lecturer) user).setRefreshToken(refreshToken);
             lecturerRepository.save((Lecturer) user);
+        } else if (user instanceof Lecturer) {
+            ((Cashier) user).setRefreshToken(refreshToken);
+            cashierRepository.save((Cashier) user);
         }
 
         Cookie cookie = createCookie(refreshToken);
@@ -165,14 +173,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
             case "LECTURER" -> lecturerRepository.findById(userId)
                     .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
+            case "CASHIER" -> cashierRepository.findById(userId)
+                    .orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
             default -> throw new ApplicationException(ErrorCode.USER_TYPE_INVALID);
         };
 
         user.setRefreshToken(null);
         if (user instanceof Student) {
             studentRepository.save((Student) user);
-        } else {
+        } else if (user instanceof  Lecturer){
             lecturerRepository.save((Lecturer) user);
+        } else {
+            cashierRepository.save((Cashier) user);
         }
 
         addTokenToBlacklist(accessToken);

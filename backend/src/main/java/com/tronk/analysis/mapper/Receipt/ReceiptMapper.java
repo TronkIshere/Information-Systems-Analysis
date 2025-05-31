@@ -46,6 +46,8 @@ public class ReceiptMapper {
 								.map(Course::getId)
 								.collect(Collectors.toList())
 				)
+				// cashier
+				.cashierId(receipt.getCashier().getId())
 				.build();
 	}
 

@@ -24,10 +24,17 @@ public class Receipt extends AbstractEntity<UUID> {
 	@Column(columnDefinition = "NVARCHAR(1000)")
 	String description;
 	LocalDate paymentDate;
+	String studentCode;
+	String studentName;
+	String studentClass;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "student_id")
 	Student student;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cashier_id")
+	Cashier cashier;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "semester_id")

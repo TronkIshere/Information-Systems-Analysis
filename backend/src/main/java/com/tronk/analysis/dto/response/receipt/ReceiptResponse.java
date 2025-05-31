@@ -19,4 +19,7 @@ public class ReceiptResponse implements Serializable {
 	boolean status;
 	String description;
 	LocalDate paymentDate;
+	String studentCode;
+	String studentName;
+	String studentClass;
 }

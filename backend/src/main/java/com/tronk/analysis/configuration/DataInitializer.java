@@ -29,6 +29,7 @@ public class DataInitializer {
     SemesterRepository semesterRepository;
     StudentRepository studentRepository;
     ReceiptRepository receiptRepository;
+    CashierRepository cashierRepository;
 
     @Bean
     public ApplicationRunner initData() {
@@ -40,6 +41,7 @@ public class DataInitializer {
                 createLecturers();
                 createStudents();
                 createSemesters();
+                createCashiers();
                 createReceipts();
             }
             log.info("Initial users inserted!");
@@ -51,7 +53,9 @@ public class DataInitializer {
                 && departmentRepository.count() == 0
                 && lecturerRepository.count() == 0
                 && semesterRepository.count() == 0
-                && studentRepository.count() == 0;
+                && studentRepository.count() == 0
+                && receiptRepository.count() == 0
+                && cashierRepository.count() == 0;
     }
 
     private void createDepartments() {
@@ -97,16 +101,46 @@ public class DataInitializer {
         List<Course> allCourses = courseRepository.findAll();
 
         List<Lecturer> lecturers = List.of(
-                createLecturer("Nguyễn Văn Giảng", "giang.nguyen@university.edu", "0987654321", "Hoạt động", "lecturer01", passwordEncoder.encode("lecturer@123"), LocalDate.of(1980, 5, 15), true, "ROLE_LECTURER", "GV001", "Tiến sĩ", BigDecimal.valueOf(20000000), LocalDate.of(2015, 8, 22), "Trí tuệ nhân tạo"),
-                createLecturer("Trần Thị Minh", "minh.tran@university.edu", "0912345678", "Hoạt động", "lecturer02", passwordEncoder.encode("lecturer@123"), LocalDate.of(1985, 3, 10), false, "ROLE_LECTURER", "GV002", "Thạc sĩ", BigDecimal.valueOf(18000000), LocalDate.of(2017, 2, 10), "Hệ thống thông tin"),
-                createLecturer("Lê Văn Hùng", "hung.le@university.edu", "0934567890", "Hoạt động", "lecturer03", passwordEncoder.encode("lecturer@123"), LocalDate.of(1979, 9, 25), true, "ROLE_LECTURER", "GV003", "Phó Giáo sư", BigDecimal.valueOf(25000000), LocalDate.of(2012, 1, 5), "An toàn thông tin"),
-                createLecturer("Phạm Thị Hoa", "hoa.pham@university.edu", "0978888888", "Ngừng hoạt động", "lecturer04", passwordEncoder.encode("lecturer@123"), LocalDate.of(1983, 6, 30), false, "ROLE_LECTURER", "GV004", "Tiến sĩ", BigDecimal.valueOf(21000000), LocalDate.of(2016, 5, 1), "Cơ sở dữ liệu"),
-                createLecturer("Đặng Văn Bình", "binh.dang@university.edu", "0909009090", "Hoạt động", "lecturer05", passwordEncoder.encode("lecturer@123"), LocalDate.of(1981, 12, 12), true, "ROLE_LECTURER", "GV005", "Thạc sĩ", BigDecimal.valueOf(17000000), LocalDate.of(2018, 3, 15), "Phần mềm nhúng"),
-                createLecturer("Hoàng Thị Yến", "yen.hoang@university.edu", "0966666666", "Hoạt động", "lecturer06", passwordEncoder.encode("lecturer@123"), LocalDate.of(1990, 11, 18), false, "ROLE_LECTURER", "GV006", "Tiến sĩ", BigDecimal.valueOf(23000000), LocalDate.of(2020, 9, 1), "Khoa học dữ liệu"),
-                createLecturer("Vũ Văn Nam", "nam.vu@university.edu", "0911999999", "Hoạt động", "lecturer07", passwordEncoder.encode("lecturer@123"), LocalDate.of(1988, 4, 4), true, "ROLE_LECTURER", "GV007", "Phó Giáo sư", BigDecimal.valueOf(26000000), LocalDate.of(2014, 10, 10), "Kỹ thuật phần mềm"),
-                createLecturer("Ngô Thị Thanh", "thanh.ngo@university.edu", "0922233344", "Hoạt động", "lecturer08", passwordEncoder.encode("lecturer@123"), LocalDate.of(1986, 8, 8), false, "ROLE_LECTURER", "GV008", "Thạc sĩ", BigDecimal.valueOf(19000000), LocalDate.of(2019, 7, 1), "Truyền thông đa phương tiện"),
-                createLecturer("Bùi Văn Quang", "quang.bui@university.edu", "0988123456", "Ngừng hoạt động", "lecturer09", passwordEncoder.encode("lecturer@123"), LocalDate.of(1975, 1, 1), true, "ROLE_LECTURER", "GV009", "Giáo sư", BigDecimal.valueOf(30000000), LocalDate.of(2005, 6, 6), "Trí tuệ nhân tạo"),
-                createLecturer("Lý Thị Mai", "mai.ly@university.edu", "0933444555", "Hoạt động", "lecturer10", passwordEncoder.encode("lecturer@123"), LocalDate.of(1992, 2, 2), false, "ROLE_LECTURER", "GV010", "Tiến sĩ", BigDecimal.valueOf(22000000), LocalDate.of(2021, 1, 1), "Khoa học máy tính")
+                createLecturer("Nguyễn Văn Giảng", "giang.nguyen@university.edu", "0987654321", "Hoạt động",
+                        "lecturer01", passwordEncoder.encode("lecturer@123"), LocalDate.of(1980, 5, 15),
+                        true, "ROLE_LECTURER", "GV001", "Tiến sĩ", BigDecimal.valueOf(20000000),
+                        LocalDate.of(2015, 8, 22), "Trí tuệ nhân tạo"),
+                createLecturer("Trần Thị Minh", "minh.tran@university.edu", "0912345678", "Hoạt động",
+                        "lecturer02", passwordEncoder.encode("lecturer@123"), LocalDate.of(1985, 3, 10),
+                        false, "ROLE_LECTURER", "GV002", "Thạc sĩ", BigDecimal.valueOf(18000000),
+                        LocalDate.of(2017, 2, 10), "Hệ thống thông tin"),
+                createLecturer("Lê Văn Hùng", "hung.le@university.edu", "0934567890", "Hoạt động",
+                        "lecturer03", passwordEncoder.encode("lecturer@123"), LocalDate.of(1979, 9, 25),
+                        true, "ROLE_LECTURER", "GV003", "Phó Giáo sư", BigDecimal.valueOf(25000000),
+                        LocalDate.of(2012, 1, 5), "An toàn thông tin"),
+                createLecturer("Phạm Thị Hoa", "hoa.pham@university.edu", "0978888888", "Ngừng hoạt động",
+                        "lecturer04", passwordEncoder.encode("lecturer@123"), LocalDate.of(1983, 6, 30),
+                        false, "ROLE_LECTURER", "GV004", "Tiến sĩ", BigDecimal.valueOf(21000000),
+                        LocalDate.of(2016, 5, 1), "Cơ sở dữ liệu"),
+                createLecturer("Đặng Văn Bình", "binh.dang@university.edu", "0909009090", "Hoạt động",
+                        "lecturer05", passwordEncoder.encode("lecturer@123"), LocalDate.of(1981, 12, 12),
+                        true, "ROLE_LECTURER", "GV005", "Thạc sĩ", BigDecimal.valueOf(17000000),
+                        LocalDate.of(2018, 3, 15), "Phần mềm nhúng"),
+                createLecturer("Hoàng Thị Yến", "yen.hoang@university.edu", "0966666666", "Hoạt động",
+                        "lecturer06", passwordEncoder.encode("lecturer@123"), LocalDate.of(1990, 11, 18),
+                        false, "ROLE_LECTURER", "GV006", "Tiến sĩ", BigDecimal.valueOf(23000000),
+                        LocalDate.of(2020, 9, 1), "Khoa học dữ liệu"),
+                createLecturer("Vũ Văn Nam", "nam.vu@university.edu", "0911999999", "Hoạt động",
+                        "lecturer07", passwordEncoder.encode("lecturer@123"), LocalDate.of(1988, 4, 4),
+                        true, "ROLE_LECTURER", "GV007", "Phó Giáo sư", BigDecimal.valueOf(26000000),
+                        LocalDate.of(2014, 10, 10), "Kỹ thuật phần mềm"),
+                createLecturer("Ngô Thị Thanh", "thanh.ngo@university.edu", "0922233344", "Hoạt động",
+                        "lecturer08", passwordEncoder.encode("lecturer@123"), LocalDate.of(1986, 8, 8),
+                        false, "ROLE_LECTURER", "GV008", "Thạc sĩ", BigDecimal.valueOf(19000000),
+                        LocalDate.of(2019, 7, 1), "Truyền thông đa phương tiện"),
+                createLecturer("Bùi Văn Quang", "quang.bui@university.edu", "0988123456", "Ngừng hoạt động",
+                        "lecturer09", passwordEncoder.encode("lecturer@123"), LocalDate.of(1975, 1, 1),
+                        true, "ROLE_LECTURER", "GV009", "Giáo sư", BigDecimal.valueOf(30000000),
+                        LocalDate.of(2005, 6, 6), "Trí tuệ nhân tạo"),
+                createLecturer("Lý Thị Mai", "mai.ly@university.edu", "0933444555", "Hoạt động",
+                        "lecturer10", passwordEncoder.encode("lecturer@123"), LocalDate.of(1992, 2, 2),
+                        false, "ROLE_LECTURER", "GV010", "Tiến sĩ", BigDecimal.valueOf(22000000),
+                        LocalDate.of(2021, 1, 1), "Khoa học máy tính")
         );
 
         for (Lecturer lecturer : lecturers) {
@@ -120,21 +154,43 @@ public class DataInitializer {
 
     private void createStudents() {
         List<Student> students = List.of(
-                createStudent("Nguyễn Hữu Trọng", "student01@university.edu", "0123456789", "Hoạt động", "student01", passwordEncoder.encode("student@123"), LocalDate.of(2000, 3, 20), false, "ROLE_STUDENT", "253A10101", "Công nghệ Thông tin", BigDecimal.valueOf(3.5)),
-                createStudent("Lê Thị Mai", "student02@university.edu", "0987654321", "Hoạt động", "student02", passwordEncoder.encode("student@123"), LocalDate.of(2001, 5, 15), false, "ROLE_STUDENT", "253A10102", "Hệ thống thông tin", BigDecimal.valueOf(3.2)),
-                createStudent("Trần Văn Nam", "student03@university.edu", "0912345678", "Hoạt động", "student03", passwordEncoder.encode("student@123"), LocalDate.of(1999, 8, 12), true, "ROLE_STUDENT", "253A10103", "An toàn thông tin", BigDecimal.valueOf(3.8)),
-                createStudent("Phạm Thị Linh", "student04@university.edu", "0909876543", "Ngừng hoạt động", "student04", passwordEncoder.encode("student@123"), LocalDate.of(2000, 12, 1), false, "ROLE_STUDENT", "253A10104", "Công nghệ phần mềm", BigDecimal.valueOf(2.9)),
-                createStudent("Vũ Văn Hải", "student05@university.edu", "0933666777", "Hoạt động", "student05", passwordEncoder.encode("student@123"), LocalDate.of(2002, 1, 10), true, "ROLE_STUDENT", "253A10105", "Trí tuệ nhân tạo", BigDecimal.valueOf(3.4)),
-                createStudent("Đặng Thị Hoa", "student06@university.edu", "0977123456", "Hoạt động", "student06", passwordEncoder.encode("student@123"), LocalDate.of(2001, 9, 25), false, "ROLE_STUDENT", "253A10106", "Khoa học máy tính", BigDecimal.valueOf(3.6)),
-                createStudent("Hoàng Văn Dũng", "student07@university.edu", "0922111222", "Hoạt động", "student07", passwordEncoder.encode("student@123"), LocalDate.of(1998, 6, 18), true, "ROLE_STUDENT", "253A10107", "Mạng máy tính", BigDecimal.valueOf(2.7)),
-                createStudent("Ngô Thị Hạnh", "student08@university.edu", "0944556677", "Ngừng hoạt động", "student08", passwordEncoder.encode("student@123"), LocalDate.of(2000, 11, 22), false, "ROLE_STUDENT", "253A10108", "Phát triển phần mềm", BigDecimal.valueOf(3.1)),
-                createStudent("Bùi Văn Khoa", "student09@university.edu", "0966332211", "Hoạt động", "student09", passwordEncoder.encode("student@123"), LocalDate.of(1999, 3, 3), true, "ROLE_STUDENT", "253A10109", "Công nghệ Web", BigDecimal.valueOf(3.3)),
-                createStudent("Lý Thị Thanh", "student10@university.edu", "0911888999", "Hoạt động", "student10", passwordEncoder.encode("student@123"), LocalDate.of(2001, 4, 4), false, "ROLE_STUDENT", "253A10110", "Kỹ thuật phần mềm", BigDecimal.valueOf(3.9))
+                createStudent("Nguyễn Hữu Trọng", "student01@university.edu", "0123456789", "Hoạt động",
+                        "student01", passwordEncoder.encode("student@123"), LocalDate.of(2000, 3, 20),
+                        false, "ROLE_STUDENT", "253A10101", "Công nghệ Thông tin", BigDecimal.valueOf(3.5)),
+                createStudent("Lê Thị Mai", "student02@university.edu", "0987654321", "Hoạt động",
+                        "student02", passwordEncoder.encode("student@123"), LocalDate.of(2001, 5, 15),
+                        false, "ROLE_STUDENT", "253A10102", "Hệ thống thông tin", BigDecimal.valueOf(3.2)),
+                createStudent("Trần Văn Nam", "student03@university.edu", "0912345678", "Hoạt động",
+                        "student03", passwordEncoder.encode("student@123"), LocalDate.of(1999, 8, 12),
+                        true, "ROLE_STUDENT", "253A10103", "An toàn thông tin", BigDecimal.valueOf(3.8)),
+                createStudent("Phạm Thị Linh", "student04@university.edu", "0909876543", "Ngừng hoạt động",
+                        "student04", passwordEncoder.encode("student@123"), LocalDate.of(2000, 12, 1),
+                        false, "ROLE_STUDENT", "253A10104", "Công nghệ phầnmềm", BigDecimal.valueOf(2.9)),
+                createStudent("Vũ Văn Hải", "student05@university.edu", "0933666777", "Hoạt động",
+                        "student05", passwordEncoder.encode("student@123"), LocalDate.of(2002, 1, 10),
+                        true, "ROLE_STUDENT", "253A10105", "Trí tuệ nhân tạo", BigDecimal.valueOf(3.4)),
+                createStudent("Đặng Thị Hoa", "student06@university.edu", "0977123456", "Hoạt động",
+                        "student06", passwordEncoder.encode("student@123"), LocalDate.of(2001, 9, 25),
+                        false, "ROLE_STUDENT", "253A10106", "Khoa học máy tính", BigDecimal.valueOf(3.6)),
+                createStudent("Hoàng Văn Dũng", "student07@university.edu", "0922111222", "Hoạt động",
+                        "student07", passwordEncoder.encode("student@123"), LocalDate.of(1998, 6, 18),
+                        true, "ROLE_STUDENT", "253A10107", "Mạng máy tính", BigDecimal.valueOf(2.7)),
+                createStudent("Ngô Thị Hạnh", "student08@university.edu", "0944556677", "Ngừng hoạt động",
+                        "student08", passwordEncoder.encode("student@123"), LocalDate.of(2000, 11, 22),
+                        false, "ROLE_STUDENT", "253A10108", "Phát triển phần mềm", BigDecimal.valueOf(3.1)),
+                createStudent("Bùi Văn Khoa", "student09@university.edu", "0966332211", "Hoạt động",
+                        "student09", passwordEncoder.encode("student@123"), LocalDate.of(1999, 3, 3),
+                        true, "ROLE_STUDENT", "253A10109", "Công nghệ Web", BigDecimal.valueOf(3.3)),
+                createStudent("Lý Thị Thanh", "student10@university.edu", "0911888999", "Hoạt động",
+                        "student10", passwordEncoder.encode("student@123"), LocalDate.of(2001, 4, 4),
+                        false, "ROLE_STUDENT", "253A10110", "Kỹ thuật phần mềm", BigDecimal.valueOf(3.9))
         );
         studentRepository.saveAll(students);
 
         // for admin role demo
-        Student admin = createStudent("Nguyễn Hữu Trọng", "Admin01@university.edu", "0123456789", "Hoạt động", "admin01", passwordEncoder.encode("admin@123"), LocalDate.of(2000, 3, 20), false, "ROLE_ADMIN", "253A10100", "Công nghệ Thông tin", BigDecimal.valueOf(3.5));
+        Student admin = createStudent("Nguyễn Hữu Trọng", "Admin01@university.edu", "0123456789", "Hoạt động",
+                "admin01", passwordEncoder.encode("admin@123"), LocalDate.of(2000, 3, 20), false,
+                "ROLE_ADMIN", "253A10100", "Công nghệ Thông tin", BigDecimal.valueOf(3.5));
         studentRepository.save(admin);
         log.info("Initial student inserted!");
     }
@@ -157,10 +213,30 @@ public class DataInitializer {
         log.info("Dummy semesters inserted: {}", semesters.size());
     }
 
+    private void createCashiers() {
+        List<Cashier> cashiers = List.of(
+                createCashier("Trần Thị Thu Ngân", "cashier01@university.edu", "0901111222", "Hoạt động",
+                        "cashier01", passwordEncoder.encode("cashier@123"), LocalDate.of(1995, 5, 15),
+                        false, "ROLE_CASHIER", BigDecimal.valueOf(8000000), LocalDate.of(2020, 6, 1)),
+                createCashier("Lê Văn Tài", "cashier02@university.edu", "0902222333", "Hoạt động",
+                        "cashier02", passwordEncoder.encode("cashier@123"), LocalDate.of(1992, 8, 20),
+                        true, "ROLE_CASHIER", BigDecimal.valueOf(8500000), LocalDate.of(2019, 3, 15)),
+                createCashier("Phạm Thị Minh Châu", "cashier03@university.edu", "0903333444", "Ngừng hoạt động",
+                        "cashier03", passwordEncoder.encode("cashier@123"), LocalDate.of(1990, 12, 5),
+                        false, "ROLE_CASHIER", BigDecimal.valueOf(9000000), LocalDate.of(2018, 1, 10)),
+                createCashier("Nguyễn Văn Phúc", "cashier04@university.edu", "0904444555", "Hoạt động",
+                        "cashier04", passwordEncoder.encode("cashier@123"), LocalDate.of(1993, 4, 25),
+                        true, "ROLE_CASHIER", BigDecimal.valueOf(8200000), LocalDate.of(2021, 2, 20))
+        );
+        cashierRepository.saveAll(cashiers);
+        log.info("Initial cashiers inserted!");
+    }
+
     private void createReceipts() {
         List<Student> students = studentRepository.findAll();
         List<Semester> semesters = semesterRepository.findAll();
         List<Course> courses = courseRepository.findAll();
+        List<Cashier> cashiers = cashierRepository.findAll();
 
         if (students.isEmpty() || semesters.isEmpty() || courses.isEmpty()) {
             log.warn("Không thể tạo receipt - thiếu sinh viên, học kỳ hoặc khóa học.");
@@ -168,6 +244,7 @@ public class DataInitializer {
         }
 
         Student student = students.get(0);
+        Cashier cashier = cashiers.get(0);
 
         List<Receipt> receipts = new ArrayList<>();
 
@@ -180,10 +257,14 @@ public class DataInitializer {
             receipt.setTotalAmount(totalAmount);
             receipt.setStatus(true);
             receipt.setDescription("Học phí " + semester.getName());
+            receipt.setCashier(cashier);
             receipt.setStudent(student);
             receipt.setSemester(semester);
+            receipt.setStudentName("Nguyễn Hữu Trọng");
+            receipt.setStudentCode("253A10101");
+            receipt.setStudentClass("demo");
             receipt.setCourses(new HashSet<>(courses));
-
+            receipt.setPaymentDate(LocalDate.now());
             receipts.add(receipt);
         }
 
@@ -227,6 +308,24 @@ public class DataInitializer {
         lecturer.setHireDate(hireDate);
         lecturer.setResearchField(researchField);
         return lecturer;
+    }
+
+    private Cashier createCashier(String name, String email, String phoneNumber, String status,
+                                    String loginName, String password, LocalDate birthDay, boolean gender,
+                                    String roles, BigDecimal salary, LocalDate hireDate){
+        Cashier cashier = new Cashier();
+        cashier.setName(name);
+        cashier.setEmail(email);
+        cashier.setPhoneNumber(phoneNumber);
+        cashier.setStatus(status);
+        cashier.setLoginName(loginName);
+        cashier.setPassword(password);
+        cashier.setBirthDay(birthDay);
+        cashier.setGender(gender);
+        cashier.setRoles(roles);
+        cashier.setSalary(salary);
+        cashier.setHireDate(hireDate);
+        return cashier;
     }
 
     private Student createStudent(String name, String email, String phoneNumber, String status,
