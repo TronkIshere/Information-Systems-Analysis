@@ -1,6 +1,8 @@
 package com.tronk.analysis.configuration;
 
 import com.tronk.analysis.entity.*;
+import com.tronk.analysis.exception.ApplicationException;
+import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.repository.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @Slf4j(topic = "INIT-APPLICATION")
@@ -154,7 +157,7 @@ public class DataInitializer {
 
     private void createStudents() {
         List<Student> students = List.of(
-                createStudent("Nguyễn Hữu Trọng", "student01@university.edu", "0123456789", "Hoạt động",
+                createStudent("Nguyễn Hữu Trọng", "nguyenhuutrong11133@gmail.com", "0123456789", "Hoạt động",
                         "student01", passwordEncoder.encode("student@123"), LocalDate.of(2000, 3, 20),
                         false, "ROLE_STUDENT", "253A10101", "Công nghệ Thông tin", BigDecimal.valueOf(3.5)),
                 createStudent("Lê Thị Mai", "student02@university.edu", "0987654321", "Hoạt động",
@@ -233,17 +236,17 @@ public class DataInitializer {
     }
 
     private void createReceipts() {
-        List<Student> students = studentRepository.findAll();
         List<Semester> semesters = semesterRepository.findAll();
         List<Course> courses = courseRepository.findAll();
         List<Cashier> cashiers = cashierRepository.findAll();
 
-        if (students.isEmpty() || semesters.isEmpty() || courses.isEmpty()) {
+        Student student = studentRepository.findByEmail("nguyenhuutrong11133@gmail.com")
+                .orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+
+        if (semesters.isEmpty() || courses.isEmpty()) {
             log.warn("Không thể tạo receipt - thiếu sinh viên, học kỳ hoặc khóa học.");
             return;
         }
-
-        Student student = students.get(0);
         Cashier cashier = cashiers.get(0);
 
         List<Receipt> receipts = new ArrayList<>();

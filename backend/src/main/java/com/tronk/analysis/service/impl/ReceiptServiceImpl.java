@@ -9,6 +9,7 @@ import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.mapper.Receipt.ReceiptMapper;
 import com.tronk.analysis.repository.*;
+import com.tronk.analysis.service.EmailService;
 import com.tronk.analysis.service.ReceiptService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
@@ -28,11 +29,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ReceiptServiceImpl implements ReceiptService {
-	SemesterRepository semesterRepository;
+	EmailService emailService;
+	CourseRepository courseRepository;
 	StudentRepository studentRepository;
 	ReceiptRepository receiptRepository;
-	CourseRepository courseRepository;
 	CashierRepository cashierRepository;
+	SemesterRepository semesterRepository;
+
 	@Override
 	public ReceiptResponse createReceipt(UploadReceiptRequest request) {
 		Student student = studentRepository.findById(request.getStudentId())
@@ -69,8 +72,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receipt.setSemester(semester);
 		receipt.setCourses(courses);
 		receipt.setCashier(cashier);
+		receiptRepository.save(receipt);
 
-		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
+		emailService.sendReceiptForStudent(receipt.getId());
+
+		return ReceiptMapper.toResponse(receipt);
 	}
 
 
@@ -106,7 +112,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
 
 		receipt.setTotalAmount(request.getTotalAmount());
+
+		if(receipt.isStatus() == false && request.isStatus() == true)
+			emailService.sendRPaymentReceiptInfoForStudent(receipt.getId());
 		receipt.setStatus(request.isStatus());
+
 		receipt.setDescription(request.getDescription());
 		receipt.setPaymentDate(request.getPaymentDate());
 		receipt.setStudentName(request.getStudentName());
