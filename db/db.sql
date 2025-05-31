@@ -36,6 +36,7 @@ SELECT * FROM receipt;
 SELECT * FROM receipt_courses;
 SELECT * FROM semester;
 SELECT * FROM student;
+SELECT * FROM cashier;
 
 SELECT 
     COLUMN_NAME, 
