@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useCourses } from "@/services/course";
 import { useSemesters } from "@/services/semester";
 import { useCreateReceipt } from "@/services/receipt";
@@ -23,7 +23,13 @@ import { SearchInput } from "@/components/ui/search/SearchInput";
 import useAppRoute from "@/utils/route";
 import UIHelper from "@/utils/ui.helper.util";
 import { ToastType } from "@/types/toast";
-import { UploadReceiptRequest } from "@/types/api";
+import {
+  CourseResponse,
+  SemesterResponse,
+  UploadReceiptRequest,
+} from "@/types/api";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 function RegisterCoursePage() {
   const { replace } = useAppRoute();
@@ -76,13 +82,6 @@ function RegisterCoursePage() {
     setNewReceipt((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleExportReceipt = () => {
-    UIHelper.showToast({
-      message: "Chức năng xuất biên lai PDF sẽ được triển khai sau",
-      type: ToastType.info,
-    });
-  };
-
   const handleSubmit = () => {
     if (
       !newReceipt.studentId ||
@@ -118,6 +117,34 @@ function RegisterCoursePage() {
         },
       }
     );
+  };
+
+  const receiptRef = useRef<HTMLDivElement>(null);
+
+  const handleExportReceipt = async () => {
+    if (!receiptRef.current) return;
+
+    try {
+      const canvas = await html2canvas(receiptRef.current, {
+        scale: 2,
+        useCORS: true,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      pdf.save(`hoa-don-${new Date().toLocaleDateString("vi-VN")}.pdf`);
+    } catch (error) {
+      UIHelper.showToast({
+        message: "Xuất PDF thất bại! Vui lòng thử lại",
+        type: ToastType.error,
+      });
+    }
   };
 
   if (!newReceipt.studentId) {
@@ -255,8 +282,171 @@ function RegisterCoursePage() {
           </Paper>
         </Grid>
       </Grid>
+
+      <div style={{ position: "absolute", left: "-9999px" }}>
+        <div
+          ref={receiptRef}
+          style={{ width: "210mm", padding: "20px", fontFamily: "Arial" }}
+        >
+          <ReceiptTemplate
+            newReceipt={newReceipt}
+            courses={courses}
+            semesters={semesters}
+            totalAmount={totalAmount}
+          />
+        </div>
+      </div>
     </Stack>
   );
 }
 
 export default RegisterCoursePage;
+
+function ReceiptTemplate({
+  newReceipt,
+  courses,
+  semesters,
+  totalAmount,
+}: {
+  newReceipt: UploadReceiptRequest;
+  courses: CourseResponse[] | undefined;
+  semesters: SemesterResponse[] | undefined;
+  totalAmount: number;
+}) {
+  const semester = semesters?.find((s) => s.id === newReceipt.semesterId);
+  const selectedCourses = courses?.filter((course) =>
+    newReceipt.courseIds.includes(course.id)
+  );
+
+  const currentDate = new Date();
+  const formattedDate = `${currentDate.getDate()}/${
+    currentDate.getMonth() + 1
+  }/${currentDate.getFullYear()}`;
+
+  return (
+    <>
+      <Typography variant="h4" align="center" gutterBottom>
+        HÓA ĐƠN ĐĂNG KÝ MÔN HỌC
+      </Typography>
+
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={6}>
+          <Typography>
+            <strong>Họ tên:</strong> {newReceipt.studentName}
+          </Typography>
+          <Typography>
+            <strong>Lớp:</strong> {newReceipt.studentClass}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} textAlign="right">
+          <Typography>
+            <strong>Mã SV:</strong> {newReceipt.studentCode}
+          </Typography>
+          <Typography>
+            <strong>Ngày:</strong> {formattedDate}
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Typography variant="h6" gutterBottom>
+        Học kỳ: {semester?.name || "N/A"}
+      </Typography>
+
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ border: "1px solid #000", padding: "8px" }}>STT</th>
+            <th style={{ border: "1px solid #000", padding: "8px" }}>
+              Môn học
+            </th>
+            <th style={{ border: "1px solid #000", padding: "8px" }}>
+              Số tín chỉ
+            </th>
+            <th style={{ border: "1px solid #000", padding: "8px" }}>
+              Đơn giá (VND)
+            </th>
+            <th style={{ border: "1px solid #000", padding: "8px" }}>
+              Thành tiền (VND)
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {selectedCourses?.map((course, index) => (
+            <tr key={course.id}>
+              <td
+                style={{
+                  border: "1px solid #000",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
+                {index + 1}
+              </td>
+              <td style={{ border: "1px solid #000", padding: "8px" }}>
+                {course.name}
+              </td>
+              <td
+                style={{
+                  border: "1px solid #000",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
+                {course.credit}
+              </td>
+              <td
+                style={{
+                  border: "1px solid #000",
+                  padding: "8px",
+                  textAlign: "right",
+                }}
+              >
+                {course.baseFeeCredit.toLocaleString()}
+              </td>
+              <td
+                style={{
+                  border: "1px solid #000",
+                  padding: "8px",
+                  textAlign: "right",
+                }}
+              >
+                {(course.credit * course.baseFeeCredit).toLocaleString()}
+              </td>
+            </tr>
+          ))}
+          <tr>
+            <td
+              colSpan={4}
+              style={{
+                border: "1px solid #000",
+                padding: "8px",
+                textAlign: "right",
+                fontWeight: "bold",
+              }}
+            >
+              TỔNG CỘNG:
+            </td>
+            <td
+              style={{
+                border: "1px solid #000",
+                padding: "8px",
+                textAlign: "right",
+                fontWeight: "bold",
+              }}
+            >
+              {totalAmount.toLocaleString()} VND
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <Grid container justifyContent="flex-end" sx={{ mt: 6 }}>
+        <Grid item xs={4} textAlign="center">
+          <Typography fontStyle="italic">Ngày {formattedDate}</Typography>
+          <Typography fontWeight="bold">Người lập phiếu</Typography>
+          <Typography fontStyle="italic">(Ký và ghi rõ họ tên)</Typography>
+        </Grid>
+      </Grid>
+    </>
+  );
+}
