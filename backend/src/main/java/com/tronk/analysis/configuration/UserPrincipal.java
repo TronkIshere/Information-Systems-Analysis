@@ -1,5 +1,6 @@
 package com.tronk.analysis.configuration;
 
+import com.tronk.analysis.entity.Cashier;
 import com.tronk.analysis.entity.Lecturer;
 import com.tronk.analysis.entity.Student;
 import com.tronk.analysis.entity.common.User;
@@ -42,6 +43,7 @@ public class UserPrincipal implements UserDetails {
     private static String determineUserType(User user) {
         if (user instanceof Student) return "STUDENT";
         if (user instanceof Lecturer) return "LECTURER";
+        if (user instanceof Cashier) return "CASHIER";
         return "UNKNOWN";
     }
 

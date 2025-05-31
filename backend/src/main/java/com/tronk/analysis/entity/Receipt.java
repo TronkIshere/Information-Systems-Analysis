@@ -25,7 +25,9 @@ public class Receipt extends AbstractEntity<UUID> {
 	String description;
 	LocalDate paymentDate;
 	String studentCode;
+	@Column(columnDefinition = "NVARCHAR(255)")
 	String studentName;
+	@Column(columnDefinition = "NVARCHAR(255)")
 	String studentClass;
 
 	@ManyToOne(fetch = FetchType.LAZY)

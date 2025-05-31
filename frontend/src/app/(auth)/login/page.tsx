@@ -2,7 +2,7 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import ClientSession from "@/services/session/client.session";
 import { AuthResponse } from "@/types/api";
-import { ADMIN_URL, STUDENT_URL } from "@/types/app.url.type";
+import { ADMIN_URL, CASHIER_URL, STUDENT_URL } from "@/types/app.url.type";
 import { ToastType } from "@/types/toast";
 import useAppRoute from "@/utils/route";
 import UIHelper from "@/utils/ui.helper.util";
@@ -29,6 +29,8 @@ export default function LoginPage() {
       redirectUrl = ADMIN_URL.HOME;
     } else if (roles.includes("ROLE_STUDENT")) {
       redirectUrl = STUDENT_URL.HOME;
+    } else if (roles.includes("ROLE_CASHIER")) {
+      redirectUrl = CASHIER_URL.HOME;
     }
 
     setTimeout(() => {

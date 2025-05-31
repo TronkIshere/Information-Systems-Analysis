@@ -21,7 +21,7 @@ public class ReceiptController {
 	private final ReceiptService receiptService;
 
 	@GetMapping("/list")
-	ResponseAPI<List<ReceiptFullInfoResponse>> getAllUsers() {
+	ResponseAPI<List<ReceiptFullInfoResponse>> getAllReceipt() {
 		var result = receiptService.getAllReceipts();
 		return ResponseAPI.<List<ReceiptFullInfoResponse>>builder()
 				.code(HttpStatus.OK.value())

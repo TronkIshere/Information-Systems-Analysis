@@ -19,3 +19,9 @@ export enum STUDENT_URL {
   PROFILE = "/student/profile",
   RECEIPT = "/student/receipt",
 }
+
+export enum CASHIER_URL {
+  _ = "",
+  HOME = "/cashier",
+  PAYMENT = "/cashier/payment",
+}

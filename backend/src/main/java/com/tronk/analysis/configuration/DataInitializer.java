@@ -255,7 +255,7 @@ public class DataInitializer {
 
             Receipt receipt = new Receipt();
             receipt.setTotalAmount(totalAmount);
-            receipt.setStatus(true);
+            receipt.setStatus(false);
             receipt.setDescription("Học phí " + semester.getName());
             receipt.setCashier(cashier);
             receipt.setStudent(student);

@@ -1,10 +1,12 @@
 package com.tronk.analysis.service.impl;
 
 import com.tronk.analysis.configuration.UserPrincipal;
+import com.tronk.analysis.entity.Cashier;
 import com.tronk.analysis.entity.Lecturer;
 import com.tronk.analysis.entity.Student;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
+import com.tronk.analysis.repository.CashierRepository;
 import com.tronk.analysis.repository.LecturerRepository;
 import com.tronk.analysis.repository.StudentRepository;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,7 @@ import java.util.Optional;
 public class UserDetailsServiceCustomizer implements UserDetailsService {
     LecturerRepository lecturerRepository;
     StudentRepository studentRepository;
+    CashierRepository cashierRepository;
 
     @Override
     @Transactional
@@ -30,6 +33,11 @@ public class UserDetailsServiceCustomizer implements UserDetailsService {
         Optional<Lecturer> lecturer = lecturerRepository.findByLoginName(loginName);
         if (lecturer.isPresent()) {
             return UserPrincipal.create(lecturer.get());
+        }
+
+        Optional<Cashier> cashier = cashierRepository.findByLoginName(loginName);
+        if (cashier.isPresent()) {
+            return UserPrincipal.create(cashier.get());
         }
 
         Student student = studentRepository.findByLoginName(loginName)

@@ -1,4 +1,4 @@
-import { ADMIN_URL, STUDENT_URL } from "@/types/app.url.type";
+import { ADMIN_URL, CASHIER_URL, STUDENT_URL } from "@/types/app.url.type";
 import IconDashboard from "@/assets/icons/IconDashboard";
 import IconCustomer from "@/assets/icons/IconCustomer";
 import IconReport from "@/assets/icons/IconReport";
@@ -66,6 +66,21 @@ export const getStudentMenu = () => [
     text: "Đăng ký môn học",
     icon: <IconCompletedOrder />,
     link: STUDENT_URL.REGISTER_COURSE,
+    type: "single",
+  },
+];
+
+export const getCashierMenu = () => [
+  {
+    text: "Tổng quan",
+    icon: <IconDashboard />,
+    link: CASHIER_URL.HOME,
+    type: "single",
+  },
+  {
+    text: "Thanh toán",
+    icon: <IconCompletedOrder />,
+    link: CASHIER_URL.PAYMENT,
     type: "single",
   },
 ];

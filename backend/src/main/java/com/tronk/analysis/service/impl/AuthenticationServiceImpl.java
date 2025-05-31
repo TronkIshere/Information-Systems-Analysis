@@ -73,7 +73,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             case "LECTURER" -> lecturerRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Lecturer not found"));
             case "CASHIER" -> cashierRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Lecturer not found"));
+                    .orElseThrow(() -> new RuntimeException("Cashier not found"));
             default -> throw new IllegalArgumentException("Invalid user type");
         };
     }
@@ -88,7 +88,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else if (user instanceof Lecturer) {
             ((Lecturer) user).setRefreshToken(refreshToken);
             lecturerRepository.save((Lecturer) user);
-        } else if (user instanceof Lecturer) {
+        } else if (user instanceof Cashier) {
             ((Cashier) user).setRefreshToken(refreshToken);
             cashierRepository.save((Cashier) user);
         }
@@ -181,9 +181,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRefreshToken(null);
         if (user instanceof Student) {
             studentRepository.save((Student) user);
-        } else if (user instanceof  Lecturer){
+        } else if (user instanceof Lecturer){
             lecturerRepository.save((Lecturer) user);
-        } else {
+        } else if (user instanceof  Cashier){
             cashierRepository.save((Cashier) user);
         }
 

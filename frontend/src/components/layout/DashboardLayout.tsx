@@ -5,7 +5,11 @@ import SideNav from "@/components/ui/SideNav";
 import ClientSession from "@/services/session/client.session";
 import { useRouter } from "next/navigation";
 import { MenuItem } from "@/types/api";
-import { getAdminMenu, getStudentMenu } from "../ui/SideNav/untils";
+import {
+  getAdminMenu,
+  getCashierMenu,
+  getStudentMenu,
+} from "../ui/SideNav/untils";
 
 function DashboardLayout({
   children,
@@ -22,6 +26,10 @@ function DashboardLayout({
 
     if (roles.includes("ROLE_STUDENT")) {
       return getStudentMenu();
+    }
+
+    if (roles.includes("ROLE_CASHIER")) {
+      return getCashierMenu();
     }
 
     router.push("/login");

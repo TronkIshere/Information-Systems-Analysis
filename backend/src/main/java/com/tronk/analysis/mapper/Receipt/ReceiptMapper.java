@@ -35,7 +35,9 @@ public class ReceiptMapper {
 				.paymentDate(receipt.getPaymentDate())
 				// student
 				.studentId(receipt.getStudent().getId())
-				.studentName(receipt.getStudent().getName())
+				.studentName(receipt.getStudentName())
+				.studentCode(receipt.getStudentCode())
+				.studentClass(receipt.getStudentClass())
 				// semester
 				.semesterId(receipt.getSemester().getId())
 				.semesterName(receipt.getSemester().getName())
@@ -47,7 +49,7 @@ public class ReceiptMapper {
 								.collect(Collectors.toList())
 				)
 				// cashier
-				.cashierId(receipt.getCashier().getId())
+				.cashierId(receipt.getCashier() != null ? receipt.getCashier().getId() : null)
 				.build();
 	}
 
