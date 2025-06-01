@@ -2,7 +2,6 @@ package com.tronk.analysis.dto.response.semester;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.cglib.core.Local;
 
 import java.io.Serializable;
 import java.time.LocalDate;

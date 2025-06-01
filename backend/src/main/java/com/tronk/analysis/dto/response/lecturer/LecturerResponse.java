@@ -16,7 +16,6 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LecturerResponse implements Serializable {
-	// lecturer
 	UUID id;
 	String lecturerCode;
 	String academicRank;
@@ -29,8 +28,6 @@ public class LecturerResponse implements Serializable {
 	String status;
 	LocalDate birthDay;
 	boolean gender;
-	// course
 	List<UUID> courseIds;
-	// department
 	UUID departmentId;
 }

@@ -113,7 +113,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 		receipt.setTotalAmount(request.getTotalAmount());
 
-		if(receipt.isStatus() == false && request.isStatus() == true)
+		if(!receipt.isStatus() && request.isStatus())
 			emailService.sendRPaymentReceiptInfoForStudent(receipt.getId());
 		receipt.setStatus(request.isStatus());
 

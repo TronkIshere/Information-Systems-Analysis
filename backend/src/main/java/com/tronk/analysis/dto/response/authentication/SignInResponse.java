@@ -19,7 +19,6 @@ public class SignInResponse implements Serializable {
     SignInStatus status;
     String authProvider;
     UUID userId;
-    // temporary
     String roles;
 }
 

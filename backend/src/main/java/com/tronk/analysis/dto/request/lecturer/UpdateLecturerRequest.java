@@ -30,8 +30,6 @@ public class UpdateLecturerRequest implements Serializable {
 	LocalDate birthDay;
 	boolean gender;
 	String status;
-	// course
 	List<UUID> courseIds;
-	// department
 	UUID departmentId;
 }

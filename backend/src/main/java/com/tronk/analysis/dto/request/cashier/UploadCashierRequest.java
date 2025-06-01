@@ -1,12 +1,11 @@
 package com.tronk.analysis.dto.request.cashier;
 
 import lombok.*;
-import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
-import java.time.LocalDate;
-import java.util.Date;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Set;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
