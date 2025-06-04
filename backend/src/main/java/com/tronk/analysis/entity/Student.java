@@ -20,10 +20,14 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Student extends User {
 	String studentCode;
+	BigDecimal gpa;
+
 	@Column(columnDefinition = "NVARCHAR(255)")
 	String major;
-	BigDecimal gpa;
 
 	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
 	Set<Receipt> receipts = new HashSet<>();
+
+	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+	Set<StudentCourse> studentCourses = new HashSet<>();
 }

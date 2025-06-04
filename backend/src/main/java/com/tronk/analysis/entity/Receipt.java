@@ -21,10 +21,10 @@ import java.math.BigDecimal;
 public class Receipt extends AbstractEntity<UUID> {
 	BigDecimal totalAmount;
 	boolean status;
-	@Column(columnDefinition = "NVARCHAR(1000)")
-	String description;
 	LocalDate paymentDate;
 	String studentCode;
+	@Column(columnDefinition = "NVARCHAR(1000)")
+	String description;
 	@Column(columnDefinition = "NVARCHAR(255)")
 	String studentName;
 	@Column(columnDefinition = "NVARCHAR(255)")

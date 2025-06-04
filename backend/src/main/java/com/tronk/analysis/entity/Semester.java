@@ -18,11 +18,15 @@ import java.util.Date;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Semester extends AbstractEntity<UUID> {
-	@Column(columnDefinition = "NVARCHAR(255)")
-	String name;
 	LocalDate startDate;
 	LocalDate endDate;
 
+	@Column(columnDefinition = "NVARCHAR(255)")
+	String name;
+
 	@OneToMany(mappedBy = "semester")
 	Set<Receipt> receipts = new HashSet<>();
+
+	@OneToMany(mappedBy = "semester")
+	Set<StudentCourse> studentCourses = new HashSet<>();
 }
