@@ -42,12 +42,12 @@ public class ReceiptMapper {
 				.semesterId(receipt.getSemester().getId())
 				.semesterName(receipt.getSemester().getName())
 				// courses
-				.courseIds(
-						receipt.getCourses()
-								.stream()
-								.map(Course::getId)
-								.collect(Collectors.toList())
-				)
+//				.courseIds(
+//						receipt.getCourses()
+//								.stream()
+//								.map(Course::getId)
+//								.collect(Collectors.toList())
+//				)
 				// cashier
 				.cashierId(receipt.getCashier() != null ? receipt.getCashier().getId() : null)
 				.build();

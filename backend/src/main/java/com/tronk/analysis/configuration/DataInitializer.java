@@ -266,7 +266,7 @@ public class DataInitializer {
             receipt.setStudentName("Nguyễn Hữu Trọng");
             receipt.setStudentCode("253A10101");
             receipt.setStudentClass("demo");
-            receipt.setCourses(new HashSet<>(courses));
+//            receipt.setCourses(new HashSet<>(courses));
             receipt.setPaymentDate(LocalDate.now());
             receipts.add(receipt);
         }

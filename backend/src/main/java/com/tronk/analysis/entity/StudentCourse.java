@@ -25,14 +25,9 @@ public class StudentCourse extends AbstractEntity<UUID> {
     Student student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
-    Course course;
+    @JoinColumn(name = "receipt_item_id", nullable = false)
+    ReceiptItem receiptItem;
 
     @Enumerated(EnumType.STRING)
     EnrollmentStatus status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "semester_id")
-    Semester semester;
-
 }

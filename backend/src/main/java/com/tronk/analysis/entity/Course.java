@@ -1,7 +1,10 @@
 package com.tronk.analysis.entity;
 
 import com.tronk.analysis.entity.common.AbstractEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -28,19 +31,8 @@ public class Course extends AbstractEntity<UUID> {
 	Collection<Department> departments = new HashSet<>();
 
 	@ManyToMany(mappedBy = "courses")
-	Collection<Receipt> receipts = new HashSet<>();
-
-	@ManyToMany(mappedBy = "courses")
 	Collection<Lecturer> lecturers = new HashSet<>();
 
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<StudentCourse> studentCourses = new HashSet<>();
-
-	@ManyToMany
-	@JoinTable(
-			name = "course_prerequisites",
-			joinColumns = @JoinColumn(name = "course_id"),
-			inverseJoinColumns = @JoinColumn(name = "prerequisite_id")
-	)
-	private Set<Course> prerequisites = new HashSet<>();
+	@OneToMany(mappedBy = "course")
+	Set<ReceiptItem> receiptItems = new HashSet<>();
 }

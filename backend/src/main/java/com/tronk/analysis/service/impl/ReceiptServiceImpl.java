@@ -70,7 +70,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
-		receipt.setCourses(courses);
+//		receipt.setCourses(courses);
 		receipt.setCashier(cashier);
 		receiptRepository.save(receipt);
 
@@ -125,7 +125,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
-		receipt.setCourses(courses);
+//		receipt.setCourses(courses);
 		receipt.setCashier(cashier);
 
 		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
@@ -155,12 +155,12 @@ public class ReceiptServiceImpl implements ReceiptService {
 		Course course = courseRepository.findById(request.getCourseId())
 				.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
 
-		if (receipt.getCourses().contains(course)) {
-			throw new ApplicationException(ErrorCode.RECEIPT_ALREADY_HAS_COURSE);
-		}
-
-		receipt.getCourses().add(course);
-		course.getReceipts().add(receipt);
+//		if (receipt.getCourses().contains(course)) {
+//			throw new ApplicationException(ErrorCode.RECEIPT_ALREADY_HAS_COURSE);
+//		}
+//
+//		receipt.getCourses().add(course);
+//		course.getReceipts().add(receipt);
 
 		receiptRepository.save(receipt);
 	}
@@ -173,12 +173,12 @@ public class ReceiptServiceImpl implements ReceiptService {
 		Course course = courseRepository.findById(request.getCourseId())
 				.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
 
-		if (!receipt.getCourses().contains(course)) {
-			throw new ApplicationException(ErrorCode.RECEIPT_DOES_NOT_HAVE_COURSE);
-		}
-
-		receipt.getCourses().remove(course);
-		course.getReceipts().remove(receipt);
+//		if (!receipt.getCourses().contains(course)) {
+//			throw new ApplicationException(ErrorCode.RECEIPT_DOES_NOT_HAVE_COURSE);
+//		}
+//
+//		receipt.getCourses().remove(course);
+//		course.getReceipts().remove(receipt);
 
 		receiptRepository.save(receipt);
 	}
@@ -220,7 +220,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 		receipt.setStudentClass(request.getStudentClass());
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
-		receipt.setCourses(new HashSet<>(courses));
+//		receipt.setCourses(new HashSet<>(courses));
 		receipt.setTotalAmount(totalAmount);
 
 		receiptRepository.save(receipt);

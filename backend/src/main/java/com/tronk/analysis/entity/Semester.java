@@ -26,7 +26,4 @@ public class Semester extends AbstractEntity<UUID> {
 
 	@OneToMany(mappedBy = "semester")
 	Set<Receipt> receipts = new HashSet<>();
-
-	@OneToMany(mappedBy = "semester")
-	Set<StudentCourse> studentCourses = new HashSet<>();
 }

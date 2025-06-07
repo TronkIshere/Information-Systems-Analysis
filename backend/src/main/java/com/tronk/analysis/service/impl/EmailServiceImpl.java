@@ -93,18 +93,18 @@ public class EmailServiceImpl implements EmailService {
         sb.append("+--------------------------------+------------+-----------------+\n");
 
         // Course items with detailed information
-        for (Course course : receipt.getCourses()) {
-            String courseName = course.getName();
-            if (courseName.length() > 30) {
-                courseName = courseName.substring(0, 27) + "...";
-            }
-            BigDecimal courseTotal = course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit()));
-
-            sb.append(String.format("| %-30s | %10d | %15s |\n",
-                    courseName,
-                    course.getCredit(),
-                    formatCurrency(courseTotal)));
-        }
+//        for (Course course : receipt.getCourses()) {
+//            String courseName = course.getName();
+//            if (courseName.length() > 30) {
+//                courseName = courseName.substring(0, 27) + "...";
+//            }
+//            BigDecimal courseTotal = course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit()));
+//
+//            sb.append(String.format("| %-30s | %10d | %15s |\n",
+//                    courseName,
+//                    course.getCredit(),
+//                    formatCurrency(courseTotal)));
+//        }
         sb.append("+--------------------------------+------------+-----------------+\n");
 
         // Total amount section
