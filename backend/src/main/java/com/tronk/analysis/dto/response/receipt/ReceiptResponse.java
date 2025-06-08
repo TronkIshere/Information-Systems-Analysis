@@ -5,6 +5,7 @@ import java.io.Serializable;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -22,4 +23,9 @@ public class ReceiptResponse implements Serializable {
 	String studentCode;
 	String studentName;
 	String studentClass;
+	String semesterName;
+	UUID studentId;
+	UUID semesterId;
+	UUID cashierId;
+	List<UUID> courseOfferingIds;
 }

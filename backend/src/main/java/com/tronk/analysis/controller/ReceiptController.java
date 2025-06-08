@@ -1,9 +1,11 @@
 package com.tronk.analysis.controller;
 
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
-import com.tronk.analysis.dto.request.receipt.*;
+import com.tronk.analysis.dto.request.receipt.AssignReceiptToCourseRequest;
+import com.tronk.analysis.dto.request.receipt.RemoveReceiptFromCourseRequest;
+import com.tronk.analysis.dto.request.receipt.UpdateReceiptRequest;
+import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
 import com.tronk.analysis.dto.response.common.ResponseAPI;
-import com.tronk.analysis.dto.response.receipt.ReceiptFullInfoResponse;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.service.ReceiptService;
 import jakarta.validation.Valid;
@@ -21,9 +23,9 @@ public class ReceiptController {
 	private final ReceiptService receiptService;
 
 	@GetMapping("/list")
-	ResponseAPI<List<ReceiptFullInfoResponse>> getAllReceipt() {
+	ResponseAPI<List<ReceiptResponse>> getAllReceipt() {
 		var result = receiptService.getAllReceipts();
-		return ResponseAPI.<List<ReceiptFullInfoResponse>>builder()
+		return ResponseAPI.<List<ReceiptResponse>>builder()
 				.code(HttpStatus.OK.value())
 				.message("success")
 				.data(result)
@@ -39,17 +41,6 @@ public class ReceiptController {
 			.message("success")
 			.data(result)
 			.build();
-	}
-
-	@PostMapping("/uploadReceiptWithFullInfo")
-	public ResponseAPI<ReceiptResponse> createReceiptWithFullInfo(
-			@RequestBody UploadReceiptWithFullInfoRequest request) {
-		var result = receiptService.createReceiptWithFullInfo(request);
-		return ResponseAPI.<ReceiptResponse>builder()
-				.code(HttpStatus.OK.value())
-				.message("success")
-				.data(result)
-				.build();
 	}
 
 	@PostMapping("/{id}/paid-status")

@@ -1,8 +1,10 @@
 package com.tronk.analysis.service.impl;
 
 import com.tronk.analysis.dto.request.lecturer.AssignReceiptToSemesterRequest;
-import com.tronk.analysis.dto.request.receipt.*;
-import com.tronk.analysis.dto.response.receipt.ReceiptFullInfoResponse;
+import com.tronk.analysis.dto.request.receipt.AssignReceiptToCourseRequest;
+import com.tronk.analysis.dto.request.receipt.RemoveReceiptFromCourseRequest;
+import com.tronk.analysis.dto.request.receipt.UpdateReceiptRequest;
+import com.tronk.analysis.dto.request.receipt.UploadReceiptRequest;
 import com.tronk.analysis.dto.response.receipt.ReceiptResponse;
 import com.tronk.analysis.entity.*;
 import com.tronk.analysis.exception.ApplicationException;
@@ -20,58 +22,34 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ReceiptServiceImpl implements ReceiptService {
-	EmailService emailService;
-	CourseRepository courseRepository;
+	CourseOfferingRepository courseOfferingRepository;
+	StudentCourseRepository studentCourseRepository;
+	SemesterRepository semesterRepository;
 	StudentRepository studentRepository;
 	ReceiptRepository receiptRepository;
 	CashierRepository cashierRepository;
-	SemesterRepository semesterRepository;
+	CourseRepository courseRepository;
+	EmailService emailService;
 
 	@Override
 	public ReceiptResponse createReceipt(UploadReceiptRequest request) {
-		Student student = studentRepository.findById(request.getStudentId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
-
-		Semester semester = semesterRepository.findById(request.getSemesterId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+		Student student = findStudent(request.getStudentId());
+		Semester semester = findSemester(request.getSemesterId());
+		Set<CourseOffering> courseOfferings = findCourseOfferings(request.getCourseOfferingIds());
 
 		Cashier cashier = null;
-		if (request.getCashierId() != null) {
-			cashier = cashierRepository.findById(request.getCashierId())
-					.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
-		}
+		if (request.getCashierId() != null)
+			cashier = findCashier(request.getCashierId());
 
-		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
+		createStudentCourses(student, courseOfferings);
 
-		BigDecimal totalAmount = request.getTotalAmount();
-		if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) == 0) {
-			totalAmount = courses.stream()
-					.map(course -> course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit())))
-					.reduce(BigDecimal.ZERO, BigDecimal::add);
-		}
-
-		Receipt receipt = new Receipt();
-		receipt.setTotalAmount(totalAmount);
-		receipt.setStatus(request.isStatus());
-		receipt.setDescription(request.getDescription());
-		receipt.setPaymentDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDate.now());
-		receipt.setStudentName(request.getStudentName());
-		receipt.setStudentCode(request.getStudentCode());
-		receipt.setStudentClass(request.getStudentClass());
-
-		receipt.setStudent(student);
-		receipt.setSemester(semester);
-//		receipt.setCourses(courses);
-		receipt.setCashier(cashier);
+		Receipt receipt = createReceiptObject(request, courseOfferings, student, semester, cashier);
 		receiptRepository.save(receipt);
 
 		emailService.sendReceiptForStudent(receipt.getId());
@@ -79,10 +57,69 @@ public class ReceiptServiceImpl implements ReceiptService {
 		return ReceiptMapper.toResponse(receipt);
 	}
 
+	private Student findStudent(UUID id) {
+		return studentRepository.findById(id)
+				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
+	}
 
-	@Override
-	public List<ReceiptFullInfoResponse> getAllReceipts() {
-		return ReceiptMapper.toFullInfoList(receiptRepository.findAll());
+	private Semester findSemester(UUID id) {
+		return semesterRepository.findById(id)
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+	}
+
+	private Set<CourseOffering> findCourseOfferings(List<UUID> ids) {
+		return new HashSet<>(courseOfferingRepository.findAllById(ids));
+	}
+
+	private Cashier findCashier(UUID id) {
+		return cashierRepository.findById(id)
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+	}
+
+	private void createStudentCourses(Student student, Set<CourseOffering> courseOfferings) {
+		Set<StudentCourse> studentCourses = new HashSet<>();
+		for (CourseOffering offering : courseOfferings) {
+			StudentCourse studentCourse = new StudentCourse();
+			studentCourse.setStudent(student);
+			studentCourse.setCourseOffering(offering);
+			studentCourse.setEnrollmentDate(LocalDate.now());
+			studentCourse.setStatus(EnrollmentStatus.ENROLLED);
+			studentCourse.setGrade(null);
+			studentCourses.add(studentCourse);
+		}
+
+		studentCourseRepository.saveAll(studentCourses);
+	}
+
+	private BigDecimal calculateTotalAmount(BigDecimal totalAmount, Set<CourseOffering> courseOfferings) {
+		BigDecimal result = totalAmount;
+		if (result == null || result.compareTo(BigDecimal.ZERO) == 0) {
+			result = courseOfferings.stream()
+					.map(courseOffering -> {
+						Course course = courseOffering.getCourse();
+						return course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit()));
+					})
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+		}
+		return result;
+	}
+
+	private Receipt createReceiptObject(UploadReceiptRequest request, Set<CourseOffering> courseOfferings,
+										Student student, Semester semester, Cashier cashier) {
+		Receipt receipt = new Receipt();
+		receipt.setStatus(request.isStatus());
+		receipt.setDescription(request.getDescription());
+		receipt.setStudentName(request.getStudentName());
+		receipt.setStudentCode(request.getStudentCode());
+		receipt.setStudentClass(request.getStudentClass());
+		receipt.setTotalAmount(calculateTotalAmount(receipt.getTotalAmount(), courseOfferings));
+		receipt.setPaymentDate(request.getPaymentDate() != null ? request.getPaymentDate() : LocalDate.now());
+
+		receipt.setStudent(student);
+		receipt.setSemester(semester);
+		receipt.setCourseOfferings(courseOfferings);
+		receipt.setCashier(cashier);
+		return receipt;
 	}
 
 	@Override
@@ -94,29 +131,29 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 	@Override
 	public ReceiptResponse updateReceipt(UpdateReceiptRequest request) {
-		Receipt receipt = receiptRepository.findById(request.getId())
+		Receipt receipt = findReceipt(request.getId());
+		Student student = findStudent(request.getStudentId());
+		Semester semester = findSemester(request.getSemesterId());
+		Set<CourseOffering> courseOfferings = findCourseOfferings(request.getCourseOfferingIds());
+
+		Cashier cashier = Optional.ofNullable(request.getCashierId())
+				.map(this::findCashier)
+				.orElse(null);
+
+		updateReceiptObject(request, receipt, student, semester, cashier, courseOfferings);
+		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
+	}
+
+	private Receipt findReceipt(UUID id) {
+		return receiptRepository.findById(id)
 				.orElseThrow(() -> new ApplicationException(ErrorCode.RECEIPT_NOT_FOUND));
+	}
 
-		Student student = studentRepository.findById(request.getStudentId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
-
-		Semester semester = semesterRepository.findById(request.getSemesterId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
-
-		Cashier cashier = null;
-		if (request.getCashierId() != null) {
-			cashier = cashierRepository.findById(request.getCashierId())
-					.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
-		}
-
-		Set<Course> courses = new HashSet<>(courseRepository.findAllById(request.getCourseIds()));
-
+	private void updateReceiptObject(UpdateReceiptRequest request, Receipt receipt,
+									 Student student, Semester semester,
+									 Cashier cashier, Set<CourseOffering> courseOfferings) {
 		receipt.setTotalAmount(request.getTotalAmount());
-
-		if(!receipt.isStatus() && request.isStatus())
-			emailService.sendRPaymentReceiptInfoForStudent(receipt.getId());
 		receipt.setStatus(request.isStatus());
-
 		receipt.setDescription(request.getDescription());
 		receipt.setPaymentDate(request.getPaymentDate());
 		receipt.setStudentName(request.getStudentName());
@@ -125,10 +162,8 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 		receipt.setStudent(student);
 		receipt.setSemester(semester);
-//		receipt.setCourses(courses);
+		receipt.setCourseOfferings(courseOfferings);
 		receipt.setCashier(cashier);
-
-		return ReceiptMapper.toResponse(receiptRepository.save(receipt));
 	}
 
 	@Override
@@ -196,43 +231,16 @@ public class ReceiptServiceImpl implements ReceiptService {
 	}
 
 	@Override
-	public ReceiptResponse createReceiptWithFullInfo(UploadReceiptWithFullInfoRequest request) {
-		Student student = studentRepository.findById(request.getStudentId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.USER_NOT_EXISTED));
-		Semester semester = semesterRepository.findById(request.getSemesterId())
-				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
-		List<Course> courses = courseRepository.findAllById(request.getCourseId());
-
-		if (courses.isEmpty()) {
-			throw new ApplicationException(ErrorCode.COURSE_NOT_FOUND);
-		}
-
-		BigDecimal totalAmount = courses.stream()
-				.map(course -> course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit())))
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
-
-		Receipt receipt = new Receipt();
-		receipt.setStatus(request.isStatus());
-		receipt.setDescription(request.getDescription());
-		receipt.setPaymentDate(receipt.getPaymentDate());
-		receipt.setStudentName(request.getStudentName());
-		receipt.setStudentCode(request.getStudentCode());
-		receipt.setStudentClass(request.getStudentClass());
-		receipt.setStudent(student);
-		receipt.setSemester(semester);
-//		receipt.setCourses(new HashSet<>(courses));
-		receipt.setTotalAmount(totalAmount);
-
-		receiptRepository.save(receipt);
-		return ReceiptMapper.toResponse(receipt);
-	}
-
-	@Override
 	public ReceiptResponse markAsPaid(UUID id) {
 		Receipt receipt = receiptRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Receipt not found"));
 		receipt.setStatus(true);
 		receiptRepository.save(receipt);
 		return ReceiptMapper.toResponse(receipt);
+	}
+
+	@Override
+	public List<ReceiptResponse> getAllReceipts() {
+		return ReceiptMapper.toResponseList(receiptRepository.findAll());
 	}
 }

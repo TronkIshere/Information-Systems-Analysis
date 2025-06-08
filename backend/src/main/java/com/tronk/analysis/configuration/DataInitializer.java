@@ -18,21 +18,22 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 @Configuration
 @Slf4j(topic = "INIT-APPLICATION")
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE ,makeFinal = true)
 public class DataInitializer {
-    PasswordEncoder passwordEncoder;
-    CourseRepository courseRepository;
+    StudentCourseRepository studentCourseRepository;
+    CourseOfferingRepository receiptItemRepository;
     DepartmentRepository departmentRepository;
     LecturerRepository lecturerRepository;
     SemesterRepository semesterRepository;
     StudentRepository studentRepository;
     ReceiptRepository receiptRepository;
     CashierRepository cashierRepository;
+    CourseRepository courseRepository;
+    PasswordEncoder passwordEncoder;
 
     @Bean
     public ApplicationRunner initData() {
@@ -45,6 +46,8 @@ public class DataInitializer {
                 createStudents();
                 createSemesters();
                 createCashiers();
+                createReceiptItems();
+                createStudentCourses();
                 createReceipts();
             }
             log.info("Initial users inserted!");
@@ -235,6 +238,14 @@ public class DataInitializer {
         log.info("Initial cashiers inserted!");
     }
 
+    private void createReceiptItems() {
+
+    }
+
+    private void createStudentCourses() {
+
+    }
+
     private void createReceipts() {
         List<Semester> semesters = semesterRepository.findAll();
         List<Course> courses = courseRepository.findAll();
@@ -356,6 +367,18 @@ public class DataInitializer {
         semester.setStartDate(startDate);
         semester.setEndDate(endDate);
         return semester;
+    }
+
+    private StudentCourse crreateStudentCourse() {
+        StudentCourse studentCourse = new StudentCourse();
+
+        return studentCourse;
+    }
+
+    private CourseOffering createRReceiptItem() {
+        CourseOffering receiptItem = new CourseOffering();
+
+        return receiptItem;
     }
 
     private Receipt createReceipt(BigDecimal totalAmount, boolean status, String description) {

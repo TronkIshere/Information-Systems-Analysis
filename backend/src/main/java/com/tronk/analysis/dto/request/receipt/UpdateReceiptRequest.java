@@ -26,5 +26,5 @@ public class UpdateReceiptRequest implements Serializable {
 	UUID studentId;
 	UUID semesterId;
 	UUID cashierId;
-	List<UUID> courseIds;
+	List<UUID> courseOfferingIds;
 }

@@ -24,6 +24,6 @@ public class UploadReceiptRequest implements Serializable {
 	String studentClass;
 	UUID studentId;
 	UUID SemesterId;
-	List<UUID> courseIds;
+	List<UUID> courseOfferingIds;
 	UUID cashierId;
 }

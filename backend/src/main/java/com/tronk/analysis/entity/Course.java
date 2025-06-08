@@ -34,5 +34,5 @@ public class Course extends AbstractEntity<UUID> {
 	Collection<Lecturer> lecturers = new HashSet<>();
 
 	@OneToMany(mappedBy = "course")
-	Set<ReceiptItem> receiptItems = new HashSet<>();
+	Set<CourseOffering> courseOfferings = new HashSet<>();
 }
