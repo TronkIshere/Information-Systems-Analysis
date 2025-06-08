@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReceiptItem extends AbstractEntity<UUID> {
+public class CourseOffering extends AbstractEntity<UUID> {
     LocalDate startDate;
     LocalDate endDate;
 
