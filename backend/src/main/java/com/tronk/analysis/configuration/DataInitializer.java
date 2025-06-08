@@ -1,8 +1,6 @@
 package com.tronk.analysis.configuration;
 
 import com.tronk.analysis.entity.*;
-import com.tronk.analysis.exception.ApplicationException;
-import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.repository.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,17 +13,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Configuration
 @Slf4j(topic = "INIT-APPLICATION")
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE ,makeFinal = true)
 public class DataInitializer {
+    CourseOfferingRepository courseOfferingRepository;
     StudentCourseRepository studentCourseRepository;
-    CourseOfferingRepository receiptItemRepository;
     DepartmentRepository departmentRepository;
     LecturerRepository lecturerRepository;
     SemesterRepository semesterRepository;
@@ -46,9 +42,8 @@ public class DataInitializer {
                 createStudents();
                 createSemesters();
                 createCashiers();
-                createReceiptItems();
+                createReceiptsAndCourseOfferings();
                 createStudentCourses();
-                createReceipts();
             }
             log.info("Initial users inserted!");
         };
@@ -238,52 +233,122 @@ public class DataInitializer {
         log.info("Initial cashiers inserted!");
     }
 
-    private void createReceiptItems() {
-
-    }
-
-    private void createStudentCourses() {
-
-    }
-
-    private void createReceipts() {
+    private void createReceiptsAndCourseOfferings() {
+        // Fetch all required data
         List<Semester> semesters = semesterRepository.findAll();
         List<Course> courses = courseRepository.findAll();
         List<Cashier> cashiers = cashierRepository.findAll();
+        List<Student> students = studentRepository.findAll();
 
-        Student student = studentRepository.findByEmail("nguyenhuutrong11133@gmail.com")
-                .orElseThrow(() -> new ApplicationException(ErrorCode.STUDENT_NOT_FOUND));
-
-        if (semesters.isEmpty() || courses.isEmpty()) {
-            log.warn("Không thể tạo receipt - thiếu sinh viên, học kỳ hoặc khóa học.");
+        // Validation
+        if (semesters.isEmpty() || cashiers.isEmpty() || courses.isEmpty() || students.isEmpty()) {
+            log.warn("Không thể tạo receipt - thiếu dữ liệu.");
             return;
         }
+
         Cashier cashier = cashiers.get(0);
+        Random random = new Random();
+        int batchSize = 50;
+        List<Receipt> allReceipts = new ArrayList<>();
 
-        List<Receipt> receipts = new ArrayList<>();
+        // Process in batches
+        for (int i = 0; i < students.size(); i += batchSize) {
+            List<Student> batch = students.subList(i, Math.min(i + batchSize, students.size()));
+            List<Receipt> batchReceipts = new ArrayList<>();
 
-        for (Semester semester : semesters) {
-            BigDecimal totalAmount = courses.stream()
-                    .map(c -> c.getBaseFeeCredit().multiply(BigDecimal.valueOf(c.getCredit())))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            for (Student student : batch) {
+                for (Semester semester : semesters) {
+                    // Create receipt logic
+                    Receipt receipt = createReceiptForStudent(student, semester, courses, cashier, random);
+                    batchReceipts.add(receipt);
+                }
+            }
 
-            Receipt receipt = new Receipt();
-            receipt.setTotalAmount(totalAmount);
-            receipt.setStatus(false);
-            receipt.setDescription("Học phí " + semester.getName());
-            receipt.setCashier(cashier);
-            receipt.setStudent(student);
-            receipt.setSemester(semester);
-            receipt.setStudentName("Nguyễn Hữu Trọng");
-            receipt.setStudentCode("253A10101");
-            receipt.setStudentClass("demo");
-//            receipt.setCourses(new HashSet<>(courses));
-            receipt.setPaymentDate(LocalDate.now());
-            receipts.add(receipt);
+            receiptRepository.saveAll(batchReceipts);
+            allReceipts.addAll(batchReceipts);
         }
 
-        receiptRepository.saveAll(receipts);
-        log.info("Đã tạo {} receipts cho sinh viên {}", receipts.size(), student.getId());
+        log.info("Đã tạo {} receipts với {} course offerings",
+                allReceipts.size(),
+                allReceipts.stream().mapToInt(r -> r.getCourseOfferings().size()).sum());
+    }
+
+    private Receipt createReceiptForStudent(Student student, Semester semester,
+                                            List<Course> courses, Cashier cashier, Random random) {
+        int courseCount = 4 + random.nextInt(3);
+        List<Course> selectedCourses = new ArrayList<>(courses);
+        Collections.shuffle(selectedCourses);
+        selectedCourses = selectedCourses.subList(0, courseCount);
+
+        BigDecimal totalAmount = selectedCourses.stream()
+                .map(c -> c.getBaseFeeCredit().multiply(BigDecimal.valueOf(c.getCredit())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Receipt receipt = new Receipt();
+        receipt.setTotalAmount(totalAmount);
+        receipt.setStatus(random.nextBoolean());
+        receipt.setDescription("Học phí " + semester.getName());
+        receipt.setCashier(cashier);
+        receipt.setStudent(student);
+        receipt.setSemester(semester);
+        receipt.setStudentName(student.getName());
+        receipt.setStudentCode(student.getStudentCode());
+        receipt.setStudentClass("Lớp " + student.getStudentCode().substring(0, 4));
+        receipt.setPaymentDate(LocalDate.now().minusMonths(random.nextInt(12)));
+
+        Set<CourseOffering> courseOfferings = new HashSet<>();
+        for (Course course : selectedCourses) {
+            CourseOffering offering = new CourseOffering();
+            offering.setStartDate(semester.getStartDate());
+            offering.setEndDate(semester.getEndDate());
+            offering.setCourse(course);
+            offering.setReceipt(receipt);
+            courseOfferings.add(offering);
+        }
+        receipt.setCourseOfferings(courseOfferings);
+
+        return receipt;
+    }
+
+    private void createStudentCourses() {
+        List<CourseOffering> courseOfferings = courseOfferingRepository.findAllWithReceiptAndStudent();
+        if (courseOfferings.isEmpty()) {
+            log.warn("Không có course offerings để tạo student courses");
+            return;
+        }
+
+        List<StudentCourse> studentCourses = new ArrayList<>();
+        String[] grades = {"A", "B", "C", "D", "F"};
+        Random random = new Random();
+
+        for (CourseOffering offering : courseOfferings) {
+            if (offering.getReceipt() == null || offering.getReceipt().getStudent() == null) {
+                log.warn("Skipping course offering with null receipt/student: {}", offering.getId());
+                continue;
+            }
+
+            StudentCourse sc = new StudentCourse();
+            sc.setStudent(offering.getReceipt().getStudent());
+            sc.setCourseOffering(offering);
+            sc.setEnrollmentDate(offering.getStartDate().minusDays(7 + random.nextInt(14)));
+            sc.setGrade(grades[random.nextInt(grades.length)]);
+            sc.setStatus(calculateEnrollmentStatus(offering));
+
+            studentCourses.add(sc);
+        }
+
+        studentCourseRepository.saveAll(studentCourses);
+        log.info("Đã tạo {} student courses", studentCourses.size());
+    }
+
+    private EnrollmentStatus calculateEnrollmentStatus(CourseOffering offering) {
+        if (LocalDate.now().isBefore(offering.getStartDate())) {
+            return EnrollmentStatus.ENROLLED;
+        } else if (LocalDate.now().isAfter(offering.getEndDate())) {
+            return EnrollmentStatus.COMPLETED;
+        } else {
+            return EnrollmentStatus.ENROLLED;
+        }
     }
 
 
@@ -367,26 +432,6 @@ public class DataInitializer {
         semester.setStartDate(startDate);
         semester.setEndDate(endDate);
         return semester;
-    }
-
-    private StudentCourse crreateStudentCourse() {
-        StudentCourse studentCourse = new StudentCourse();
-
-        return studentCourse;
-    }
-
-    private CourseOffering createRReceiptItem() {
-        CourseOffering receiptItem = new CourseOffering();
-
-        return receiptItem;
-    }
-
-    private Receipt createReceipt(BigDecimal totalAmount, boolean status, String description) {
-        Receipt receipt = new Receipt();
-        receipt.setTotalAmount(totalAmount);
-        receipt.setStatus(status);
-        receipt.setDescription(description);
-        return receipt;
     }
 }
 
