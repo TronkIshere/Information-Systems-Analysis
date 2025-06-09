@@ -21,7 +21,7 @@ public class CourseOffering extends AbstractEntity<UUID> {
     LocalDate endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receipt_id", nullable = false)
+    @JoinColumn(name = "receipt_id")
     Receipt receipt;
 
     @ManyToOne(fetch = FetchType.LAZY)
