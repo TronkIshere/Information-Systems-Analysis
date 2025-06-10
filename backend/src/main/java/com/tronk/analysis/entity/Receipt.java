@@ -41,6 +41,11 @@ public class Receipt extends AbstractEntity<UUID> {
 	@JoinColumn(name = "semester_id")
 	Semester semester;
 
-	@OneToMany(mappedBy = "receipt", orphanRemoval = true)
+	@ManyToMany
+	@JoinTable(
+			name = "receipt_course_offering",
+			joinColumns = @JoinColumn(name = "receipt_id"),
+			inverseJoinColumns = @JoinColumn(name = "course_offering_id")
+	)
 	Set<CourseOffering> courseOfferings = new HashSet<>();
 }

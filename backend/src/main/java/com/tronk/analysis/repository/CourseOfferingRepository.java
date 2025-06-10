@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CourseOfferingRepository extends JpaRepository<CourseOffering, UUID> {
-    @Query("SELECT co FROM CourseOffering co LEFT JOIN FETCH co.receipt r LEFT JOIN FETCH r.student")
+    @Query("SELECT co FROM CourseOffering co LEFT JOIN FETCH co.receipts r LEFT JOIN FETCH r.student")
     List<CourseOffering> findAllWithReceiptAndStudent();
 
     @Query("SELECT o FROM CourseOffering o JOIN FETCH o.course")

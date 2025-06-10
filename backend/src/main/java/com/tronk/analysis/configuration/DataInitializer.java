@@ -298,13 +298,15 @@ public class DataInitializer {
         Random random = new Random();
 
         for (CourseOffering offering : courseOfferings) {
-            if (offering.getReceipt() == null || offering.getReceipt().getStudent() == null) {
-                log.warn("Skipping course offering with null receipt/student: {}", offering.getId());
+            if (offering.getReceipts() == null || offering.getReceipts().isEmpty()) {
+                log.warn("Skipping course offering without receipts: {}", offering.getId());
                 continue;
             }
 
+            Receipt firstReceipt = offering.getReceipts().iterator().next();
+
             StudentCourse sc = new StudentCourse();
-            sc.setStudent(offering.getReceipt().getStudent());
+            sc.setStudent(firstReceipt.getStudent());
             sc.setCourseOffering(offering);
             sc.setEnrollmentDate(offering.getStartDate().minusDays(7 + random.nextInt(14)));
             sc.setGrade(grades[random.nextInt(grades.length)]);
@@ -444,23 +446,16 @@ public class DataInitializer {
             int courseCount = Math.min(3 + new Random().nextInt(3), semesterOfferings.size());
             List<CourseOffering> selectedOfferings = semesterOfferings.subList(0, courseCount);
 
-            BigDecimal totalAmount = BigDecimal.ZERO;
-            Set<CourseOffering> receiptCourseOfferings = new HashSet<>();
-
             for (CourseOffering offering : selectedOfferings) {
-                offering.setReceipt(receipt);
                 receipt.getCourseOfferings().add(offering);
-                receiptCourseOfferings.add(offering);
-
-                Course course = offering.getCourse();
-                BigDecimal courseFee = course.getBaseFeeCredit()
-                        .multiply(BigDecimal.valueOf(course.getCredit()));
-                totalAmount = totalAmount.add(courseFee);
             }
 
-            receipt.setCourseOfferings(receiptCourseOfferings);
-            receipt.setTotalAmount(totalAmount);
+            BigDecimal totalAmount = selectedOfferings.stream()
+                    .map(offering -> offering.getCourse().getBaseFeeCredit()
+                            .multiply(BigDecimal.valueOf(offering.getCourse().getCredit())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+            receipt.setTotalAmount(totalAmount);
             return receipt;
         } catch (Exception e) {
             log.error("Lỗi khi tạo receipt cho student {} và semester {}", student.getId(), semester.getId(), e);

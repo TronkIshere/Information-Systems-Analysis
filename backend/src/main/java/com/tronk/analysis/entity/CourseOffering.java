@@ -20,9 +20,8 @@ public class CourseOffering extends AbstractEntity<UUID> {
     LocalDate startDate;
     LocalDate endDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receipt_id")
-    Receipt receipt;
+    @ManyToMany(mappedBy = "courseOfferings")
+    Set<Receipt> receipts = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
@@ -32,6 +31,6 @@ public class CourseOffering extends AbstractEntity<UUID> {
     @JoinColumn(name = "semester_id", nullable = false)
     Semester semester;
 
-    @OneToMany(mappedBy = "courseOffering", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "courseOffering", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     Set<StudentCourse> studentCourses = new HashSet<>();
 }
