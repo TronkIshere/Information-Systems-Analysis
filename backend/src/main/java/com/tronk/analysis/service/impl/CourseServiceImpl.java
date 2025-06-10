@@ -20,7 +20,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -37,8 +39,14 @@ public class CourseServiceImpl implements CourseService {
 		course.setCredit(request.getCredit());
 		course.setBaseFeeCredit(request.getBaseFeeCredit());
 		course.setSubjectType(request.isSubjectType());
-		Course savedEntity = courseRepository.save(course);
-		return CourseMapper.toResponse(savedEntity);
+
+		if (request.getPrerequisiteIds() != null && !request.getPrerequisiteIds().isEmpty()) {
+			Set<Course> prerequisites = new HashSet<>(courseRepository.findAllById(request.getPrerequisiteIds()));
+			course.setPrerequisites(prerequisites);
+		}
+
+		courseRepository.save(course);
+		return CourseMapper.toResponse(course);
 	}
 
 	@Override
@@ -61,6 +69,12 @@ public class CourseServiceImpl implements CourseService {
 		course.setCredit(request.getCredit());
 		course.setBaseFeeCredit(request.getBaseFeeCredit());
 		course.setSubjectType(request.isSubjectType());
+
+		if (request.getPrerequisiteIds() != null) {
+			Set<Course> prerequisites = new HashSet<>(courseRepository.findAllById(request.getPrerequisiteIds()));
+			course.setPrerequisites(prerequisites);
+		}
+
 		courseRepository.save(course);
 		return CourseMapper.toResponse(course);
 	}

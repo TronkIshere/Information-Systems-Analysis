@@ -16,6 +16,14 @@ public class CourseMapper {
 				.credit(course.getCredit())
 				.baseFeeCredit(course.getBaseFeeCredit())
 				.subjectType(course.isSubjectType())
+				.isPrerequisiteForId(course.getIsPrerequisiteFor()
+						.stream()
+						.map(Course::getId)
+						.toList())
+				.prerequisiteIds(course.getPrerequisites()
+						.stream()
+						.map(Course::getId)
+						.toList())
 				.build();
 	}
 

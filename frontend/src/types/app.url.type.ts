@@ -9,6 +9,7 @@ export enum ADMIN_URL {
   DEPARTMENT = "/admin/department",
   RECEIPT = "/admin/receipt",
   SEMESTER = "/admin/semester",
+  COURSEOFFERING = "/admin/courseOffering",
 }
 
 export enum STUDENT_URL {

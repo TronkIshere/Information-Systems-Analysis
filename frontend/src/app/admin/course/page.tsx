@@ -11,11 +11,14 @@ import {
 } from "@/services/course";
 import { CourseResponse } from "@/types/api";
 import {
+  Autocomplete,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  ListItemText,
   Stack,
   TextField,
   Typography,
@@ -57,6 +60,11 @@ function CoursePage() {
       accessorKey: "subjectType",
       header: "Môn thực hành",
       cell: ({ row }) => (row.original.subjectType ? "Có" : "Không"),
+    },
+    {
+      accessorKey: "prerequisiteCount",
+      header: "Số môn tiên quyết",
+      cell: ({ row }) => row.original.prerequisiteIds?.length || 0,
     },
     {
       accessorKey: "actions",
@@ -102,8 +110,13 @@ function CoursePage() {
 
   const handleSubmit = () => {
     if (selectedCourse) {
+      const courseData = {
+        ...selectedCourse,
+        prerequisiteIds: selectedCourse.prerequisiteIds || [],
+      };
+
       const operation = isCreating ? createCourse : updateCourse;
-      operation(selectedCourse, {
+      operation(courseData, {
         onSuccess: () => {
           setIsEditModalOpen(false);
           setSelectedCourse(null);
@@ -182,6 +195,7 @@ function CoursePage() {
                 credit: 0,
                 baseFeeCredit: 0,
                 subjectType: false,
+                prerequisiteIds: [],
               });
               setIsCreating(true);
               setIsEditModalOpen(true);
@@ -246,6 +260,51 @@ function CoursePage() {
                 <option value="true">Thực hành</option>
                 <option value="false">Lý thuyết</option>
               </TextField>
+
+              <Autocomplete
+                multiple
+                options={
+                  courses
+                    ?.filter((course) => course.id !== selectedCourse.id)
+                    .map((course) => course.id) || []
+                }
+                getOptionLabel={(option) => {
+                  const course = courses?.find((c) => c.id === option);
+                  return course ? course.name : "";
+                }}
+                value={selectedCourse.prerequisiteIds || []}
+                onChange={(event, newValue) => {
+                  setSelectedCourse((prev) => ({
+                    ...prev!,
+                    prerequisiteIds: newValue,
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Môn tiên quyết"
+                    placeholder="Chọn môn học"
+                  />
+                )}
+                renderOption={(props, option) => {
+                  const course = courses?.find((c) => c.id === option);
+                  return (
+                    <li {...props} key={option}>
+                      <Checkbox
+                        checked={
+                          selectedCourse.prerequisiteIds?.includes(option) ||
+                          false
+                        }
+                      />
+                      <ListItemText
+                        primary={course?.name}
+                        secondary={`${course?.credit} tín chỉ`}
+                      />
+                    </li>
+                  );
+                }}
+                filterSelectedOptions
+              />
             </Stack>
           )}
         </DialogContent>

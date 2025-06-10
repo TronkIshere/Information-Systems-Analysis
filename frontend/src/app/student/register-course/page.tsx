@@ -1,6 +1,5 @@
 "use client";
 import React, { useMemo, useRef, useState } from "react";
-import { useCourses } from "@/services/course";
 import { useSemesters } from "@/services/semester";
 import { useCreateReceipt } from "@/services/receipt";
 import ClientSession from "@/services/session/client.session";
@@ -8,12 +7,8 @@ import {
   Box,
   Button,
   Checkbox,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   SelectChangeEvent,
   Stack,
   TextField,
@@ -84,17 +79,8 @@ function RegisterCoursePage() {
     setNewReceipt((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<string>) => {
-    const { name, value } = e.target;
-    setNewReceipt((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleSubmit = () => {
-    if (
-      !newReceipt.studentId ||
-      // !newReceipt.semesterId ||
-      newReceipt.courseOfferingIds.length === 0
-    ) {
+    if (!newReceipt.studentId || newReceipt.courseOfferingIds.length === 0) {
       UIHelper.showToast({
         message: "Vui lòng chọn học kỳ và ít nhất một môn học",
         type: ToastType.error,
@@ -108,19 +94,30 @@ function RegisterCoursePage() {
       { ...newReceipt, totalAmount },
       {
         onSuccess: () => {
+          console.log("Đăng ký thành công, chuẩn bị hiển thị toast");
           UIHelper.showToast({
             message: "Đăng ký thành công! Vui lòng thanh toán",
             type: ToastType.success,
           });
+
+          // Reset form sau khi đăng ký thành công
           setNewReceipt((prev) => ({
             ...prev,
-            courseIds: [],
+            courseOfferingIds: [],
             semesterId: "",
           }));
         },
-        onError: () => {
+        onError: (error) => {
+          const err = error as any;
+          // Kiểm tra cả response.data (nếu có) vì bạn đã gói error trong fetchApi
+          const errorData = err?.response?.data || err;
+          const errorCode = errorData.code;
+          const errorMessage = errorData.message || "Đăng ký thất bại!";
+
+          console.error("Lỗi khi đăng ký:", err, errorCode, errorMessage);
+
           UIHelper.showToast({
-            message: "Đăng ký thất bại! Vui lòng thử lại",
+            message: errorMessage,
             type: ToastType.error,
           });
         },
@@ -212,22 +209,6 @@ function RegisterCoursePage() {
           </Grid>
         </Grid>
       </Paper>
-
-      {/* <FormControl fullWidth>
-        <InputLabel>Chọn học kỳ</InputLabel>
-        <Select
-          name="semesterId"
-          value={newReceipt.semesterId}
-          onChange={handleSelectChange}
-          label="Chọn học kỳ"
-        >
-          {semesters?.map((semester) => (
-            <MenuItem key={semester.id} value={semester.id}>
-              {semester.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl> */}
 
       <SearchInput onSearch={setSearchTerm} placeholder="Tìm kiếm môn học..." />
 

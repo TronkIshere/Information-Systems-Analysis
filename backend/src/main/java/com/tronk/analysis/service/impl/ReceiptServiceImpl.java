@@ -17,13 +17,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.jpa.repository.query.JSqlParserUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +42,12 @@ public class ReceiptServiceImpl implements ReceiptService {
 	public ReceiptResponse createReceipt(UploadReceiptRequest request) {
 		Student student = findStudent(request.getStudentId());
 		Set<CourseOffering> courseOfferings = findCourseOfferings(request.getCourseOfferingIds());
+
+		List<String> missingPrerequisites = validateCoursePrerequisites(student, courseOfferings);
+
+		if (!missingPrerequisites.isEmpty())
+			throw new ApplicationException(ErrorCode.PREREQUISITE_NOT_MET,
+					"Không thể đăng ký vì thiếu môn tiên quyết: " + String.join(", ", missingPrerequisites));
 
 		Semester semester = request.getSemesterId() == null
 				? findTopByOrderByStartDateDesc()
@@ -69,6 +75,27 @@ public class ReceiptServiceImpl implements ReceiptService {
 	private Semester findSemester(UUID id) {
 		return semesterRepository.findById(id)
 				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+	}
+
+	private List<String> validateCoursePrerequisites(Student student, Set<CourseOffering> offeringsToRegister) {
+		Set<Course> completedCourses = student.getStudentCourses().stream()
+				.filter(sc -> sc.getStatus() == EnrollmentStatus.COMPLETED)
+				.map(sc -> sc.getCourseOffering().getCourse())
+				.collect(Collectors.toSet());
+
+		List<String> missing = new ArrayList<>();
+
+		for (CourseOffering offering : offeringsToRegister) {
+			Course course = offering.getCourse();
+
+			for (Course prerequisite : course.getPrerequisites()) {
+				if (!completedCourses.contains(prerequisite)) {
+					missing.add(course.getName() + " yêu cầu đã học " + prerequisite.getName());
+				}
+			}
+		}
+
+		return missing;
 	}
 
 	private Semester findTopByOrderByStartDateDesc() {

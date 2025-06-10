@@ -83,16 +83,23 @@ async function fetchApi<T>(
     cache,
     next,
   });
-  const jsonResponse = await response.json();
+
+  const responseData = await response.json();
+
   if (!response.ok) {
-    const message = (await response.json()).message || response.statusText;
+    const message = responseData.message || response.statusText;
     if (typeof window !== "undefined") {
       UIHelper.showToast({ type: ToastType.error, message });
     }
-    throw new Error(message);
+    throw {
+      response: {
+        data: responseData,
+        status: response.status,
+      },
+    };
   }
 
-  return jsonResponse.data;
+  return responseData.data;
 }
 
 export const api = {

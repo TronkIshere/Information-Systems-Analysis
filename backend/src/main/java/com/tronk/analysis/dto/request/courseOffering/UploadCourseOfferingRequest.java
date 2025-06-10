@@ -19,4 +19,5 @@ public class UploadCourseOfferingRequest implements Serializable {
 	Set studentCourses;
 	UUID id;
 	UUID courseId;
+	UUID semesterId;
 }

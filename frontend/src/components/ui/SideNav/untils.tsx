@@ -52,6 +52,12 @@ export const getAdminMenu = () => {
       icon: <IconDashboard />,
       link: ADMIN_URL.SEMESTER,
     },
+    {
+      type: "single",
+      text: "Mở môn học",
+      icon: <IconDashboard />,
+      link: ADMIN_URL.COURSEOFFERING,
+    },
   ];
 };
 

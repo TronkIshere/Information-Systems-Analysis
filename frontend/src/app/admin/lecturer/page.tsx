@@ -365,6 +365,7 @@ function LecturerPage() {
                 <option value="Hoạt động">Hoạt động</option>
                 <option value="Ngừng hoạt động">Ngừng hoạt động</option>
               </TextField>
+
               <Autocomplete
                 multiple
                 options={courses?.map((course) => course.id) || []}

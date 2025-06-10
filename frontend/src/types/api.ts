@@ -171,6 +171,7 @@ export interface CourseResponse {
   credit: number;
   baseFeeCredit: number;
   subjectType: boolean;
+  prerequisiteIds: string[];
 }
 
 export interface UploadCourseRequest {
@@ -178,6 +179,7 @@ export interface UploadCourseRequest {
   credit: number;
   baseFeeCredit: number;
   subjectType: boolean;
+  prerequisiteIds: string[];
 }
 
 export interface UpdateCourseRequest {
@@ -186,6 +188,7 @@ export interface UpdateCourseRequest {
   credit: number;
   baseFeeCredit: number;
   subjectType: boolean;
+  prerequisiteIds: string[];
 }
 
 export interface Course {
@@ -365,16 +368,19 @@ export interface CourseOfferingResponse {
   credit: number;
   baseFeeCredit: number;
   subjectType: boolean;
+  semesterId: string;
 }
 
 export interface UploadCourseOfferingRequest {
   id: string;
   startDate: Date | null;
   endDate: Date | null;
+  semesterId: string;
 }
 
 export interface UpdateCourseOfferingRequest {
   id: string;
   startDate: Date | null;
   endDate: Date | null;
+  semesterId: string;
 }

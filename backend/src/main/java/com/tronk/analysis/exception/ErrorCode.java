@@ -48,6 +48,7 @@ public enum ErrorCode {
     COURSE_CREDIT_INVALID(4103, "Invalid credit value", HttpStatus.BAD_REQUEST),
     COURSE_FEE_INVALID(4104, "Invalid course fee", HttpStatus.BAD_REQUEST),
     COURSE_PREREQUISITE_CONFLICT(4105, "Course prerequisite conflict", HttpStatus.CONFLICT),
+    PREREQUISITE_NOT_MET(4106, "Prerequisite course not completed", HttpStatus.BAD_REQUEST),
 
     // Department related errors (42xx)
     DEPARTMENT_NOT_FOUND(4201, "Department not found", HttpStatus.NOT_FOUND),

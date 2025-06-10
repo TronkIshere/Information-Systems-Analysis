@@ -23,4 +23,5 @@ public class CourseOfferingResponse implements Serializable {
 	int credit;
 	BigDecimal baseFeeCredit;
 	boolean subjectType;
+	UUID semesterId;
 }
