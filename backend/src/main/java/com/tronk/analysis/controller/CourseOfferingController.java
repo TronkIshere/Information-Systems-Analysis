@@ -9,19 +9,39 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/receiptItems")
+@RequestMapping("/api/v1/courseOfferings")
 public class CourseOfferingController {
+	private final CourseOfferingService courseOfferingService;
 
-	private final CourseOfferingService receiptItemService;
+	@GetMapping("/open-list")
+	public ResponseAPI<List<CourseOfferingResponse>> getOpenCourseOfferings() {
+		var result = courseOfferingService.getOpenCourseOfferings();
+		return ResponseAPI.<List<CourseOfferingResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
+
+	@GetMapping("/list")
+	ResponseAPI<List<CourseOfferingResponse>> getAllCourseOfferings() {
+		var result = courseOfferingService.getAllCourseOfferings();
+		return ResponseAPI.<List<CourseOfferingResponse>>builder()
+				.code(HttpStatus.OK.value())
+				.message("success")
+				.data(result)
+				.build();
+	}
 
 	@PostMapping
-	public ResponseAPI<CourseOfferingResponse> createReceiptItem(
+	public ResponseAPI<CourseOfferingResponse> createCourseOffering(
 			@RequestBody UploadCourseOfferingRequest request) {
-		var result = receiptItemService.createReceiptItem(request);
+		var result = courseOfferingService.createCourseOffering(request);
 		return ResponseAPI.<CourseOfferingResponse>builder()
 			.code(HttpStatus.OK.value())
 			.message("success")
@@ -30,8 +50,8 @@ public class CourseOfferingController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseAPI<CourseOfferingResponse> getReceiptItemById(@PathVariable UUID id) {
-		var result = receiptItemService.getReceiptItemById(id);
+	public ResponseAPI<CourseOfferingResponse> getCourseOfferingById(@PathVariable UUID id) {
+		var result = courseOfferingService.getCourseOfferingById(id);
 		return ResponseAPI.<CourseOfferingResponse>builder()
 			.code(HttpStatus.OK.value())
 			.message("success")
@@ -40,9 +60,9 @@ public class CourseOfferingController {
 	}
 
 	@PutMapping
-	public ResponseAPI<CourseOfferingResponse> updateReceiptItem(
+	public ResponseAPI<CourseOfferingResponse> updateCourseOffering(
 			@RequestBody UpdateCourseOfferingRequest request) {
-		var result = receiptItemService.updateReceiptItem(request);
+		var result = courseOfferingService.updateCourseOffering(request);
 		return ResponseAPI.<CourseOfferingResponse>builder()
 			.code(HttpStatus.OK.value())
 			.message("success")
@@ -51,18 +71,18 @@ public class CourseOfferingController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseAPI<String> deleteReceiptItem(@PathVariable UUID id) {
-		receiptItemService.deleteReceiptItemById(id);
+	public ResponseAPI<String> deleteCourseOffering(@PathVariable UUID id) {
+		courseOfferingService.deleteCourseOfferingById(id);
 		return ResponseAPI.<String>builder()
 			.code(HttpStatus.OK.value())
-			.message("ReceiptItem deleted successfully")
+			.message("CourseOffering deleted successfully")
 			.data("success")
 			.build();
 	}
 
 	@PutMapping("/soft-delete/{id}")
 	public ResponseAPI<String> softDeleteReceiptItem(@PathVariable UUID id) {
-		receiptItemService.softDeleteReceiptItem(id);
+		courseOfferingService.softDeleteCourseOffering(id);
 		return ResponseAPI.<String>builder()
 			.code(HttpStatus.OK.value())
 			.message("success")

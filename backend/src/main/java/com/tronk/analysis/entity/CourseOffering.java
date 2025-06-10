@@ -28,6 +28,10 @@ public class CourseOffering extends AbstractEntity<UUID> {
     @JoinColumn(name = "course_id", nullable = false)
     Course course;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "semester_id", nullable = false)
+    Semester semester;
+
     @OneToMany(mappedBy = "courseOffering", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<StudentCourse> studentCourses = new HashSet<>();
 }

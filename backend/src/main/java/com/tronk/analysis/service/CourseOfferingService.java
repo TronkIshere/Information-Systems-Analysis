@@ -9,16 +9,17 @@ import java.util.UUID;
 
 public interface CourseOfferingService {
 
-	CourseOfferingResponse createReceiptItem(UploadCourseOfferingRequest request);
+	CourseOfferingResponse createCourseOffering(UploadCourseOfferingRequest request);
 
-	CourseOfferingResponse getReceiptItemById(UUID id);
+	CourseOfferingResponse getCourseOfferingById(UUID id);
 
-	List<CourseOfferingResponse> getAllReceiptItems();
+	List<CourseOfferingResponse> getAllCourseOfferings();
 
-	CourseOfferingResponse updateReceiptItem(UpdateCourseOfferingRequest request);
+	CourseOfferingResponse updateCourseOffering(UpdateCourseOfferingRequest request);
 
-	void deleteReceiptItemById(UUID id);
+	void deleteCourseOfferingById(UUID id);
 
-	String softDeleteReceiptItem(UUID id);
+	String softDeleteCourseOffering(UUID id);
 
+	List<CourseOfferingResponse> getOpenCourseOfferings();
 }

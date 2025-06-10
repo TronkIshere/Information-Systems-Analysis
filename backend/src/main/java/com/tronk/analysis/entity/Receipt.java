@@ -41,6 +41,6 @@ public class Receipt extends AbstractEntity<UUID> {
 	@JoinColumn(name = "semester_id")
 	Semester semester;
 
-	@OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "receipt", orphanRemoval = true)
 	Set<CourseOffering> courseOfferings = new HashSet<>();
 }

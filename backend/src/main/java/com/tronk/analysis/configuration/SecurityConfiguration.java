@@ -48,7 +48,9 @@ public class SecurityConfiguration {
             "/api/v1/receipts/**",
             "/api/v1/semesters/**",
             "/api/v1/students/**",
-            "/api/v1/cashiers/**"
+            "/api/v1/cashiers/**",
+            "/api/v1/studentCourses/**",
+            "/api/v1/courseOfferings/**",
     };
 
     @Bean

@@ -14,10 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Configuration
-@Slf4j(topic = "INIT-APPLICATION")
 @AllArgsConstructor
+@Slf4j(topic = "INIT-APPLICATION")
 @FieldDefaults(level = AccessLevel.PRIVATE ,makeFinal = true)
 public class DataInitializer {
     CourseOfferingRepository courseOfferingRepository;
@@ -284,6 +285,7 @@ public class DataInitializer {
         log.info("Đã tạo {} receipts", allReceipts.size());
     }
 
+
     private void createStudentCourses() {
         List<CourseOffering> courseOfferings = courseOfferingRepository.findAllWithReceiptAndStudent();
         if (courseOfferings.isEmpty()) {
@@ -325,7 +327,6 @@ public class DataInitializer {
         }
     }
 
-
     private Course createCourse(String name, int credit, BigDecimal baseFeeCredit, boolean subjectType) {
         Course course = new Course();
         course.setName(name);
@@ -364,8 +365,8 @@ public class DataInitializer {
     }
 
     private Cashier createCashier(String name, String email, String phoneNumber, String status,
-                                    String loginName, String password, LocalDate birthDay, boolean gender,
-                                    String roles, BigDecimal salary, LocalDate hireDate){
+                                  String loginName, String password, LocalDate birthDay, boolean gender,
+                                  String roles, BigDecimal salary, LocalDate hireDate){
         Cashier cashier = new Cashier();
         cashier.setName(name);
         cashier.setEmail(email);
@@ -413,30 +414,8 @@ public class DataInitializer {
         offering.setStartDate(semester.getStartDate());
         offering.setEndDate(semester.getEndDate());
         offering.setCourse(course);
+        offering.setSemester(semester);
         return offering;
-    }
-
-    private Receipt createReceipt(
-            Student student,
-            Semester semester,
-            Cashier cashier,
-            BigDecimal totalAmount,
-            boolean status,
-            String description,
-            LocalDate paymentDate
-    ) {
-        Receipt receipt = new Receipt();
-        receipt.setTotalAmount(totalAmount);
-        receipt.setStatus(status);
-        receipt.setDescription(description);
-        receipt.setCashier(cashier);
-        receipt.setStudent(student);
-        receipt.setSemester(semester);
-        receipt.setStudentName(student.getName());
-        receipt.setStudentCode(student.getStudentCode());
-        receipt.setStudentClass("Lớp " + student.getStudentCode().substring(0, 4));
-        receipt.setPaymentDate(paymentDate);
-        return receipt;
     }
 
     private Receipt createReceipt(Student student, Semester semester,
@@ -450,35 +429,32 @@ public class DataInitializer {
             receipt.setStatus(true);
             receipt.setStudentCode("demo");
             receipt.setStudentName(student.getName());
-            receipt.setStudentClass("demo");
+            receipt.setStudentClass("Lớp Demo");
             receipt.setDescription("Thanh toán học phí kỳ " + semester.getName());
 
-            List<CourseOffering> availableOfferings = new ArrayList<>(allOfferings);
-            if (availableOfferings.isEmpty()) {
+            List<CourseOffering> semesterOfferings = allOfferings.stream()
+                    .filter(offering -> offering.getSemester().getId().equals(semester.getId()))
+                    .collect(Collectors.toList());
+
+            if (semesterOfferings.isEmpty()) {
                 return null;
             }
 
-            Collections.shuffle(availableOfferings);
-            int courseCount = Math.min(3 + new Random().nextInt(3), availableOfferings.size());
-            List<CourseOffering> selectedOfferings = availableOfferings.subList(0, courseCount);
+            Collections.shuffle(semesterOfferings);
+            int courseCount = Math.min(3 + new Random().nextInt(3), semesterOfferings.size());
+            List<CourseOffering> selectedOfferings = semesterOfferings.subList(0, courseCount);
 
             BigDecimal totalAmount = BigDecimal.ZERO;
             Set<CourseOffering> receiptCourseOfferings = new HashSet<>();
 
             for (CourseOffering offering : selectedOfferings) {
-                // Tạo bản sao của CourseOffering để tránh detached entity
-                CourseOffering newOffering = new CourseOffering();
-                newOffering.setCourse(offering.getCourse()); // Course đã được fetch
-                newOffering.setStartDate(offering.getStartDate());
-                newOffering.setEndDate(offering.getEndDate());
+                offering.setReceipt(receipt);
+                receipt.getCourseOfferings().add(offering);
+                receiptCourseOfferings.add(offering);
 
-                // Tính toán phí
                 Course course = offering.getCourse();
                 BigDecimal courseFee = course.getBaseFeeCredit()
                         .multiply(BigDecimal.valueOf(course.getCredit()));
-
-                newOffering.setReceipt(receipt);
-                receiptCourseOfferings.add(newOffering);
                 totalAmount = totalAmount.add(courseFee);
             }
 
@@ -487,11 +463,12 @@ public class DataInitializer {
 
             return receipt;
         } catch (Exception e) {
-            log.error("Lỗi khi tạo receipt cho student {} và semester {}",
-                    student.getId(), semester.getId(), e);
+            log.error("Lỗi khi tạo receipt cho student {} và semester {}", student.getId(), semester.getId(), e);
             return null;
         }
     }
+
+
 }
 
 

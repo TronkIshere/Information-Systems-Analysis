@@ -8,8 +8,8 @@ import com.tronk.analysis.entity.CourseOffering;
 import com.tronk.analysis.exception.ApplicationException;
 import com.tronk.analysis.exception.ErrorCode;
 import com.tronk.analysis.mapper.courseOffering.CourseOfferingMapper;
-import com.tronk.analysis.repository.CourseRepository;
 import com.tronk.analysis.repository.CourseOfferingRepository;
+import com.tronk.analysis.repository.CourseRepository;
 import com.tronk.analysis.service.CourseOfferingService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,11 +26,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CourseOfferingServiceImpl implements CourseOfferingService {
-	CourseOfferingRepository receiptItemRepository;
+	CourseOfferingRepository courseOfferingRepository;
 	CourseRepository courseRepository;
 
 	@Override
-	public CourseOfferingResponse createReceiptItem(UploadCourseOfferingRequest request) {
+	public List<CourseOfferingResponse> getOpenCourseOfferings() {
+		LocalDate currentDate = LocalDate.now();
+		List<CourseOffering> openCourses = courseOfferingRepository.findOpenCourseOfferings(currentDate);
+		return CourseOfferingMapper.toResponseList(openCourses);
+	}
+
+	@Override
+	public CourseOfferingResponse createCourseOffering(UploadCourseOfferingRequest request) {
 		CourseOffering receiptItem = new CourseOffering();
 		receiptItem.setStartDate(request.getStartDate());
 		receiptItem.setEndDate(request.getEndDate());
@@ -39,25 +47,25 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
 						.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
 		receiptItem.setCourse(course);
 
-		receiptItemRepository.save(receiptItem);
+		courseOfferingRepository.save(receiptItem);
 		return CourseOfferingMapper.toResponse(receiptItem);
 	}
 
 	@Override
-	public List<CourseOfferingResponse> getAllReceiptItems() {
-		return CourseOfferingMapper.toResponseList(receiptItemRepository.findAll());
+	public List<CourseOfferingResponse> getAllCourseOfferings() {
+		return CourseOfferingMapper.toResponseList(courseOfferingRepository.findAll());
 	}
 
 	@Override
-	public CourseOfferingResponse getReceiptItemById(UUID id) {
+	public CourseOfferingResponse getCourseOfferingById(UUID id) {
 		return CourseOfferingMapper.toResponse(
-			receiptItemRepository.findById(id)
+			courseOfferingRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("ReceiptItem not found")));
 	}
 
 	@Override
-	public CourseOfferingResponse updateReceiptItem(UpdateCourseOfferingRequest request) {
-		CourseOffering receiptItem = receiptItemRepository.findById(request.getId())
+	public CourseOfferingResponse updateCourseOffering(UpdateCourseOfferingRequest request) {
+		CourseOffering receiptItem = courseOfferingRepository.findById(request.getId())
 			.orElseThrow(() -> new EntityNotFoundException("ReceiptItem not found"));
 		receiptItem.setStartDate(request.getStartDate());
 		receiptItem.setEndDate(request.getEndDate());
@@ -67,23 +75,23 @@ public class CourseOfferingServiceImpl implements CourseOfferingService {
 				.orElseThrow(() -> new ApplicationException(ErrorCode.COURSE_NOT_FOUND));
 		receiptItem.setCourse(course);
 
-		receiptItemRepository.save(receiptItem);
+		courseOfferingRepository.save(receiptItem);
 		return CourseOfferingMapper.toResponse(receiptItem);
 	}
 
 	@Override
-	public void deleteReceiptItemById(UUID id) {
-		CourseOffering entity = receiptItemRepository.findById(id)
+	public void deleteCourseOfferingById(UUID id) {
+		CourseOffering entity = courseOfferingRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException("ReceiptItem not found"));
-		receiptItemRepository.delete(entity);
+		courseOfferingRepository.delete(entity);
 	}
 
 	@Override
-	public String softDeleteReceiptItem(UUID id) {
-		CourseOffering entity = receiptItemRepository.findById(id)
+	public String softDeleteCourseOffering(UUID id) {
+		CourseOffering entity = courseOfferingRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException("ReceiptItem not found"));
 		entity.setDeletedAt(LocalDateTime.now());
-		receiptItemRepository.save(entity);
+		courseOfferingRepository.save(entity);
 		return "ReceiptItem with ID " + id + " has been soft deleted";
 	}
 }

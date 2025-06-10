@@ -18,22 +18,32 @@ import {
   Stack,
   TextField,
   Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { SearchInput } from "@/components/ui/search/SearchInput";
 import useAppRoute from "@/utils/route";
 import UIHelper from "@/utils/ui.helper.util";
 import { ToastType } from "@/types/toast";
 import {
-  CourseResponse,
+  CourseOfferingResponse,
   SemesterResponse,
   UploadReceiptRequest,
 } from "@/types/api";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import {
+  useCourseOfferings,
+  useOpenCourseOfferings,
+} from "@/services/courseOffering";
 
 function RegisterCoursePage() {
   const { replace } = useAppRoute();
-  const { data: courses, isLoading, error } = useCourses();
+  const { data: courseOfferings, isLoading, error } = useOpenCourseOfferings();
   const { data: semesters } = useSemesters();
   const { mutate: createReceipt } = useCreateReceipt();
 
@@ -54,13 +64,13 @@ function RegisterCoursePage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const totalAmount = useMemo(() => {
-    if (!courses || newReceipt.courseIds.length === 0) return 0;
+    if (!courseOfferings || newReceipt.courseIds.length === 0) return 0;
 
     return newReceipt.courseIds.reduce((sum, courseId) => {
-      const course = courses.find((c) => c.id === courseId);
+      const course = courseOfferings.find((c) => c.id === courseId);
       return sum + (course ? course.credit * course.baseFeeCredit : 0);
     }, 0);
-  }, [newReceipt.courseIds, courses]);
+  }, [newReceipt.courseIds, courseOfferings]);
 
   const handleCourseSelect = (courseId: string) => {
     setNewReceipt((prev) => {
@@ -155,9 +165,9 @@ function RegisterCoursePage() {
   if (isLoading) return <div>Đang tải danh sách môn học...</div>;
   if (error) return <div>Lỗi khi tải danh sách môn học</div>;
 
-  const filteredCourses =
-    courses?.filter((course) =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCourseOfferings =
+    courseOfferings?.filter((courseOffering) =>
+      courseOffering.courseName.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
   return (
@@ -222,28 +232,60 @@ function RegisterCoursePage() {
 
       <SearchInput onSearch={setSearchTerm} placeholder="Tìm kiếm môn học..." />
 
-      <Stack spacing={2}>
-        {filteredCourses.map((course) => (
-          <Stack
-            key={course.id}
-            direction="row"
-            alignItems="center"
-            className="p-4 border rounded-lg hover:bg-gray-50"
-          >
-            <Checkbox
-              checked={newReceipt.courseIds.includes(course.id)}
-              onChange={() => handleCourseSelect(course.id)}
-            />
-            <Stack>
-              <Typography variant="h6">{course.name}</Typography>
-              <Typography variant="body2">
-                {course.credit} tín chỉ - Môn học{" "}
-                {course.subjectType ? "bắt buộc" : "tự chọn"}
-              </Typography>
-            </Stack>
-          </Stack>
-        ))}
-      </Stack>
+      <Paper elevation={3} className="p-4">
+        <Typography variant="h6" gutterBottom>
+          Danh sách môn học
+        </Typography>
+        <TableContainer sx={{ maxHeight: 400 }}>
+          <Table stickyHeader size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox"></TableCell>
+                <TableCell>Tên môn</TableCell>
+                <TableCell align="center">Số TC</TableCell>
+                <TableCell align="center">Loại môn</TableCell>
+                <TableCell align="right">Đơn giá (VND)</TableCell>
+                <TableCell align="right">Thành tiền (VND)</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredCourseOfferings.map((courseOffering) => {
+                const courseAmount =
+                  courseOffering.credit * courseOffering.baseFeeCredit;
+                return (
+                  <TableRow
+                    key={courseOffering.id}
+                    hover
+                    selected={newReceipt.courseIds.includes(courseOffering.id)}
+                    onClick={() => handleCourseSelect(courseOffering.id)}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={newReceipt.courseIds.includes(
+                          courseOffering.id
+                        )}
+                      />
+                    </TableCell>
+                    <TableCell>{courseOffering.courseName}</TableCell>
+                    <TableCell align="center">
+                      {courseOffering.credit}
+                    </TableCell>
+                    <TableCell align="center">
+                      {courseOffering.subjectType ? "Thực hành" : "Lý thuyết"}
+                    </TableCell>
+                    <TableCell align="right">
+                      {courseOffering.baseFeeCredit.toLocaleString()}
+                    </TableCell>
+                    <TableCell align="right">
+                      {courseAmount.toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
 
       <Grid container spacing={4}>
         <Grid item xs={12} md={5}>
@@ -290,7 +332,7 @@ function RegisterCoursePage() {
         >
           <ReceiptTemplate
             newReceipt={newReceipt}
-            courses={courses}
+            courseOfferings={courseOfferings}
             semesters={semesters}
             totalAmount={totalAmount}
           />
@@ -304,18 +346,18 @@ export default RegisterCoursePage;
 
 function ReceiptTemplate({
   newReceipt,
-  courses,
+  courseOfferings,
   semesters,
   totalAmount,
 }: {
   newReceipt: UploadReceiptRequest;
-  courses: CourseResponse[] | undefined;
+  courseOfferings: CourseOfferingResponse[] | undefined;
   semesters: SemesterResponse[] | undefined;
   totalAmount: number;
 }) {
   const semester = semesters?.find((s) => s.id === newReceipt.semesterId);
-  const selectedCourses = courses?.filter((course) =>
-    newReceipt.courseIds.includes(course.id)
+  const selectedCourseOfferings = courseOfferings?.filter((courseOffering) =>
+    newReceipt.courseIds.includes(courseOffering.id)
   );
 
   const currentDate = new Date();
@@ -363,6 +405,9 @@ function ReceiptTemplate({
               Số tín chỉ
             </th>
             <th style={{ border: "1px solid #000", padding: "8px" }}>
+              Loại môn
+            </th>
+            <th style={{ border: "1px solid #000", padding: "8px" }}>
               Đơn giá (VND)
             </th>
             <th style={{ border: "1px solid #000", padding: "8px" }}>
@@ -371,7 +416,7 @@ function ReceiptTemplate({
           </tr>
         </thead>
         <tbody>
-          {selectedCourses?.map((course, index) => (
+          {selectedCourseOfferings?.map((course, index) => (
             <tr key={course.id}>
               <td
                 style={{
@@ -383,7 +428,7 @@ function ReceiptTemplate({
                 {index + 1}
               </td>
               <td style={{ border: "1px solid #000", padding: "8px" }}>
-                {course.name}
+                {course.courseName}
               </td>
               <td
                 style={{
@@ -393,6 +438,15 @@ function ReceiptTemplate({
                 }}
               >
                 {course.credit}
+              </td>
+              <td
+                style={{
+                  border: "1px solid #000",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
+                {course.subjectType ? "Thực hành" : "Lý thuyết"}
               </td>
               <td
                 style={{
@@ -416,7 +470,7 @@ function ReceiptTemplate({
           ))}
           <tr>
             <td
-              colSpan={4}
+              colSpan={5}
               style={{
                 border: "1px solid #000",
                 padding: "8px",
@@ -440,10 +494,18 @@ function ReceiptTemplate({
         </tbody>
       </table>
 
-      <Grid container justifyContent="flex-end" sx={{ mt: 6 }}>
+      <Grid container justifyContent="space-between" sx={{ mt: 6 }}>
         <Grid item xs={4} textAlign="center">
           <Typography fontStyle="italic">Ngày {formattedDate}</Typography>
+        </Grid>
+
+        <Grid item xs={4} textAlign="center">
           <Typography fontWeight="bold">Người lập phiếu</Typography>
+          <Typography fontStyle="italic">(Ký và ghi rõ họ tên)</Typography>
+        </Grid>
+
+        <Grid item xs={4} textAlign="center">
+          <Typography fontWeight="bold">Thủ quỹ</Typography>
           <Typography fontStyle="italic">(Ký và ghi rõ họ tên)</Typography>
         </Grid>
       </Grid>

@@ -355,3 +355,26 @@ export interface UpdateCashierRequest {
   hireDate: string;
   password?: string;
 }
+
+export interface CourseOfferingResponse {
+  id: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  courseId: string;
+  courseName: string;
+  credit: number;
+  baseFeeCredit: number;
+  subjectType: boolean;
+}
+
+export interface UploadCourseOfferingRequest {
+  id: string;
+  startDate: Date | null;
+  endDate: Date | null;
+}
+
+export interface UpdateCourseOfferingRequest {
+  id: string;
+  startDate: Date | null;
+  endDate: Date | null;
+}

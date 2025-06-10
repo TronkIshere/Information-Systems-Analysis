@@ -10,13 +10,21 @@ public class CourseOfferingMapper {
 	public CourseOfferingMapper() {
 	}
 
-	public static CourseOfferingResponse toResponse(CourseOffering receiptItem) {
+	public static CourseOfferingResponse toResponse(CourseOffering courseOffering) {
 		return CourseOfferingResponse.builder()
-			.build();
+				.id(courseOffering.getId())
+				.startDate(courseOffering.getStartDate())
+				.endDate(courseOffering.getEndDate())
+				.courseId(courseOffering.getCourse().getId())
+				.courseName(courseOffering.getCourse().getName())
+				.baseFeeCredit(courseOffering.getCourse().getBaseFeeCredit())
+				.credit(courseOffering.getCourse().getCredit())
+				.subjectType(courseOffering.getCourse().isSubjectType())
+				.build();
 	}
 
-	public static List<CourseOfferingResponse> toResponseList(List<CourseOffering> receiptItems) {
-		return receiptItems.stream()
+	public static List<CourseOfferingResponse> toResponseList(List<CourseOffering> courseOfferings) {
+		return courseOfferings.stream()
 			.map(CourseOfferingMapper::toResponse)
 			.collect(Collectors.toList());
 	}
