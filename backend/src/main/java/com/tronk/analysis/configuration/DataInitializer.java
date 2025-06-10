@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -91,6 +92,32 @@ public class DataInitializer {
                 createCourse("Toán rời rạc", 3, BigDecimal.valueOf(450000), false)
         );
 
+        Map<String, Course> courseMap = courses.stream()
+                .collect(Collectors.toMap(Course::getName, Function.identity()));
+
+        // Gán các môn tiên quyết
+        courseMap.get("Mạng máy tính").getPrerequisites().add(courseMap.get("Toán rời rạc"));
+        courseMap.get("Trí tuệ nhân tạo").getPrerequisites().add(courseMap.get("Toán rời rạc"));
+        courseMap.get("Hệ điều hành").getPrerequisites().add(courseMap.get("Lập trình Java"));
+        courseMap.get("Phân tích thiết kế hệ thống").getPrerequisites().addAll(List.of(
+                courseMap.get("Cơ sở dữ liệu"),
+                courseMap.get("Lập trình Java")
+        ));
+        courseMap.get("Lập trình Web").getPrerequisites().addAll(List.of(
+                courseMap.get("Lập trình Java"),
+                courseMap.get("Cơ sở dữ liệu")
+        ));
+        courseMap.get("An toàn thông tin").getPrerequisites().addAll(List.of(
+                courseMap.get("Mạng máy tính"),
+                courseMap.get("Hệ điều hành")
+        ));
+        courseMap.get("Đồ án chuyên ngành").getPrerequisites().addAll(List.of(
+                courseMap.get("Lập trình Java"),
+                courseMap.get("Cơ sở dữ liệu"),
+                courseMap.get("Phân tích thiết kế hệ thống"),
+                courseMap.get("Hệ điều hành")
+        ));
+
         courses.forEach(course -> {
             course.getDepartments().add(itDepartment);
             itDepartment.getCourses().add(course);
@@ -98,8 +125,9 @@ public class DataInitializer {
 
         courseRepository.saveAll(courses);
         departmentRepository.save(itDepartment);
-        log.info("Initial courses inserted!");
+        log.info("Initial courses with prerequisites inserted!");
     }
+
 
     private void createLecturers() {
         Department itDepartment = departmentRepository.findAll().get(0);
@@ -462,8 +490,6 @@ public class DataInitializer {
             return null;
         }
     }
-
-
 }
 
 

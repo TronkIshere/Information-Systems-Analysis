@@ -1,10 +1,7 @@
 package com.tronk.analysis.entity;
 
 import com.tronk.analysis.entity.common.AbstractEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -35,4 +32,15 @@ public class Course extends AbstractEntity<UUID> {
 
 	@OneToMany(mappedBy = "course")
 	Set<CourseOffering> courseOfferings = new HashSet<>();
+
+	@ManyToMany
+	@JoinTable(
+			name = "course_prerequisite",
+			joinColumns = @JoinColumn(name = "course_id"),
+			inverseJoinColumns = @JoinColumn(name = "prerequisite_id")
+	)
+	Set<Course> prerequisites = new HashSet<>();
+
+	@ManyToMany(mappedBy = "prerequisites")
+	Set<Course> isPrerequisiteFor = new HashSet<>();
 }
