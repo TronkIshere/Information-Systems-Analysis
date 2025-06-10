@@ -251,8 +251,8 @@ export interface ReceiptResponse {
   studentName: string;
   studentClass: string;
   studentCode: string;
-  semesterId: string;
-  courseIds: string[];
+  semesterId?: string;
+  courseOfferingIds: string[];
   cashierId: string;
 }
 
@@ -265,8 +265,8 @@ export interface UploadReceiptRequest {
   studentName: string;
   studentClass: string;
   studentCode: string;
-  semesterId: string;
-  courseIds: string[];
+  semesterId?: string;
+  courseOfferingIds: string[];
   cashierId: string;
 }
 
@@ -280,8 +280,8 @@ export interface UpdateReceiptRequest {
   studentName: string;
   studentCode: string;
   studentId: string;
-  semesterId: string;
-  courseIds: string[];
+  semesterId?: string;
+  courseOfferingIds: string[];
   cashierId: string;
 }
 

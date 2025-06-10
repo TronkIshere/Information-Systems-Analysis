@@ -36,10 +36,7 @@ import {
 } from "@/types/api";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {
-  useCourseOfferings,
-  useOpenCourseOfferings,
-} from "@/services/courseOffering";
+import { useOpenCourseOfferings } from "@/services/courseOffering";
 
 function RegisterCoursePage() {
   const { replace } = useAppRoute();
@@ -50,7 +47,7 @@ function RegisterCoursePage() {
   const [newReceipt, setNewReceipt] = useState<UploadReceiptRequest>({
     studentId: ClientSession.getUserId() || "",
     semesterId: "",
-    courseIds: [],
+    courseOfferingIds: [],
     studentName: "",
     studentClass: "",
     studentCode: "",
@@ -64,21 +61,21 @@ function RegisterCoursePage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const totalAmount = useMemo(() => {
-    if (!courseOfferings || newReceipt.courseIds.length === 0) return 0;
+    if (!courseOfferings || newReceipt.courseOfferingIds.length === 0) return 0;
 
-    return newReceipt.courseIds.reduce((sum, courseId) => {
+    return newReceipt.courseOfferingIds.reduce((sum, courseId) => {
       const course = courseOfferings.find((c) => c.id === courseId);
       return sum + (course ? course.credit * course.baseFeeCredit : 0);
     }, 0);
-  }, [newReceipt.courseIds, courseOfferings]);
+  }, [newReceipt.courseOfferingIds, courseOfferings]);
 
   const handleCourseSelect = (courseId: string) => {
     setNewReceipt((prev) => {
-      const newCourseIds = prev.courseIds.includes(courseId)
-        ? prev.courseIds.filter((id) => id !== courseId)
-        : [...prev.courseIds, courseId];
+      const newCourseOfferingIds = prev.courseOfferingIds.includes(courseId)
+        ? prev.courseOfferingIds.filter((id) => id !== courseId)
+        : [...prev.courseOfferingIds, courseId];
 
-      return { ...prev, courseIds: newCourseIds };
+      return { ...prev, courseOfferingIds: newCourseOfferingIds };
     });
   };
 
@@ -95,8 +92,8 @@ function RegisterCoursePage() {
   const handleSubmit = () => {
     if (
       !newReceipt.studentId ||
-      !newReceipt.semesterId ||
-      newReceipt.courseIds.length === 0
+      // !newReceipt.semesterId ||
+      newReceipt.courseOfferingIds.length === 0
     ) {
       UIHelper.showToast({
         message: "Vui lòng chọn học kỳ và ít nhất một môn học",
@@ -104,6 +101,8 @@ function RegisterCoursePage() {
       });
       return;
     }
+
+    console.log("Dữ liệu gửi lên backend:", { ...newReceipt, totalAmount });
 
     createReceipt(
       { ...newReceipt, totalAmount },
@@ -172,7 +171,7 @@ function RegisterCoursePage() {
 
   return (
     <Stack spacing={4} className="p-8 max-w-4xl mx-auto">
-      <Typography variant="h3" className="text-center">
+      <Typography variant="h4" className="text-center">
         Đăng ký môn học mới
       </Typography>
 
@@ -214,7 +213,7 @@ function RegisterCoursePage() {
         </Grid>
       </Paper>
 
-      <FormControl fullWidth>
+      {/* <FormControl fullWidth>
         <InputLabel>Chọn học kỳ</InputLabel>
         <Select
           name="semesterId"
@@ -228,7 +227,7 @@ function RegisterCoursePage() {
             </MenuItem>
           ))}
         </Select>
-      </FormControl>
+      </FormControl> */}
 
       <SearchInput onSearch={setSearchTerm} placeholder="Tìm kiếm môn học..." />
 
@@ -256,12 +255,14 @@ function RegisterCoursePage() {
                   <TableRow
                     key={courseOffering.id}
                     hover
-                    selected={newReceipt.courseIds.includes(courseOffering.id)}
+                    selected={newReceipt.courseOfferingIds.includes(
+                      courseOffering.id
+                    )}
                     onClick={() => handleCourseSelect(courseOffering.id)}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
-                        checked={newReceipt.courseIds.includes(
+                        checked={newReceipt.courseOfferingIds.includes(
                           courseOffering.id
                         )}
                       />
@@ -305,9 +306,7 @@ function RegisterCoursePage() {
                 className="whitespace-nowrap"
                 fullWidth
                 onClick={handleSubmit}
-                disabled={
-                  !newReceipt.semesterId || newReceipt.courseIds.length === 0
-                }
+                disabled={newReceipt.courseOfferingIds.length === 0}
               >
                 Xác nhận đăng ký
               </Button>
@@ -357,7 +356,7 @@ function ReceiptTemplate({
 }) {
   const semester = semesters?.find((s) => s.id === newReceipt.semesterId);
   const selectedCourseOfferings = courseOfferings?.filter((courseOffering) =>
-    newReceipt.courseIds.includes(courseOffering.id)
+    newReceipt.courseOfferingIds.includes(courseOffering.id)
   );
 
   const currentDate = new Date();

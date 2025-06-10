@@ -17,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.jpa.repository.query.JSqlParserUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,8 +41,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 	@Override
 	public ReceiptResponse createReceipt(UploadReceiptRequest request) {
 		Student student = findStudent(request.getStudentId());
-		Semester semester = findSemester(request.getSemesterId());
 		Set<CourseOffering> courseOfferings = findCourseOfferings(request.getCourseOfferingIds());
+
+		Semester semester = request.getSemesterId() == null
+				? findTopByOrderByStartDateDesc()
+				: findSemester(request.getSemesterId());
 
 		Cashier cashier = null;
 		if (request.getCashierId() != null)
@@ -64,6 +68,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 	private Semester findSemester(UUID id) {
 		return semesterRepository.findById(id)
+				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
+	}
+
+	private Semester findTopByOrderByStartDateDesc() {
+		return semesterRepository.findTopByOrderByStartDateDesc()
 				.orElseThrow(() -> new ApplicationException(ErrorCode.SEMESTER_NOT_FOUND));
 	}
 

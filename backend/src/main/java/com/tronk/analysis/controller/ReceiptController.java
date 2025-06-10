@@ -35,6 +35,7 @@ public class ReceiptController {
 	@PostMapping
 	public ResponseAPI<ReceiptResponse> createReceipt(
 			@RequestBody UploadReceiptRequest request) {
+		System.out.println("Testing");
 		var result = receiptService.createReceipt(request);
 		return ResponseAPI.<ReceiptResponse>builder()
 			.code(HttpStatus.OK.value())
