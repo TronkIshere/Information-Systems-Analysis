@@ -109,7 +109,6 @@ function RegisterCoursePage() {
         },
         onError: (error) => {
           const err = error as any;
-          // Kiểm tra cả response.data (nếu có) vì bạn đã gói error trong fetchApi
           const errorData = err?.response?.data || err;
           const errorCode = errorData.code;
           const errorMessage = errorData.message || "Đăng ký thất bại!";

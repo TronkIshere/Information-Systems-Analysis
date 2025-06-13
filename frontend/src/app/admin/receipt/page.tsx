@@ -5,6 +5,7 @@ import { SearchInput } from "@/components/ui/search/SearchInput";
 import CustomTable from "@/components/ui/table/CustomTable";
 import { useCashiers } from "@/services/cashier";
 import { useCourses } from "@/services/course";
+import { useCourseOfferings } from "@/services/courseOffering";
 import {
   useDeleteReceipt,
   useReceipts,
@@ -39,7 +40,7 @@ function ReceiptPage() {
   const { data: receipts, isLoading, error } = useReceipts();
   const { data: students } = useStudents();
   const { data: semesters } = useSemesters();
-  const { data: courses } = useCourses();
+  const { data: courseOfferings } = useCourseOfferings();
   const { data: cashiers } = useCashiers();
   const { mutate: updateReceipt } = useUpdateReceipt();
   const { mutate: createReceipt } = useCreateReceipt();
@@ -233,7 +234,7 @@ function ReceiptPage() {
                 paymentDate: null,
                 studentId: "",
                 semesterId: "",
-                courseIds: [],
+                courseOfferingIds: [],
                 studentName: "",
                 studentClass: "",
                 studentCode: "",
@@ -316,11 +317,15 @@ function ReceiptPage() {
 
               <Autocomplete
                 multiple
-                options={courses?.map((course) => course.id) || []}
-                getOptionLabel={(option) =>
-                  courses?.find((c) => c.id === option)?.name || ""
+                options={
+                  courseOfferings?.map((courseOffering) => courseOffering.id) ||
+                  []
                 }
-                value={selectedReceipt.courseIds}
+                getOptionLabel={(option) =>
+                  courseOfferings?.find((c) => c.id === option)?.courseName ||
+                  ""
+                }
+                value={selectedReceipt.courseOfferingIds}
                 onChange={handleCourseSelection}
                 renderInput={(params) => (
                   <TextField
@@ -330,15 +335,19 @@ function ReceiptPage() {
                   />
                 )}
                 renderOption={(props, option) => {
-                  const course = courses?.find((c) => c.id === option);
+                  const courseOffering = courseOfferings?.find(
+                    (c) => c.id === option
+                  );
                   return (
                     <li {...props}>
                       <Checkbox
-                        checked={selectedReceipt.courseIds.includes(option)}
+                        checked={selectedReceipt.courseOfferingIds.includes(
+                          option
+                        )}
                       />
                       <ListItemText
-                        primary={course?.name}
-                        secondary={`${course?.credit} tín chỉ`}
+                        primary={courseOffering?.courseId}
+                        secondary={`${courseOffering?.credit} tín chỉ`}
                       />
                     </li>
                   );
