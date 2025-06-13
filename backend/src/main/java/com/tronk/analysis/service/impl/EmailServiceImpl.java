@@ -1,6 +1,7 @@
 package com.tronk.analysis.service.impl;
 
 import com.tronk.analysis.entity.Course;
+import com.tronk.analysis.entity.CourseOffering;
 import com.tronk.analysis.entity.Receipt;
 import com.tronk.analysis.entity.Student;
 import com.tronk.analysis.exception.ApplicationException;
@@ -93,18 +94,19 @@ public class EmailServiceImpl implements EmailService {
         sb.append("+--------------------------------+------------+-----------------+\n");
 
         // Course items with detailed information
-//        for (Course course : receipt.getCourses()) {
-//            String courseName = course.getName();
-//            if (courseName.length() > 30) {
-//                courseName = courseName.substring(0, 27) + "...";
-//            }
-//            BigDecimal courseTotal = course.getBaseFeeCredit().multiply(BigDecimal.valueOf(course.getCredit()));
-//
-//            sb.append(String.format("| %-30s | %10d | %15s |\n",
-//                    courseName,
-//                    course.getCredit(),
-//                    formatCurrency(courseTotal)));
-//        }
+        for (CourseOffering courseOffering : receipt.getCourseOfferings()) {
+            String courseName = courseOffering.getCourse().getName();
+            if (courseName.length() > 30) {
+                courseName = courseName.substring(0, 27) + "...";
+            }
+            BigDecimal courseTotal = courseOffering.getCourse().getBaseFeeCredit()
+                    .multiply(BigDecimal.valueOf(courseOffering.getCourse().getCredit()));
+
+            sb.append(String.format("| %-30s | %10d | %15s |\n",
+                    courseName,
+                    courseOffering.getCourse().getCredit(),
+                    formatCurrency(courseTotal)));
+        }
         sb.append("+--------------------------------+------------+-----------------+\n");
 
         // Total amount section
