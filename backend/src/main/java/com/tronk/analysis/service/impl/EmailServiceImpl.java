@@ -121,7 +121,7 @@ public class EmailServiceImpl implements EmailService {
         sb.append("- ").append(receipt.getDescription()).append("\n\n");
         sb.append("=========================================================\n");
         sb.append("Cảm ơn quý khách đã sử dụng dịch vụ!\n");
-        sb.append("Mọi thắc mắc vui lòng liên hệ: 1900 9999\n");
+        sb.append("Mọi thắc mắc vui lòng liên hệ: 03529256696\n");
         sb.append("=========================================================\n");
 
         return sb.toString();

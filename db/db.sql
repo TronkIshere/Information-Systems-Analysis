@@ -34,7 +34,7 @@ SELECT * FROM lecturer;
 SELECT * FROM lecturer_course;
 SELECT * FROM receipt;
 SELECT * FROM semester;
-SELECT * FROM student;* 
+SELECT * FROM student;
 SELECT * FROM cashier;
 SELECT * FROM course_offering;
 SELECT * FROM student_course;
